@@ -34,18 +34,18 @@ namespace KidGame.Core
             _particleRootGO.transform.SetParent(transform);
         }
 
-        #region »ù´¡²¥·Å·½·¨
+        #region ä¸»è¦æ’­æ”¾æ–¹æ³•
 
         /// <summary>
-        /// ²¥·ÅÁ£×ÓÌØĞ§
+        /// æ’­æ”¾ç²’å­æ•ˆæœ
         /// </summary>
-        /// <param name="effectName">ÌØĞ§Ãû³Æ</param>
-        /// <param name="position">Éú³ÉÎ»ÖÃ</param>
-        /// <param name="rotation">Éú³ÉĞı×ª</param>
-        /// <param name="parent">¸¸ÎïÌå</param>
-        /// <param name="autoDestroy">ÊÇ·ñ×Ô¶¯Ïú»Ù</param>
-        /// <param name="destroyDelay">Ïú»ÙÑÓ³ÙÊ±¼ä</param>
-        /// <param name="scale">Ëõ·Å±ÈÀı</param>
+        /// <param name="effectName">æ•ˆæœåç§°</param>
+        /// <param name="position">ç”Ÿæˆä½ç½®</param>
+        /// <param name="rotation">ç”Ÿæˆæ—‹è½¬</param>
+        /// <param name="parent">çˆ¶èŠ‚ç‚¹</param>
+        /// <param name="autoDestroy">æ˜¯å¦è‡ªåŠ¨é”€æ¯</param>
+        /// <param name="destroyDelay">é”€æ¯å»¶è¿Ÿæ—¶é—´</param>
+        /// <param name="scale">ç¼©æ”¾æ¯”ä¾‹</param>
         public ParticleSystem PlayEffect(string effectName,
             Vector3 position,
             Quaternion rotation = default,
@@ -54,16 +54,16 @@ namespace KidGame.Core
             float destroyDelay = -1f,
             Vector3? scale = null)
         {
-            // ´Ó×ÊÔ´¼ÓÔØÁ£×ÓÌØĞ§
+            // æŸ¥æ‰¾é…ç½®æ•°æ®ä¸­çš„ç²’å­æ•ˆæœ
             ParticleData effectData = particleDatas.particleDataList.Find(x => x.effectName == effectName);
 
             if (effectData == null)
             {
-                Debug.LogWarning("Î´ÕÒµ½Á£×ÓÌØĞ§£º" + effectName);
+                Debug.LogWarning("æœªæ‰¾åˆ°æŒ‡å®šçš„ç²’å­æ•ˆæœï¼š" + effectName);
                 return null;
             }
 
-            // ´´½¨Á£×ÓÌØĞ§ÊµÀı
+            // åˆ›å»ºç²’å­æ•ˆæœå®ä¾‹
             GameObject effectGO = new GameObject(effectName);
             effectGO.transform.SetParent(parent != null ? parent : _particleRootGO.transform);
             effectGO.transform.position = position;
@@ -77,7 +77,7 @@ namespace KidGame.Core
             GameObject prefab = Resources.Load<GameObject>(effectData.effectPath);
             if (prefab == null)
             {
-                Debug.LogWarning($"Á£×ÓÌØĞ§Ô¤ÖÆÌå¼ÓÔØÊ§°Ü£º{effectData.effectPath}");
+                Debug.LogWarning($"ç²’å­æ•ˆæœé¢„åˆ¶ä»¶åŠ è½½å¤±è´¥ï¼š{effectData.effectPath}");
                 Destroy(effectGO);
                 return null;
             }
@@ -108,59 +108,20 @@ namespace KidGame.Core
         }
 
         #endregion
-
-        #region ÖØÔØ
-
-        // ÖØÔØ1£º½öĞèÌØĞ§Ãû³ÆºÍÎ»ÖÃ
-        public ParticleSystem PlayEffect(string effectName, Vector3 position)
-        {
-            return PlayEffect(effectName, position, default, null, true, -1f, null);
-        }
-
-        // ÖØÔØ2£ºÖ¸¶¨Î»ÖÃºÍĞı×ª
-        public ParticleSystem PlayEffect(string effectName, Vector3 position, Quaternion rotation)
-        {
-            return PlayEffect(effectName, position, rotation, null, true, -1f, null);
-        }
-
-        // ÖØÔØ3£ºÖ¸¶¨¸¸ÎïÌå
-        public ParticleSystem PlayEffect(string effectName, Vector3 position, Transform parent)
-        {
-            return PlayEffect(effectName, position, default, parent, true, -1f, null);
-        }
-
-        // ÖØÔØ4£ºÍêÈ«×Ô¶¨Òå²ÎÊı
-        public ParticleSystem PlayEffect(string effectName,
-            Vector3 position,
-            Quaternion rotation,
-            Transform parent,
-            bool autoDestroy,
-            float destroyDelay)
-        {
-            return PlayEffect(effectName, position, rotation, parent, autoDestroy, destroyDelay, null);
-        }
-
-        // ÖØÔØ5£º×Ô¶¨ÒåËõ·Å
-        public ParticleSystem PlayEffect(string effectName, Vector3 position, Vector3 scale)
-        {
-            return PlayEffect(effectName, position, default, null, true, -1f, scale);
-        }
-
-        #endregion
-
-        #region ÌØĞ§¿ØÖÆ
+        
+        #region æ•ˆæœç®¡ç†
 
         /// <summary>
-        /// Í£Ö¹Á£×ÓÌØĞ§
+        /// åœæ­¢æŒ‡å®šç²’å­æ•ˆæœ
         /// </summary>
-        /// <param name="effectName">ÌØĞ§Ãû³Æ</param>
-        /// <param name="immediate">ÊÇ·ñÁ¢¼´Ïú»Ù</param>
+        /// <param name="effectName">æ•ˆæœåç§°</param>
+        /// <param name="immediate">æ˜¯å¦ç«‹å³é”€æ¯</param>
         public void StopEffect(string effectName, bool immediate = false)
         {
             ParticleInfo info = activeParticleEffects.Find(x => x.effectName == effectName);
             if (info == null)
             {
-                Debug.LogWarning("Î´ÕÒµ½»îÔ¾µÄÁ£×ÓÌØĞ§£º" + effectName);
+                Debug.LogWarning("æœªæ‰¾åˆ°æ´»è·ƒçš„ç²’å­æ•ˆæœï¼š" + effectName);
                 return;
             }
 
@@ -180,63 +141,19 @@ namespace KidGame.Core
                 StartCoroutine(AutoDestroyEffect(info, info.particleSystem.main.duration));
             }
         }
-
-        /// <summary>
-        /// ÔİÍ£Á£×ÓÌØĞ§
-        /// </summary>
-        /// <param name="effectName">ÌØĞ§Ãû³Æ</param>
-        public void PauseEffect(string effectName)
-        {
-            ParticleInfo info = activeParticleEffects.Find(x => x.effectName == effectName);
-            if (info == null)
-            {
-                Debug.LogWarning("Î´ÕÒµ½»îÔ¾µÄÁ£×ÓÌØĞ§£º" + effectName);
-                return;
-            }
-
-            info.particleSystem.Pause();
-        }
-
-        /// <summary>
-        /// »Ö¸´²¥·ÅÁ£×ÓÌØĞ§
-        /// </summary>
-        /// <param name="effectName">ÌØĞ§Ãû³Æ</param>
-        public void ResumeEffect(string effectName)
-        {
-            ParticleInfo info = activeParticleEffects.Find(x => x.effectName == effectName);
-            if (info == null)
-            {
-                Debug.LogWarning("Î´ÕÒµ½»îÔ¾µÄÁ£×ÓÌØĞ§£º" + effectName);
-                return;
-            }
-
-            info.particleSystem.Play();
-        }
-
-        /// <summary>
-        /// Í£Ö¹ËùÓĞÁ£×ÓÌØĞ§
-        /// </summary>
-        /// <param name="immediate">ÊÇ·ñÁ¢¼´Ïú»Ù</param>
-        public void StopAllEffects(bool immediate = false)
-        {
-            foreach (var info in activeParticleEffects.ToArray())
-            {
-                StopEffect(info.effectName, immediate);
-            }
-        }
-
+        
         #endregion
 
-        #region ¸¨Öú·½·¨
+        #region åç¨‹æ–¹æ³•
 
         /// <summary>
-        /// ×Ô¶¯Ïú»ÙÁ£×ÓÌØĞ§
+        /// è‡ªåŠ¨é”€æ¯ç²’å­æ•ˆæœ
         /// </summary>
         private IEnumerator AutoDestroyEffect(ParticleInfo info, float delay)
         {
             yield return new WaitForSeconds(delay);
 
-            if (info.particleSystem != null)
+            if (info.particleSystem != null && info.particleSystem.transform.parent != null)
             {
                 Destroy(info.particleSystem.transform.parent.gameObject);
             }

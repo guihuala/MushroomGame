@@ -2,21 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class TipsController : Singleton<TipsController>
 {
-    [Header("UI Elements")] public GameObject tipTextPrefab;
-    public GameObject tipIconPrefab;
-    public GameObject tipTextAndIconPrefab;
+    [Header("UI Elements")] 
+    public GameObject tipTextPrefab;
 
-    [Header("References")] public Canvas uiCanvas;
+    [Header("References")] 
+    public Canvas uiCanvas;
 
-    [Header("Z-Order")] public bool alwaysOnTop = true;
+    [Header("Z-Order")] 
+    public bool alwaysOnTop = true;
 
+    [Header("Animation Settings")]
+    public float fadeInDuration = 0.2f;
+    public float fadeOutDuration = 0.15f;
+    public float scaleFrom = 0.8f;
+    
     private GameObject currentTip;
     private bool _followCursor;
     private Vector2 _screenOffset;
     private Coroutine fadeCoroutine;
+    private Sequence currentAnimation;
 
     private Camera UICamera => uiCanvas != null ? uiCanvas.worldCamera : null;
 
@@ -29,23 +37,7 @@ public class TipsController : Singleton<TipsController>
             txt.text = message;
         }
     }
-
-    public void ShowIconTip(Sprite icon, Vector3 screenPosition, bool followCursor = true)
-    {
-        SpawnAndCommonSetup(tipIconPrefab, screenPosition, followCursor);
-        var img = currentTip.GetComponentInChildren<Image>(true);
-        if (img) img.sprite = icon;
-    }
-
-    public void ShowTextAndIconTip(string message, Sprite icon, Vector3 screenPosition, bool followCursor = true)
-    {
-        SpawnAndCommonSetup(tipTextAndIconPrefab, screenPosition, followCursor);
-        var img = currentTip.GetComponentInChildren<Image>(true);
-        if (img) img.sprite = icon;
-        var txt = currentTip.GetComponentInChildren<Text>(true);
-        if (txt) txt.text = message;
-    }
-
+    
     private void SpawnAndCommonSetup(GameObject prefab, Vector3 screenPosition, bool followCursor)
     {
         if (!uiCanvas)
@@ -54,8 +46,18 @@ public class TipsController : Singleton<TipsController>
             return;
         }
 
+        // 停止所有正在进行的动画
+        if (currentAnimation != null && currentAnimation.IsActive())
+        {
+            currentAnimation.Kill();
+        }
+        
+        if (fadeCoroutine != null) 
+            StopCoroutine(fadeCoroutine);
+
+        // 如果已有提示，先立即隐藏
         if (currentTip != null)
-            Destroy(currentTip);
+            DestroyImmediate(currentTip);
 
         currentTip = Instantiate(prefab, uiCanvas.transform);
         if (alwaysOnTop) currentTip.transform.SetAsLastSibling();
@@ -65,8 +67,8 @@ public class TipsController : Singleton<TipsController>
         AutoAdjustOffset(screenPosition);
         UpdateTipPositionByScreen(screenPosition);
 
-        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
-        fadeCoroutine = StartCoroutine(FadeIn(currentTip));
+        // 使用 DOTween 替代协程动画
+        FadeIn(currentTip);
     }
 
     private void AutoAdjustOffset(Vector3 screenPos)
@@ -127,15 +129,23 @@ public class TipsController : Singleton<TipsController>
     {
         if (currentTip != null)
         {
-            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
-            fadeCoroutine = StartCoroutine(FadeOutAndDestroy(currentTip));
+            // 停止所有正在进行的动画
+            if (currentAnimation != null && currentAnimation.IsActive())
+            {
+                currentAnimation.Kill();
+            }
+            
+            if (fadeCoroutine != null) 
+                StopCoroutine(fadeCoroutine);
+                
+            FadeOutAndDestroy(currentTip);
             currentTip = null;
         }
     }
 
     #region 动画
 
-    private IEnumerator FadeIn(GameObject tip)
+    private void FadeIn(GameObject tip)
     {
         var cg = tip.GetComponent<CanvasGroup>();
         if (!cg) cg = tip.AddComponent<CanvasGroup>();
@@ -143,44 +153,41 @@ public class TipsController : Singleton<TipsController>
         var rt = tip.GetComponent<RectTransform>();
 
         cg.alpha = 0f;
-        rt.localScale = Vector3.one * 0.8f;
+        rt.localScale = Vector3.one * scaleFrom;
 
-        float t = 0f;
-        while (t < 0.2f)
-        {
-            t += Time.deltaTime;
-            float progress = t / 0.2f;
-
-            cg.alpha = Mathf.Lerp(0f, 1f, progress);
-            rt.localScale = Vector3.Lerp(Vector3.one * 0.8f, Vector3.one, progress);
-
-            yield return null;
-        }
-
-        cg.alpha = 1f;
-        rt.localScale = Vector3.one;
+        // 使用 DOTween 创建动画序列
+        currentAnimation = DOTween.Sequence();
+        currentAnimation.SetUpdate(UpdateType.Normal, true); // 不受时间缩放影响
+        
+        // 添加淡入和缩放动画
+        currentAnimation.Join(cg.DOFade(1f, fadeInDuration).SetEase(Ease.OutQuad));
+        currentAnimation.Join(rt.DOScale(Vector3.one, fadeInDuration).SetEase(Ease.OutBack));
+        
+        currentAnimation.OnComplete(() => {
+            currentAnimation = null;
+        });
     }
 
-    private IEnumerator FadeOutAndDestroy(GameObject tip)
+    private void FadeOutAndDestroy(GameObject tip)
     {
         var cg = tip.GetComponent<CanvasGroup>();
         if (!cg) cg = tip.AddComponent<CanvasGroup>();
 
         var rt = tip.GetComponent<RectTransform>();
 
-        float t = 0f;
-        while (t < 0.15f)
-        {
-            t += Time.deltaTime;
-            float progress = t / 0.15f;
-
-            cg.alpha = Mathf.Lerp(1f, 0f, progress);
-            rt.localScale = Vector3.Lerp(Vector3.one, Vector3.one * 0.8f, progress);
-
-            yield return null;
-        }
-
-        Destroy(tip);
+        // 使用 DOTween 创建动画序列
+        currentAnimation = DOTween.Sequence();
+        currentAnimation.SetUpdate(UpdateType.Normal, true); // 不受时间缩放影响
+        
+        // 添加淡出和缩放动画
+        currentAnimation.Join(cg.DOFade(0f, fadeOutDuration).SetEase(Ease.InQuad));
+        currentAnimation.Join(rt.DOScale(Vector3.one * scaleFrom, fadeOutDuration).SetEase(Ease.InBack));
+        
+        currentAnimation.OnComplete(() => {
+            if (tip != null)
+                Destroy(tip);
+            currentAnimation = null;
+        });
     }
 
     #endregion

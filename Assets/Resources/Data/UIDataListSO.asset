@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b60abcc9a1fbf4a239349beb709d1785, type: 3}
   m_Name: UIDataListSO
   m_EditorClassIdentifier: 
-  uiDataList: []
+  uiDataList:
+  - uiName: SettingPanel
+    uiPath: Panel/SettingPanel

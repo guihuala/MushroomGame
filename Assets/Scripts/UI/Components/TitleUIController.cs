@@ -22,11 +22,15 @@ public class TitleUIController : MonoBehaviour
 
     public void OnSettingsButtonClicked()
     {
-        
+        UIManager.Instance.OpenPanel("SettingsPanel");
     }
 
     public void OnExitButtonClicked()
     {
-        
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

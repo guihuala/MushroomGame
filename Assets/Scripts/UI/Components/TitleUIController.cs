@@ -22,7 +22,7 @@ public class TitleUIController : MonoBehaviour
 
     public void OnSettingsButtonClicked()
     {
-        UIManager.Instance.OpenPanel("SettingsPanel");
+        UIManager.Instance.OpenPanel("SettingPanel");
     }
 
     public void OnExitButtonClicked()

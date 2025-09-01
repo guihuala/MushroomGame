@@ -69,7 +69,6 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     private Color originalColor;
     
     private Image buttonImage;
-    private Text buttonText;
     private Sequence hoverSequence;
     private Sequence clickSequence;
 
@@ -82,7 +81,6 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         
         // 获取UI组件
         buttonImage = GetComponent<Image>();
-        buttonText = GetComponentInChildren<Text>();
         
         if (buttonImage != null)
         {
@@ -194,12 +192,6 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
             buttonImage.DOColor(targetColor, animationDuration)
                        .SetEase(easeType);
         }
-        
-        if (buttonText != null)
-        {
-            buttonText.DOColor(targetColor, animationDuration)
-                      .SetEase(easeType);
-        }
     }
 
     private void PlayCombinedHoverAnimation()
@@ -250,12 +242,6 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
             buttonImage.DOColor(originalColor, animationDuration)
                        .SetEase(easeType);
         }
-        
-        if (buttonText != null)
-        {
-            buttonText.DOColor(originalColor, animationDuration)
-                      .SetEase(easeType);
-        }
     }
     #endregion
 
@@ -264,7 +250,6 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         transform.DOKill();
         
         if (buttonImage != null) buttonImage.DOKill();
-        if (buttonText != null) buttonText.DOKill();
         
         if (hoverSequence != null) hoverSequence.Kill();
         if (clickSequence != null) clickSequence.Kill();
@@ -283,6 +268,5 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         transform.rotation = originalRotation;
         
         if (buttonImage != null) buttonImage.color = originalColor;
-        if (buttonText != null) buttonText.color = originalColor;
     }
 }

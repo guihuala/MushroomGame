@@ -43,7 +43,6 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         HandleKeyboardMovement();
-        HandleEdgeScrolling();
         HandleMouseDrag();
         HandleZoom();
         
@@ -66,33 +65,7 @@ public class CameraController : MonoBehaviour
             _targetPosition += movement;
         }
     }
-
-    /// <summary>
-    /// 处理边缘滚动
-    /// </summary>
-    private void HandleEdgeScrolling()
-    {
-        if (!edgeScrolling) return;
-        
-        Vector3 movement = Vector3.zero;
-        Vector2 mousePosition = Input.mousePosition;
-        
-        // 检查屏幕边缘
-        if (mousePosition.x < edgeThreshold)
-            movement.x -= 1f;
-        if (mousePosition.x > Screen.width - edgeThreshold)
-            movement.x += 1f;
-        if (mousePosition.y < edgeThreshold)
-            movement.y -= 1f;
-        if (mousePosition.y > Screen.height - edgeThreshold)
-            movement.y += 1f;
-        
-        if (movement != Vector3.zero)
-        {
-            movement = movement.normalized * moveSpeed * Time.deltaTime;
-            _targetPosition += movement;
-        }
-    }
+    
 
     /// <summary>
     /// 处理鼠标拖拽
@@ -117,18 +90,6 @@ public class CameraController : MonoBehaviour
         {
             Vector3 difference = _dragOrigin - GetMouseWorldPosition();
             _targetPosition += difference;
-        }
-        
-        // 右键拖拽（可选）
-        if (Input.GetMouseButtonDown(1))
-        {
-            _dragOrigin = GetMouseWorldPosition();
-            _isDragging = true;
-        }
-        
-        if (Input.GetMouseButtonUp(1))
-        {
-            _isDragging = false;
         }
     }
 

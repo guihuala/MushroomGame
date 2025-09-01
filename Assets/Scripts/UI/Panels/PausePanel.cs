@@ -1,15 +1,16 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class SettingsPanel : BasePanel
+public class PausePanel : BasePanel
 {
     [Header("组件配置")]
     public Slider bgmVolumeSlider;
     public Slider sfxVolumeSlider;
     
-    public Button backButton;
-    public Button resetButton;
+    public Button resumeButton;
+    public Button mainmenuButton;
 
     private void Start()
     {
@@ -19,10 +20,14 @@ public class SettingsPanel : BasePanel
         bgmVolumeSlider.onValueChanged.AddListener(ChangeBgmVolume);
         sfxVolumeSlider.onValueChanged.AddListener(ChangeSfxVolume);
 
-        backButton.onClick.AddListener(SaveSettings);
-        resetButton.onClick.AddListener(ResetSettings);
+        resumeButton.onClick.AddListener(OnResumeButtonClick);
+        mainmenuButton.onClick.AddListener(OnMainmenuButtonClick);
+        
+        GameManager.Instance.PauseGame();
     }
-    
+
+    #region 音量设置
+
     private void ChangeMainVolume(float value)
     {
         AudioManager.Instance.ChangeMainVolume(value);
@@ -44,18 +49,22 @@ public class SettingsPanel : BasePanel
         PlayerPrefs.SetFloat("BgmVolumeFactor", AudioManager.Instance.bgmVolumeFactor);
         PlayerPrefs.SetFloat("SfxVolumeFactor", AudioManager.Instance.sfxVolumeFactor);
         PlayerPrefs.Save();
-
-        UIManager.Instance.ClosePanel(panelName);
+        
         Debug.Log("Settings Saved!");
     }
-    
-    private void ResetSettings()
+
+    #endregion
+
+    private void OnMainmenuButtonClick()
     {
-        bgmVolumeSlider.value = 0.8f;
-        sfxVolumeSlider.value = 0.8f;
-        
-        ChangeMainVolume(1f);
-        ChangeBgmVolume(0.8f);
-        ChangeSfxVolume(0.8f);
+        SaveSettings();
+        GameManager.Instance.ReturnToMainMenu();
+    }
+
+    private void OnResumeButtonClick()
+    {
+        SaveSettings();
+        GameManager.Instance.ResumeGame();
+        UIManager.Instance.ClosePanel(panelName);
     }
 }

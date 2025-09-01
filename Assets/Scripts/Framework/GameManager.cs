@@ -75,7 +75,7 @@ public class GameManager : Singleton<GameManager>
     // 返回主菜单
     public void ReturnToMainMenu()
     {
-        SetGameState(GameState.GameOver);
+        SetGameState(GameState.Playing);
         SceneLoader.Instance.LoadScene(GameScene.MainMenu);
     }
 

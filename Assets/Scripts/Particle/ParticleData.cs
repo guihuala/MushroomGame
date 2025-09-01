@@ -4,11 +4,8 @@ using UnityEngine;
 using System;
 
 
-namespace KidGame.Core
+[CreateAssetMenu(fileName = "New ParticleDataListSO", menuName = "CustomizedSO/ParticleDataListSO")]
+public class ParticleDatas : ScriptableObject
 {
-    [CreateAssetMenu(fileName = "New ParticleDataListSO", menuName = "CustomizedSO/ParticleDataListSO")]
-    public class ParticleDatas : ScriptableObject
-    {
-        public List<ParticleData> particleDataList;
-    }
+    public List<ParticleData> particleDataList;
 }

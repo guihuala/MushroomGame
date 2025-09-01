@@ -10,7 +10,7 @@ public enum GameScene
     Gameplay = 1,   // 游戏场景
 }
 
-public class SceneLoader : Singleton<SceneLoader>
+public class SceneLoader : SingletonPersistent<SceneLoader>
 {
     [Header("加载界面设置")]
     [SerializeField] private CanvasGroup loadingCanvas;

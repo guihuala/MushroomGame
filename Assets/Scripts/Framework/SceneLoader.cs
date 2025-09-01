@@ -6,9 +6,8 @@ using System;
 
 public enum GameScene
 {
-    Splash = 0,     // 启动场景
-    MainMenu = 1,   // 主菜单
-    Gameplay = 2,   // 游戏场景
+    MainMenu = 0,   // 主菜单
+    Gameplay = 1,   // 游戏场景
 }
 
 public class SceneLoader : Singleton<SceneLoader>
@@ -17,7 +16,6 @@ public class SceneLoader : Singleton<SceneLoader>
     [SerializeField] private CanvasGroup loadingCanvas;
     [SerializeField] private Image progressBar;
     [SerializeField] private Text progressText;
-    [SerializeField] private Text tipText;
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float minLoadingTime = 1.5f;
 

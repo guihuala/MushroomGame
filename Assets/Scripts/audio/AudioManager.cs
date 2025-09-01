@@ -3,73 +3,85 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 [Serializable]
 public class AudioInfo
 {
     public string audioName;
-
     public AudioSource audioSource;
 }
+
 public class AudioManager : SingletonPersistent<AudioManager>
 {
-    // ±£´æËùÓĞBGMµÄÒôÆµĞÅÏ¢
+    // å­˜å‚¨æ‰€æœ‰BGMçš„éŸ³é¢‘ä¿¡æ¯
     public List<AudioInfo> bgmAudioInfoList;
 
-    // ±£´æËùÓĞSFXµÄÒôÆµĞÅÏ¢
+    // å­˜å‚¨æ‰€æœ‰SFXçš„éŸ³é¢‘ä¿¡æ¯
     public List<AudioInfo> sfxAudioInfoList;
 
-    // ÒôÆµ¹ÜÀíµÄÈ«¾ÖÒôÁ¿
+    // éŸ³é‡æ§åˆ¶å…¨å±€éŸ³é‡
     public float mainVolume;
 
-    // BGMµÄÒôÁ¿Òò×Ó£¬×îÖÕÒôÁ¿ = mainVolume * bgmVolumeFactor
+    // BGMéŸ³é‡å› å­ï¼Œå®é™…éŸ³é‡ = mainVolume * bgmVolumeFactor
     public float bgmVolumeFactor;
 
-    // SFXµÄÒôÁ¿Òò×Ó£¬×îÖÕÒôÁ¿ = mainVolume * sfxVolumeFactor
+    // SFXéŸ³é‡å› å­ï¼Œå®é™…éŸ³é‡ = mainVolume * sfxVolumeFactor
     public float sfxVolumeFactor;
 
-    // ±£´æÒôÆµÊı¾İµÄ×ÊÔ´
+    // éŸ³é¢‘èµ„æºçš„æ ¹èŠ‚ç‚¹
     public AudioDatas audioDatas;
 
     private GameObject _bgmSourcesRootGO;
-
     private GameObject _sfxSourcesRootGO;
 
+    // å¼•ç”¨AudioMixer
+    public AudioMixer audioMixer;
+
+    // æš´éœ²å‚æ•°åç§°
+    private const string BGM_VOLUME_PARAM = "BGM";
+    private const string SFX_VOLUME_PARAM = "Sfx";
+    
     protected override void Awake()
     {
         base.Awake();
 
-        // ´´½¨BGMºÍSFXµÄAudioSource¸¸¼¶ÈİÆ÷
+        // åˆ›å»ºBGMå’ŒSFXçš„AudioSourceæ ¹èŠ‚ç‚¹
         _bgmSourcesRootGO = new GameObject("BGM_ROOT");
-
         _sfxSourcesRootGO = new GameObject("SFX_ROOT");
 
         _bgmSourcesRootGO.transform.SetParent(transform);
-
         _sfxSourcesRootGO.transform.SetParent(transform);
+
+        // åŠ è½½å­˜å‚¨çš„éŸ³é‡è®¾ç½®
+        mainVolume = PlayerPrefs.GetFloat("MainVolume", 1f);
+        bgmVolumeFactor = PlayerPrefs.GetFloat("BgmVolumeFactor", .8f);
+        sfxVolumeFactor = PlayerPrefs.GetFloat("SfxVolumeFactor", .8f);
     }
 
+    private void Start()
+    {
+        // åˆå§‹åŒ–AudioMixerçš„éŸ³é‡
+        ChangeBgmVolume(bgmVolumeFactor);
+        ChangeSfxVolume(sfxVolumeFactor);
+    }
+
+
     /// <summary>
-    /// ²¥·ÅBGM
+    /// æ’­æ”¾BGM
     /// </summary>
-    /// <param name="fadeInMusicName">ĞèÒªµ­ÈëµÄÒôÀÖÃû³Æ</param>
-    /// <param name="fadeOutMusicName">ĞèÒªµ­³öµÄÒôÀÖÃû³Æ£¬Ä¬ÈÏÖµÎª¿Õ×Ö·û´®</param>
-    /// <param name="fadeInDuration">µ­Èë³ÖĞøÊ±¼ä</param>
-    /// <param name="fadeOutDuration">µ­³ö³ÖĞøÊ±¼ä</param>
-    /// <param name="loop">ÊÇ·ñÑ­»·²¥·Å</param>
     public void PlayBgm(string fadeInMusicName, string fadeOutMusicName = "", float fadeInDuration = 0.5f, float fadeOutDuration = 0.5f, bool loop = true)
     {
-        // ´´½¨DoTweenĞòÁĞ£¬ÓÃÓÚ²¥·Å¹ı¶É¶¯»­
         Sequence s = DOTween.Sequence();
 
-        // Èç¹ûĞèÒªµ­³öÄ³¸öBGM
+        // å¦‚æœéœ€è¦æ·¡å‡ºæŸä¸ªBGM
         if (fadeOutMusicName != "")
         {
             AudioInfo fadeOutInfo = bgmAudioInfoList.Find(x => x.audioName == fadeOutMusicName);
 
             if (fadeOutInfo == null)
             {
-                Debug.LogWarning("µ±Ç°Î´¼ÓÔØ" + fadeOutMusicName + ",ÎŞ·¨½øĞĞµ­³ö²Ù×÷");
+                Debug.LogWarning("æœªæ‰¾åˆ°BGMï¼š" + fadeOutMusicName);
                 return;
             }
 
@@ -79,7 +91,7 @@ public class AudioManager : SingletonPersistent<AudioManager>
             }));
         }
 
-        // Èç¹ûĞèÒª²¥·ÅµÄÒôÀÖÒÑ¾­´æÔÚ£¬ÔòÖ±½Ó»Ö¸´²¥·Å
+        // æ£€æŸ¥æ˜¯å¦å·²å­˜åœ¨éœ€è¦æ’­æ”¾çš„BGM
         AudioInfo audioInfo = bgmAudioInfoList.Find(x => x.audioName == fadeInMusicName);
 
         if (audioInfo != null)
@@ -88,65 +100,57 @@ public class AudioManager : SingletonPersistent<AudioManager>
             {
                 audioInfo.audioSource.Play();
             }));
-
             return;
         }
 
-        // ´Ó×ÊÔ´ÖĞ²éÕÒĞèÒª²¥·ÅµÄÒôÀÖÊı¾İ
+        // ä»èµ„æºåŠ è½½å¹¶æ’­æ”¾æ–°çš„BGM
         AudioData fadeInData = audioDatas.audioDataList.Find(x => x.audioName == fadeInMusicName);
 
         if (fadeInData == null)
         {
-            Debug.LogWarning("ÒôÆµ×ÊÔ´SOÖĞÎ´ÕÒµ½Ãû³ÆÎª" + fadeInMusicName + "µÄÒôÆµÊı¾İ");
+            Debug.LogWarning("æœªæ‰¾åˆ°BGMï¼š" + fadeInMusicName);
             return;
         }
 
-        // ¶¯Ì¬´´½¨Ò»¸öGameObject²¢Ìí¼ÓAudioSource£¬¼ÓÔØÒôÆµ×ÊÔ´
         GameObject fadeInAudioGO = new GameObject(fadeInMusicName);
-
         fadeInAudioGO.transform.SetParent(_bgmSourcesRootGO.transform);
 
         AudioSource fadeInAudioSource = fadeInAudioGO.AddComponent<AudioSource>();
-
         fadeInAudioSource.clip = Resources.Load<AudioClip>(fadeInData.audioPath);
-
         fadeInAudioSource.loop = loop;
-
-        // ÉèÖÃÒôĞ§µÄÒôÁ¿
-        fadeInAudioSource.volume = mainVolume * bgmVolumeFactor;
-
-        fadeInAudioSource.Play();
+        fadeInAudioSource.volume = fadeInDuration > 0 ? 0 : mainVolume * bgmVolumeFactor;
         
+        fadeInAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Master")[1]; // è®¾ç½®ä¸ºéŸ³é¢‘æ··åˆå™¨çš„ "Master" ç»„ï¼Œç¡®ä¿åº”ç”¨éŸ³é‡æ§åˆ¶
+        
+        fadeInAudioSource.Play();
+
         if (fadeInDuration > 0)
         {
-            fadeInAudioSource.volume = 0;
             s.Append(fadeInAudioSource.DOFade(mainVolume * bgmVolumeFactor, fadeInDuration));
         }
-        AudioInfo info = new AudioInfo();
 
-        // ½«ĞÂ´´½¨µÄBGMĞÅÏ¢Ìí¼Óµ½ÁĞ±í
-        info.audioName = fadeInMusicName;
-
-        info.audioSource = fadeInAudioSource;
+        AudioInfo info = new AudioInfo
+        {
+            audioName = fadeInMusicName,
+            audioSource = fadeInAudioSource
+        };
 
         bgmAudioInfoList.Add(info);
-
         StartCoroutine(DetectingAudioPlayState(info, true));
     }
-
-
+    
     /// <summary>
-    /// ÔİÍ£BGM
+    /// æš‚åœBGM
     /// </summary>
-    /// <param name="pauseBgmName">ĞèÒªÔİÍ£µÄBGMÃû³Æ</param>
-    /// <param name="fadeOutDuration">µ­³ö³ÖĞøÊ±¼ä</param>
+    /// <param name="pauseBgmName">è¦æš‚åœçš„ç‰‡æ®µåç§°</param>
+    /// <param name="fadeOutDuration">æ·¡å‡ºé—´éš”</param>
     public void PauseBgm(string pauseBgmName, float fadeOutDuration = 0.5f)
     {
         AudioInfo audioInfo = bgmAudioInfoList.Find(x => x.audioName == pauseBgmName);
 
         if (audioInfo == null)
         {
-            Debug.LogWarning("µ±Ç°Î´¼ÓÔØ" + pauseBgmName + ",ÎŞ·¨½øĞĞÍ£Ö¹²Ù×÷");
+            Debug.LogWarning("æœªæ‰¾åˆ°BGMï¼š" + pauseBgmName);
             return;
         }
 
@@ -160,17 +164,17 @@ public class AudioManager : SingletonPersistent<AudioManager>
 
 
     /// <summary>
-    /// Í£Ö¹BGM
+    /// åœæ­¢BGM
     /// </summary>
-    /// <param name="stopBgmName">ĞèÒªÍ£Ö¹µÄBGMÃû³Æ</param>
-    /// <param name="fadeOutDuration">µ­³ö³ÖĞøÊ±¼ä</param>
+    /// <param name="stopBgmName">è¦åœæ­¢çš„ç‰‡æ®µåç§°</param>
+    /// <param name="fadeOutDuration">æ·¡å‡ºé—´éš”</param>
     public void StopBgm(string stopBgmName, float fadeOutDuration = 0.5f)
     {
         AudioInfo audioInfo = bgmAudioInfoList.Find(x => x.audioName == stopBgmName);
 
         if (audioInfo == null)
         {
-            Debug.LogWarning("µ±Ç°Î´¼ÓÔØ" + stopBgmName + ",ÎŞ·¨½øĞĞÍ£Ö¹²Ù×÷");
+            Debug.LogWarning("æœªæ‰¾åˆ°BGMï¼š" +  stopBgmName);
             return;
         }
 
@@ -188,12 +192,11 @@ public class AudioManager : SingletonPersistent<AudioManager>
     }
     
     /// <summary>
-    /// Í£Ö¹ËùÓĞÒôÀÖ
+    /// åœæ­¢æ’­æ”¾æ‰€æœ‰BGM
     /// </summary>
-    /// <param name="fadeOutDuration">µ­³ö³ÖĞøÊ±¼ä</param>
+    /// <param name="fadeOutDuration">æ·¡å‡ºé—´éš”</param>
     public void StopAllBGM(float fadeOutDuration = 0.5f)
     {
-        // Í£Ö¹ËùÓĞ BGM
         foreach (var bgmInfo in bgmAudioInfoList.ToArray())
         {
             StopBgm(bgmInfo.audioName, fadeOutDuration);
@@ -201,92 +204,72 @@ public class AudioManager : SingletonPersistent<AudioManager>
         StopAllCoroutines();
     }
 
-
-
     /// <summary>
-    /// ²¥·ÅÒôĞ§
+    /// æ’­æ”¾éŸ³æ•ˆ
     /// </summary>
-    /// <param name="sfxName">ĞèÒª²¥·ÅµÄÒôĞ§Ãû³Æ</param>
-    /// <param name="fadeInDuration">ÒôĞ§µ­ÈëÊ±¼ä</param>
-    /// <param name="loop">ÊÇ·ñÑ­»·²¥·Å</param>
-    public void PlaySfx(string sfxName, float fadeInDuration = 0, bool loop = false)
+    /// <param name="sfxName">è¦æ’­æ”¾çš„éŸ³æ•ˆç‰‡æ®µåç§°</param>
+    /// <param name="loop">æ˜¯å¦å¾ªç¯</param>
+    public void PlaySfx(string sfxName, bool loop = false)
     {
         Sequence s = DOTween.Sequence();
 
-        // ´Ó×ÊÔ´ÖĞ²éÕÒĞèÒª²¥·ÅµÄÒôĞ§Êı¾İ
+        // ä»éŸ³é¢‘åˆ—è¡¨ä¸­å¯»æ‰¾
         AudioData sfxData = audioDatas.audioDataList.Find(x => x.audioName == sfxName);
 
         if (sfxData == null)
         {
-            Debug.LogWarning("ÒôÆµ×ÊÔ´SOÖĞÎ´ÕÒµ½Ãû³ÆÎª" + sfxName + "µÄÒôÆµÊı¾İ");
+            Debug.LogWarning("æœªæ‰¾åˆ°sfxï¼š" + sfxName);
             return;
         }
 
-
-        // ¶¯Ì¬´´½¨Ò»¸öGameObject²¢Ìí¼ÓAudioSource£¬¼ÓÔØÒôĞ§×ÊÔ´
+        // åˆ›å»ºéŸ³é¢‘æ’­æ”¾å™¨
         GameObject sfxAudioGO = new GameObject(sfxName);
-
         sfxAudioGO.transform.SetParent(_sfxSourcesRootGO.transform);
 
         AudioSource sfxAudioSource = sfxAudioGO.AddComponent<AudioSource>();
-
         sfxAudioSource.clip = Resources.Load<AudioClip>(sfxData.audioPath);
-
         sfxAudioSource.loop = loop;
-
-        // ÉèÖÃÒôĞ§µÄÒôÁ¿
-        sfxAudioSource.volume = mainVolume * sfxVolumeFactor;
+        
+        sfxAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Master")[2]; // è®¾ç½®ä¸ºéŸ³é¢‘æ··åˆå™¨çš„ "Master" ç»„ï¼Œç¡®ä¿åº”ç”¨éŸ³é‡æ§åˆ¶
 
         sfxAudioSource.Play();
-        
-        if (fadeInDuration > 0)
-        {
-            sfxAudioSource.volume = 0;
-            s.Append(sfxAudioSource.DOFade(mainVolume * sfxVolumeFactor, fadeInDuration));
-        }
-        
+
         AudioInfo info = new AudioInfo();
-
-        // ½«ÒôĞ§ĞÅÏ¢Ìí¼Óµ½ÁĞ±í
         info.audioName = sfxName;
-
         info.audioSource = sfxAudioSource;
-
         sfxAudioInfoList.Add(info);
 
         StartCoroutine(DetectingAudioPlayState(info, false));
-        //ThreadPool.QueueUserWorkItem(new WaitCallback(DetectingAudioPlayState), sfxAudioGO);//?????????????????????????
     }
 
     /// <summary>
-    /// ?????§¹
+    /// æš‚åœéŸ³æ•ˆ
     /// </summary>
-    /// <param name="pauseSfxName">???????§¹??</param>
+    /// <param name="pauseSfxName">è¦æš‚åœçš„éŸ³æ•ˆåç§°</param>
     public void PauseSfx(string pauseSfxName)
     {
         AudioInfo audioInfo = sfxAudioInfoList.Find(x => x.audioName == pauseSfxName);
 
         if (audioInfo == null)
         {
-            Debug.LogWarning("?????¦Ä????" + pauseSfxName + ",??????????§¹");
+            Debug.LogWarning("æœªæ‰¾åˆ°sfxï¼š" + pauseSfxName);
             return;
         }
 
         audioInfo.audioSource.Pause();
     }
-
-
+    
     /// <summary>
-    /// ????§¹
+    /// åœæ­¢éŸ³æ•ˆ
     /// </summary>
-    /// <param name="stopSfxName">??????§¹??</param>
+    /// <param name="stopSfxName">è¦åœæ­¢çš„éŸ³æ•ˆåç§°</param>
     public void StopSfx(string stopSfxName)
     {
         AudioInfo audioInfo = bgmAudioInfoList.Find(x => x.audioName == stopSfxName);
 
         if (audioInfo == null)
         {
-            Debug.LogWarning("?????¦Ä????" + stopSfxName + ",???????????§¹");
+            Debug.LogWarning("æœªæ‰¾åˆ°sfxï¼š" + stopSfxName);
             return;
         }
 
@@ -297,79 +280,78 @@ public class AudioManager : SingletonPersistent<AudioManager>
         Destroy(audioInfo.audioSource.gameObject);
     }
 
-
     /// <summary>
-    /// ?????????
+    /// ä¿®æ”¹å…¨å±€éŸ³é‡ï¼Œå¹¶ä¿å­˜åˆ°PlayerPrefs
     /// </summary>
-    /// <param name="volume"></param>
+    /// <param name="volume">æ–°çš„å…¨å±€éŸ³é‡</param>
     public void ChangeMainVolume(float volume)
     {
         mainVolume = volume;
+        PlayerPrefs.SetFloat("MainVolume", mainVolume);
 
         foreach (var info in bgmAudioInfoList)
         {
             info.audioSource.volume = mainVolume * bgmVolumeFactor;
-
         }
         foreach (var info in sfxAudioInfoList)
         {
             info.audioSource.volume = mainVolume * sfxVolumeFactor;
         }
+        Debug.Log($"MainVolume changed to {mainVolume}");
     }
 
     /// <summary>
-    /// ???Bgm????????
+    /// ä¿®æ”¹BGMéŸ³é‡å¹¶ä½¿ç”¨AudioMixeræ§åˆ¶éŸ³é‡
     /// </summary>
-    /// <param name="factor"></param>
     public void ChangeBgmVolume(float factor)
     {
         bgmVolumeFactor = factor;
+        
+        bgmVolumeFactor = Mathf.Clamp(bgmVolumeFactor, 0f, 1f);
 
-        foreach (var info in bgmAudioInfoList)
+        PlayerPrefs.SetFloat("BgmVolumeFactor", bgmVolumeFactor);
+        
+        if (bgmVolumeFactor == 0)
         {
-            info.audioSource.volume = mainVolume * bgmVolumeFactor;
+            audioMixer.SetFloat(BGM_VOLUME_PARAM, -80f);
+        }
+        else
+        {
+            audioMixer.SetFloat(BGM_VOLUME_PARAM, Mathf.Log10(mainVolume * bgmVolumeFactor) * 20);
         }
     }
 
-
     /// <summary>
-    /// ???Sfx????????
+    /// ä¿®æ”¹éŸ³æ•ˆéŸ³é‡å¹¶ä½¿ç”¨AudioMixeræ§åˆ¶éŸ³é‡
     /// </summary>
-    /// <param name="factor"></param>
     public void ChangeSfxVolume(float factor)
     {
         sfxVolumeFactor = factor;
+        
+        sfxVolumeFactor = Mathf.Clamp(sfxVolumeFactor, 0f, 1f);
 
-        foreach (var info in sfxAudioInfoList)
+        PlayerPrefs.SetFloat("SfxVolumeFactor", sfxVolumeFactor);
+
+        // å¦‚æœå› å­ä¸º0ï¼Œåˆ™è®¾ç½®ä¸ºéå¸¸å°çš„éŸ³é‡æ¥è¿‘é™éŸ³
+        if (sfxVolumeFactor == 0)
         {
-            info.audioSource.volume = mainVolume * sfxVolumeFactor;
+            audioMixer.SetFloat(SFX_VOLUME_PARAM, -80f);
+        }
+        else
+        {
+            audioMixer.SetFloat(SFX_VOLUME_PARAM, Mathf.Log10(mainVolume * sfxVolumeFactor) * 20);
         }
     }
-    
+
+
     /// <summary>
-    /// ¼à²âÒôÆµ²¥·Å×´Ì¬£¬²¥·Å½áÊøºóÏú»Ù
+    /// æ£€æµ‹éŸ³é¢‘æ’­æ”¾çŠ¶æ€å¹¶æ¸…ç†ç»“æŸæ’­æ”¾çš„éŸ³é¢‘èµ„æº
     /// </summary>
-    /// <param name="info">ÒôÆµĞÅÏ¢</param>
-    /// <param name="isBgm">ÊÇ·ñÊÇBGM</param>
     IEnumerator DetectingAudioPlayState(AudioInfo info, bool isBgm)
     {
         AudioSource audioSource = info.audioSource;
         while (audioSource.isPlaying)
         {
-            //if (audioSource == null)
-            //{
-            //    if (isBgm)
-            //    {
-            //        bgmAudioInfoList.Remove(info);
-            //    }
-            //    else
-            //    {
-            //        sfxAudioInfoList.Remove(info);
-            //    }
-            //    Destroy(info.audioSource.gameObject);
-            //    yield return null;
-
-            //}
             yield return null;
         }
         if (isBgm)
@@ -381,5 +363,6 @@ public class AudioManager : SingletonPersistent<AudioManager>
             sfxAudioInfoList.Remove(info);
         }
 
+        Destroy(info.audioSource.gameObject);
     }
 }

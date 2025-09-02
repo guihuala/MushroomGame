@@ -1,63 +1,100 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Miner : Building, IItemPort
+public class Miner : Building, ITickable, IOrientable
 {
-    [SerializeField] private ItemDef oreItem;   // 产出物
-    [SerializeField] private float cycleTime = 1.0f; // 多少秒产一包
-    [SerializeField] private int packetAmount = 1;
-    [SerializeField] private Vector2Int outDir = Vector2Int.right;
+    [Header("生产效率")]
+    public float cycleTime = 1.0f;  // 每生产一包的时间
+    public int packetAmount = 1;    // 每包数量
+    public Vector2Int outDir = Vector2Int.right;
 
-    [Header("采集条件")]
-    public bool requiresLight;
-    public bool requiresPower;
+    [Header("资源检测")]
+    public ResourceTilemapService tileService;
+    private IResourceSource _source;
+    public LayerMask nodeMask;
+    private ResourceNode _node;
 
     private float _t;
-    private IItemPort _outPort;
-
+    private readonly Queue<ItemPayload> _buffer = new(); // 简易缓冲
+    private const int BUFFER_LIMIT = 3;
+    
     public override void OnPlaced(TileGridService g, Vector2Int c)
     {
         base.OnPlaced(g, c);
-        FindOutPort();
-        ItemTickManager.Instance.Register(GetComponent<Conveyor>());
+        
+        tileService = FindObjectOfType<ResourceTilemapService>();
+        
+        BindNodeUnder();
+        TickManager.Instance.Register(this);
     }
 
-    private void FindOutPort()
+    public override void OnRemoved()
     {
-        var nextCell = cell + outDir;
-        var world = grid.CellToWorld(nextCell);
-        var hit = Physics2D.OverlapPoint(world);
-        _outPort = hit ? hit.GetComponentInParent<IItemPort>() : null;
+        TickManager.Instance?.Unregister(this);
+        base.OnRemoved();
     }
 
-    void FixedUpdate()
+    private void BindNodeUnder()
     {
-        // 条件检查
-        if (requiresLight)
+        if (tileService)
         {
-            // TODO: 检测 LightField 
+            _source = tileService.GetSourceAt(cell);
+            if (_source != null) return;
+        }
+        else
+        {
+            Debug.LogWarning("tileService == null");
         }
 
-        if (requiresPower)
-        {
-            // TODO: 检测 PowerField
-        }
+        var pos = grid.CellToWorld(cell);
+        var hit = Physics2D.OverlapPoint(pos, nodeMask);
+        var node = hit ? hit.GetComponent<ResourceNode>() : null;
+        _source = node;
 
-        _t += Time.fixedDeltaTime;
-        if (_t >= cycleTime && _outPort != null && _outPort.CanPush)
+        if (_source == null)
+            Debug.LogWarning($"Miner at {cell} found no resource.");
+    }
+
+    public void Tick(float dt)
+    {
+        if (_source == null) return;
+        
+        // 先尝试把缓冲里的货物往外推
+        TryFlushBuffer();
+        
+        if (_source.TryConsumeOnce())
         {
             var payload = new ItemPayload
             {
-                item = oreItem,
+                item = _source.YieldItem,
                 amount = packetAmount,
-                worldPos = transform.position
+                worldPos = grid.CellToWorld(cell)
             };
-            if (_outPort.TryPush(payload)) _t = 0f;
+            _buffer.Enqueue(payload);
+            _t = 0f;
         }
+
+        // 再试一次推（避免等到下帧）
+        TryFlushBuffer();
     }
 
-    // 采集器不收货，只出货
-    public bool TryPull(ref ItemPayload payload) => false;
-    public bool TryPush(in ItemPayload payload) => false;
-    public bool CanPull => false;
-    public bool CanPush => false;
+    private void TryFlushBuffer()
+    {
+        if (_buffer.Count == 0) return;
+
+        var outPort = grid.GetPortAt(cell + outDir);
+        if (outPort != null && outPort.CanPush)
+        {
+            // 只推一包，留点节奏
+            var pkg = _buffer.Peek();
+            if (outPort.TryPush(pkg)) _buffer.Dequeue();
+        }
+    }
+    
+    public void SetDirection(Vector2Int dir)
+    {
+        outDir = dir;
+        transform.right = new Vector3(dir.x, dir.y, 0f);
+    }
 }

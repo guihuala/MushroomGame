@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4469127509786063490}
   - component: {fileID: 4677449544429423496}
   m_Layer: 0
-  m_Name: Test
+  m_Name: Miner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 1506739928, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  m_Sprite: {fileID: 712325425, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -97,9 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bed5d669697d04b10ab3c153c5de9182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  oreItem: {fileID: 0}
   cycleTime: 1
   packetAmount: 1
   outDir: {x: 1, y: 0}
-  requiresLight: 0
-  requiresPower: 0
+  tileService: {fileID: 0}
+  nodeMask:
+    serializedVersion: 2
+    m_Bits: 64

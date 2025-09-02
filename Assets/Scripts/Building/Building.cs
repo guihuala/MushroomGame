@@ -7,22 +7,20 @@ public abstract class Building : MonoBehaviour
 
     public virtual void OnPlaced(TileGridService g, Vector2Int c)
     {
-        grid = g;
-        cell = c;
-        grid.Occupy(cell, this);
+        grid = g; cell = c;
+        grid.OccupyCell(cell, this);
     }
 
     public virtual void OnRemoved()
     {
-        grid?.Release(cell);
+        grid.ReleaseCell(cell);
         Destroy(gameObject);
     }
 
-    // 预览材质/颜色切换
-    public virtual void SetPreview(bool canPlace)
+    // 预览上色（放置系统用）
+    public virtual void SetPreview(bool ok)
     {
         var sr = GetComponentInChildren<SpriteRenderer>();
-        if (!sr) return;
-        sr.color = canPlace ? Color.white : new Color(1, 0.6f, 0.6f, 0.8f);
+        if (sr) sr.color = ok ? Color.white : new Color(1, 0.6f, 0.6f, 0.85f);
     }
 }

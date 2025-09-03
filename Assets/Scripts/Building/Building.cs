@@ -17,7 +17,7 @@ public abstract class Building : MonoBehaviour
         Destroy(gameObject);
     }
 
-    // 预览上色（放置系统用）
+    // 预览上色
     public virtual void SetPreview(bool ok)
     {
         var sr = GetComponentInChildren<SpriteRenderer>();

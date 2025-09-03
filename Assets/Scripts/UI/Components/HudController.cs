@@ -1,37 +1,46 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class HudController : MonoBehaviour
 {
-    [SerializeField]private Button pauseButton;
-    [SerializeField] private CentralHub hub;
+    [SerializeField] private Button pauseButton;
+    [SerializeField] private Hub hub;
     [SerializeField] private ItemDef watchItem;
     [SerializeField] private Text label;
 
     void Awake()
     {
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
-        
-        if (hub) hub.OnDelivered += (_, __) => Refresh();
-        Refresh();
     }
 
-    private void OnDestroy()
+    void OnEnable()
     {
-        if (hub) hub.OnDelivered -= (_, __) => Refresh();
+        if (hub != null)
+        {
+            hub.OnItemReceived += HandleItemReceived;
+        }
     }
 
-    private void Refresh()
+    void OnDisable()
     {
-        int n = hub ? hub.GetDelivered(watchItem) : 0;
-        label.text = $"{watchItem.displayName}: {n}";
+        if (hub != null)
+        {
+            hub.OnItemReceived -= HandleItemReceived;
+        }
     }
 
     private void OnPauseButtonClicked()
     {
         UIManager.Instance.OpenPanel("PausePanel");
+    }
+
+    private void HandleItemReceived(ItemPayload payload)
+    {
+        if (watchItem != null && payload.item == watchItem)
+        {
+            int count = hub.GetItemCount(watchItem);
+            label.text = $"{watchItem.name}: {count}";
+        }
     }
 }

@@ -42,6 +42,12 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+        // 检查是否在建造模式，如果是则禁用相机控制
+        if (IsInBuildMode())
+        {
+            return;
+        }
+        
         HandleKeyboardMovement();
         HandleMouseDrag();
         HandleZoom();
@@ -49,6 +55,15 @@ public class CameraController : MonoBehaviour
         ApplyMovement();
         ApplyZoom();
         ClampPosition();
+    }
+
+    /// <summary>
+    /// 检查是否处于建造模式
+    /// </summary>
+    private bool IsInBuildMode()
+    {
+        var placementSystem = FindObjectOfType<PlacementSystem>();
+        return placementSystem != null && placementSystem.IsInBuildMode;
     }
 
     /// <summary>

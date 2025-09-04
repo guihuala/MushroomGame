@@ -13611,6 +13611,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellSize: 1.27
+  groundTilemap: {fileID: 453790162}
+  obstacleTilemap: {fileID: 0}
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  onlyBuildOnGround: 1
+  checkObstacles: 1
 --- !u!114 &1376572710
 MonoBehaviour:
   m_ObjectHideFlags: 0

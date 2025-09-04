@@ -8,7 +8,7 @@ public class PushSelfBase : MonoBehaviour
     private float timer;
     private bool isPushed;
 
-    private void InitPushTimer()
+    public void InitPushTimer()
     {
         timer = 0f;
         isPushed = false;

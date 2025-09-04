@@ -11,9 +11,8 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
 
     [Header("资源检测")]
     public ResourceTilemapService tileService;
-    private IResourceSource _source;
-    public LayerMask nodeMask;
-    private ResourceNode _node;
+    private IResourceSource _source;  // 绑定的资源节点
+    public LayerMask nodeMask;  // 用于检测资源节点的遮罩
 
     private float _t;  // 用于计时的变量
     private readonly Queue<ItemPayload> _buffer = new(); // 简易缓冲
@@ -67,20 +66,19 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
         return false; // 矿机不能接收推送，只能推送出去
     }
 
-    // 尝试将物品从缓冲区推送到目标
     private void TryFlushBuffer()
     {
         if (_buffer.Count == 0) return;
 
         var targetCell = cell + outDir;
         var outPort = grid.GetPortAt(targetCell);
-        
+
         if (outPort != null && outPort.CanPull) // 目标位置尝试拉取
         {
-            ItemPayload payload = _buffer.Peek();;
+            ItemPayload payload = _buffer.Peek();
+            ;
             if (outPort.TryPull(ref payload))
             {
-                // 成功拉取物品后，减少一个缓存
                 _buffer.Dequeue();
             }
         }
@@ -88,7 +86,7 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
 
     public void Tick(float dt)
     {
-        if (_source == null) 
+        if (_source == null)
         {
             DebugManager.LogWarning($"Miner at {cell} has no resource source", this);
             return;
@@ -96,8 +94,7 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
 
         // 累积时间，达到指定的 cycleTime 时采集一包资源
         _t += dt;
-        
-        // 只有当缓冲区未满，且时间到了才会尝试采集
+
         if (_buffer.Count < BUFFER_LIMIT && _t >= cycleTime)
         {
             // 如果有资源
@@ -111,11 +108,10 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
                 };
 
                 _buffer.Enqueue(payload);  // 将物品加入缓冲区
+
+
+                
                 DebugManager.Log($"Miner at {cell} produced {payload.amount}x {payload.item?.name}", this);
-            }
-            else
-            {
-                DebugManager.LogWarning($"Miner at {cell} failed to produce, no resources available", this);
             }
 
             _t = 0f;  // 重置计时器

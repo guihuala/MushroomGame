@@ -27,4 +27,11 @@ public abstract class Building : MonoBehaviour
         var sr = GetComponentInChildren<SpriteRenderer>();
         if (sr) sr.color = ok ? Color.white : new Color(1, 0.6f, 0.6f, 0.85f);
     }
+
+    /// <summary>
+    /// 当邻居建筑发生变化时调用
+    /// </summary>
+    public virtual void OnNeighborChanged()
+    {
+    }
 }

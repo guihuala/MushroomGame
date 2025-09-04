@@ -15834,7 +15834,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: -10
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0.13999999, y: 0.13999999, z: 0}
   m_MaxChunkCount: 16
@@ -16209,10 +16209,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd770f65b3aaa4306acb4b27a9ce4e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  previewValidColor: {r: 0, g: 1, b: 0, a: 0.5}
+  previewInvalidColor: {r: 1, g: 0, b: 0, a: 0.5}
   mainCam: {fileID: 1234201018}
   grid: {fileID: 1376572709}
   cameraController: {fileID: 1234201020}
-  buildingListManager: {fileID: 0}
+  buildingListManager: {fileID: 11400000, guid: 7b5a1a7eb011b498d863ca34453f342a, type: 2}
+  previewPrefab: {fileID: 8217599763905349018, guid: 94f4b6ce01fdb43b9a12791dacbb5a85, type: 3}
 --- !u!156049354 &1376572711
 Grid:
   m_ObjectHideFlags: 0

@@ -7,13 +7,12 @@ using UnityEngine.Tilemaps;
 /// </summary>
 public class TileGridService : MonoBehaviour
 {
-    [Header("网格设置")]
-    [Tooltip("每个网格单元的大小")]
+    [Header("网格设置")] [Tooltip("每个网格单元的大小")]
     public float cellSize = 1f;
 
     [Header("地图网格引用")]
     public Tilemap groundTilemap; // 引用地形Tilemap
-    public Tilemap surfaceTilemap; // 新增：地表层Tilemap
+    public Tilemap surfaceTilemap; // 地表层Tilemap
     public Tilemap obstacleTilemap; // 引用障碍物Tilemap
 
     [Header("建造设置")]
@@ -40,6 +39,8 @@ public class TileGridService : MonoBehaviour
             }
         }
     }
+
+    #region 坐标转换和检查
 
     /// <summary>
     /// 世界坐标转换为网格坐标
@@ -82,8 +83,10 @@ public class TileGridService : MonoBehaviour
         bool canBuild = CheckBuildability(cell);
         _buildableCache[cell] = canBuild;
         return canBuild;
-    }
+    }    
 
+    #endregion
+    
     #region 检查权限
     
     private bool CheckBuildability(Vector2Int cell)
@@ -169,21 +172,6 @@ public class TileGridService : MonoBehaviour
     }    
 
     #endregion
-    
-    /// <summary>
-    /// 预计算区域内所有格子的建造权限
-    /// </summary>
-    public void PrecomputeBuildability(Vector2Int startCell, Vector2Int endCell)
-    {
-        for (int x = startCell.x; x <= endCell.x; x++)
-        {
-            for (int y = startCell.y; y <= endCell.y; y++)
-            {
-                Vector2Int cell = new Vector2Int(x, y);
-                _buildableCache[cell] = CheckBuildability(cell);
-            }
-        }
-    }
 
     /// <summary>
     /// 获取指定位置的建筑
@@ -193,7 +181,9 @@ public class TileGridService : MonoBehaviour
         _buildings.TryGetValue(cell, out var building);
         return building;
     }
-    
+
+    #region 放置格子操作与邻居有关操作
+
     public bool AreCellsFree(Vector2Int startCell, Vector2Int size)
     {
         for (int x = startCell.x; x < startCell.x + size.x; x++)
@@ -210,7 +200,6 @@ public class TileGridService : MonoBehaviour
         return true;
     }
 
-    // 占用格子
     public void OccupyCells(Vector2Int startCell, Vector2Int size, Building building)
     {
         for (int x = startCell.x; x < startCell.x + size.x; x++)
@@ -219,12 +208,14 @@ public class TileGridService : MonoBehaviour
             {
                 Vector2Int cell = new Vector2Int(x, y);
                 _buildings[cell] = building;
-                _buildableCache[cell] = false;  // 更新缓存
+                _buildableCache[cell] = false;
             }
         }
+        
+        NotifyNeighborsOfChange(startCell);
+        NotifyBuildingPlaced(startCell, building);
     }
 
-    // 释放格子
     public void ReleaseCells(Vector2Int startCell, Vector2Int size)
     {
         for (int x = startCell.x; x < startCell.x + size.x; x++)
@@ -236,7 +227,52 @@ public class TileGridService : MonoBehaviour
                 _buildableCache.Remove(cell);
             }
         }
+        
+        NotifyNeighborsOfChange(startCell);
+        NotifyBuildingRemoved(startCell);
     }
+    
+    private void NotifyNeighborsOfChange(Vector2Int changedCell)
+    {
+        // 定义4个方向的邻居
+        Vector2Int[] directions = { 
+            Vector2Int.up, 
+            Vector2Int.right, 
+            Vector2Int.down, 
+            Vector2Int.left 
+        };
+    
+        foreach (var dir in directions)
+        {
+            var neighborCell = changedCell + dir;
+        
+            // 发送邻居变化消息
+            MsgCenter.SendMsg(MsgConst.MSG_NEIGHBOR_CHANGED, neighborCell);
+        
+            // 如果有建筑，也通知具体的建筑
+            var building = GetBuildingAt(neighborCell);
+            if (building != null)
+            {
+                building.OnNeighborChanged();
+            }
+        }
+    
+        DebugManager.Log($"Notified neighbors of change at {changedCell}", this);
+    }
+    
+    private void NotifyBuildingPlaced(Vector2Int cell, Building building)
+    {
+        MsgCenter.SendMsg(MsgConst.MSG_BUILDING_PLACED, cell, building);
+        DebugManager.Log($"Building placed at {cell}: {building.GetType().Name}", this);
+    }   
+    
+    private void NotifyBuildingRemoved(Vector2Int cell)
+    {
+        MsgCenter.SendMsg(MsgConst.MSG_BUILDING_REMOVED, cell);
+        DebugManager.Log($"Building removed from {cell}", this);
+    }
+    
+    #endregion
 
     #region 端口
 

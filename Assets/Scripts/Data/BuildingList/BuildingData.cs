@@ -17,4 +17,5 @@ public enum BuildingCategory
 {
     Production,     // 生产建筑（矿机等）
     Logistics,      // 物流建筑（传送带等）
+    Mushroom,       // 蘑菇
 }

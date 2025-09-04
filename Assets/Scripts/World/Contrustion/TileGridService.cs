@@ -15,13 +15,11 @@ public class TileGridService : MonoBehaviour
     public Tilemap groundTilemap; // 引用地形Tilemap
     public Tilemap surfaceTilemap; // 新增：地表层Tilemap
     public Tilemap obstacleTilemap; // 引用障碍物Tilemap
-    public LayerMask obstacleLayers; // 障碍物图层
-    public LayerMask surfaceLayers; // 新增：地表图层
 
     [Header("建造设置")]
     public bool onlyBuildOnGround = true; // 是否只能在地面上建造
     public bool checkObstacles = true; // 是否检查障碍物
-    public bool checkSurface = true; // 新增：是否检查地表接触
+    public bool checkSurface = true; // 是否检查地表接触
 
     // 存储建筑和端口的字典
     private readonly Dictionary<Vector2Int, Building> _buildings = new();
@@ -86,9 +84,8 @@ public class TileGridService : MonoBehaviour
         return canBuild;
     }
 
-    /// <summary>
-    /// 检查指定格子的建造权限
-    /// </summary>
+    #region 检查权限
+    
     private bool CheckBuildability(Vector2Int cell)
     {
         Vector3 worldPos = CellToWorld(cell);
@@ -121,10 +118,7 @@ public class TileGridService : MonoBehaviour
 
         return true;
     }
-
-    /// <summary>
-    /// 检查地面Tile
-    /// </summary>
+    
     private bool CheckGroundTile(Vector2Int cell, Vector3 worldPos)
     {
         // 优先使用Tilemap检查
@@ -136,10 +130,7 @@ public class TileGridService : MonoBehaviour
 
         return false;
     }
-
-    /// <summary>
-    /// 检查障碍物
-    /// </summary>
+    
     private bool CheckObstacles(Vector2Int cell, Vector3 worldPos)
     {
         // 检查障碍物Tilemap
@@ -151,14 +142,7 @@ public class TileGridService : MonoBehaviour
                 return true;
             }
         }
-
-        // 使用物理检测障碍物
-        Collider2D[] colliders = Physics2D.OverlapPointAll(worldPos, obstacleLayers);
-        if (colliders.Length > 0)
-        {
-            return true;
-        }
-
+        
         return false;
     }
 
@@ -167,23 +151,10 @@ public class TileGridService : MonoBehaviour
     /// </summary>
     public bool IsTouchingSurface(Vector2Int cell)
     {
-        if (!checkSurface) return true; // 如果不检查地表，默认返回true
-
-        Vector3 worldPos = CellToWorld(cell);
-
-        // 检查地表层Tilemap
-        if (surfaceTilemap != null)
-        {
-            Vector3Int tilemapCell = surfaceTilemap.WorldToCell(worldPos);
-            if (surfaceTilemap.HasTile(tilemapCell))
-            {
-                return true;
-            }
-        }
-
-        // 检查上方格子是否有地表（用于垂直接触）
-        Vector2Int belowCell = new Vector2Int(cell.x, cell.y + 1);
-        Vector3 belowWorldPos = CellToWorld(belowCell);
+        if (!checkSurface) return true;
+        
+        Vector2Int targetCell = new Vector2Int(cell.x, cell.y);
+        Vector3 belowWorldPos = CellToWorld(targetCell);
 
         if (surfaceTilemap != null)
         {
@@ -195,19 +166,12 @@ public class TileGridService : MonoBehaviour
         }
 
         return false;
-    }
+    }    
 
+    #endregion
+    
     /// <summary>
-    /// 清除建造缓存（当地图发生变化时调用）
-    /// </summary>
-    public void ClearBuildCache()
-    {
-        _buildableCache.Clear();
-        DebugManager.Log("建造缓存已清除", this);
-    }
-
-    /// <summary>
-    /// 预计算区域内所有格子的建造权限（可选，用于性能优化）
+    /// 预计算区域内所有格子的建造权限
     /// </summary>
     public void PrecomputeBuildability(Vector2Int startCell, Vector2Int endCell)
     {
@@ -274,12 +238,13 @@ public class TileGridService : MonoBehaviour
         }
     }
 
-    
+    #region 端口
+
     public void RegisterPort(Vector2Int cell, IItemPort port)
     {
-        // 允许在已占用的建筑格上注册端口（端口是格子的"功能"，并不额外占地）
+        // 允许在已占用的建筑格上注册端口
+        // 端口是格子的"功能"，并不额外占地
         _ports[cell] = port;
-        DebugManager.Log($"Port registered at cell {cell} by {port.GetType().Name}", this);
     }
 
     public void UnregisterPort(Vector2Int cell, IItemPort port)
@@ -287,11 +252,9 @@ public class TileGridService : MonoBehaviour
         if (_ports.TryGetValue(cell, out var p) && ReferenceEquals(p, port))
         {
             _ports.Remove(cell);
-            DebugManager.Log($"Port unregistered from cell {cell}", this);
         }
     }
-
-
+    
     /// <summary>
     /// 获取指定网格的物品端口
     /// </summary>
@@ -303,22 +266,7 @@ public class TileGridService : MonoBehaviour
         }
 
         return null;
-    }
-
-    #region 地表检查，用于种植蘑菇
-
-    public bool IsFree(Vector2Int cell, bool checkMushrooms = false)
-    {
-        if (!CanBuildAt(cell)) return false;
-
-        if (checkMushrooms)
-        {
-            // 对于蘑菇，需要额外检查是否接触到地表
-            return IsTouchingSurface(cell);
-        }
-
-        return !_buildings.ContainsKey(cell);
-    }
+    }    
 
     #endregion
 }

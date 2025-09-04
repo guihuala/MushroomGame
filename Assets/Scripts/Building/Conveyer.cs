@@ -103,19 +103,16 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable
             }
         }
 
-        // 传送带的尽头连接到地面时，触发弹出面板事件
+        // 传送带的尽头连接到地面时，检查是否接触到地表才触发面板
         var targetCellAtEnd = cell + outDir;
-        if (grid.IsFree(targetCellAtEnd, checkMushrooms: true))
+        if (grid.IsTouchingSurface(targetCellAtEnd))
         {
-            // 发送消息以触发面板显示
             MsgCenter.SendMsg(MsgConst.MSG_SHOW_MUSHROOM_PANEL, targetCellAtEnd);
         }
 
         // 没找到的话仍重建路径
         BuildLocalPath();
     }
-
-
     
     private void BuildLocalPath()
     {

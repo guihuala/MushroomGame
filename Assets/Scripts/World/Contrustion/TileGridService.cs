@@ -13,12 +13,15 @@ public class TileGridService : MonoBehaviour
 
     [Header("地图网格引用")]
     public Tilemap groundTilemap; // 引用地形Tilemap
+    public Tilemap surfaceTilemap; // 新增：地表层Tilemap
     public Tilemap obstacleTilemap; // 引用障碍物Tilemap
     public LayerMask obstacleLayers; // 障碍物图层
+    public LayerMask surfaceLayers; // 新增：地表图层
 
     [Header("建造设置")]
     public bool onlyBuildOnGround = true; // 是否只能在地面上建造
     public bool checkObstacles = true; // 是否检查障碍物
+    public bool checkSurface = true; // 新增：是否检查地表接触
 
     // 存储建筑和端口的字典
     private readonly Dictionary<Vector2Int, Building> _buildings = new();
@@ -131,17 +134,6 @@ public class TileGridService : MonoBehaviour
             return groundTilemap.HasTile(tilemapCell);
         }
 
-        // 如果没有Tilemap，使用物理检测（备用方案）
-        Collider2D[] colliders = Physics2D.OverlapPointAll(worldPos);
-        foreach (var collider in colliders)
-        {
-            // 这里可以根据需要添加特定的地面标签或图层检查
-            if (collider.CompareTag("Ground") || collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
-            {
-                return true;
-            }
-        }
-
         return false;
     }
 
@@ -165,6 +157,41 @@ public class TileGridService : MonoBehaviour
         if (colliders.Length > 0)
         {
             return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 检查是否接触到地表层（用于蘑菇等需要接触地表的建筑）
+    /// </summary>
+    public bool IsTouchingSurface(Vector2Int cell)
+    {
+        if (!checkSurface) return true; // 如果不检查地表，默认返回true
+
+        Vector3 worldPos = CellToWorld(cell);
+
+        // 检查地表层Tilemap
+        if (surfaceTilemap != null)
+        {
+            Vector3Int tilemapCell = surfaceTilemap.WorldToCell(worldPos);
+            if (surfaceTilemap.HasTile(tilemapCell))
+            {
+                return true;
+            }
+        }
+
+        // 检查上方格子是否有地表（用于垂直接触）
+        Vector2Int belowCell = new Vector2Int(cell.x, cell.y + 1);
+        Vector3 belowWorldPos = CellToWorld(belowCell);
+
+        if (surfaceTilemap != null)
+        {
+            Vector3Int belowTilemapCell = surfaceTilemap.WorldToCell(belowWorldPos);
+            if (surfaceTilemap.HasTile(belowTilemapCell))
+            {
+                return true;
+            }
         }
 
         return false;
@@ -203,58 +230,58 @@ public class TileGridService : MonoBehaviour
         return building;
     }
     
-    /// <summary>
-    /// 占用单元格
-    /// </summary>
-    public void OccupyCell(Vector2Int cell, Building building)
+    public bool AreCellsFree(Vector2Int startCell, Vector2Int size)
     {
-        if (!CanBuildAt(cell))
+        for (int x = startCell.x; x < startCell.x + size.x; x++)
         {
-            DebugManager.LogWarning($"Cannot occupy cell {cell} - not buildable", this);
-            return;
+            for (int y = startCell.y; y < startCell.y + size.y; y++)
+            {
+                Vector2Int cell = new Vector2Int(x, y);
+                if (!CanBuildAt(cell) || _buildings.ContainsKey(cell))  // 不能放置
+                {
+                    return false;
+                }
+            }
         }
-
-        _buildings[cell] = building;
-        
-        // 更新缓存
-        _buildableCache[cell] = false;
-        
-        DebugManager.Log($"Cell {cell} occupied by {building.GetType().Name}", this);
+        return true;
     }
 
-    /// <summary>
-    /// 释放单元格
-    /// </summary>
-    public void ReleaseCell(Vector2Int cell)
+    // 占用格子
+    public void OccupyCells(Vector2Int startCell, Vector2Int size, Building building)
     {
-        if (_buildings.Remove(cell))
+        for (int x = startCell.x; x < startCell.x + size.x; x++)
         {
-            // 更新缓存（重新检查建造权限）
-            _buildableCache.Remove(cell);
-            DebugManager.Log($"Cell {cell} released", this);
+            for (int y = startCell.y; y < startCell.y + size.y; y++)
+            {
+                Vector2Int cell = new Vector2Int(x, y);
+                _buildings[cell] = building;
+                _buildableCache[cell] = false;  // 更新缓存
+            }
         }
-        _ports.Remove(cell);
     }
 
-    // 端口管理方法
+    // 释放格子
+    public void ReleaseCells(Vector2Int startCell, Vector2Int size)
+    {
+        for (int x = startCell.x; x < startCell.x + size.x; x++)
+        {
+            for (int y = startCell.y; y < startCell.y + size.y; y++)
+            {
+                Vector2Int cell = new Vector2Int(x, y);
+                _buildings.Remove(cell);
+                _buildableCache.Remove(cell);
+            }
+        }
+    }
 
-    /// <summary>
-    /// 在指定网格注册物品端口
-    /// </summary>
+    
     public void RegisterPort(Vector2Int cell, IItemPort port)
     {
-        if (!CanBuildAt(cell))
-        {
-            DebugManager.LogWarning($"Cannot register port at {cell} - not buildable", this);
-            return;
-        }
-
+        // 允许在已占用的建筑格上注册端口（端口是格子的"功能"，并不额外占地）
         _ports[cell] = port;
+        DebugManager.Log($"Port registered at cell {cell} by {port.GetType().Name}", this);
     }
 
-    /// <summary>
-    /// 从指定网格注销物品端口
-    /// </summary>
     public void UnregisterPort(Vector2Int cell, IItemPort port)
     {
         if (_ports.TryGetValue(cell, out var p) && ReferenceEquals(p, port))
@@ -263,6 +290,7 @@ public class TileGridService : MonoBehaviour
             DebugManager.Log($"Port unregistered from cell {cell}", this);
         }
     }
+
 
     /// <summary>
     /// 获取指定网格的物品端口
@@ -277,22 +305,20 @@ public class TileGridService : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// 在Scene视图中绘制可建造区域（调试用）
-    /// </summary>
-    private void OnDrawGizmosSelected()
-    {
-        if (!Application.isPlaying) return;
+    #region 地表检查，用于种植蘑菇
 
-        // 绘制最近检查过的格子（调试用）
-        Gizmos.color = Color.green;
-        foreach (var kvp in _buildableCache)
+    public bool IsFree(Vector2Int cell, bool checkMushrooms = false)
+    {
+        if (!CanBuildAt(cell)) return false;
+
+        if (checkMushrooms)
         {
-            if (kvp.Value) // 可建造
-            {
-                Vector3 worldPos = CellToWorld(kvp.Key);
-                Gizmos.DrawWireCube(worldPos, Vector3.one * cellSize * 0.8f);
-            }
+            // 对于蘑菇，需要额外检查是否接触到地表
+            return IsTouchingSurface(cell);
         }
+
+        return !_buildings.ContainsKey(cell);
     }
+
+    #endregion
 }

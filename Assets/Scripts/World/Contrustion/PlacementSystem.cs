@@ -21,17 +21,11 @@ public class PlacementSystem : MonoBehaviour
     {
         if (!mainCam) mainCam = Camera.main;
         if (!cameraController) cameraController = FindObjectOfType<CameraController>();
-        ExitBuildMode(); // 默认进入浏览模式
+        ExitBuildMode();
     }
 
     void Update()
     {
-        // 模式切换 - 移除B键切换，改为只能通过UI进入建造模式
-        // if (Input.GetKeyDown(KeyCode.B))
-        // {
-        //     ToggleBuildMode();
-        // }
-
         if (!IsInBuildMode) return;
         
         var mouseWorld = mainCam.ScreenToWorldPoint(Input.mousePosition);
@@ -43,20 +37,7 @@ public class PlacementSystem : MonoBehaviour
         HandleBuildModeInput(cell, worldPos);
     }
 
-    /// <summary>
-    /// 切换建造模式
-    /// </summary>
-    public void ToggleBuildMode()
-    {
-        if (IsInBuildMode)
-        {
-            ExitBuildMode();
-        }
-        else
-        {
-            EnterBuildMode();
-        }
-    }
+    #region 进入和退出模式
 
     /// <summary>
     /// 进入建造模式
@@ -67,7 +48,6 @@ public class PlacementSystem : MonoBehaviour
         if (cameraController) cameraController.enabled = false; // 禁用相机控制
         Cursor.visible = true;
         SelectIndex(1); // 默认选择第一个建筑
-        DebugManager.Log("进入建造模式 - WASD旋转, 鼠标左键放置, 右键取消");
     }
 
     /// <summary>
@@ -76,7 +56,7 @@ public class PlacementSystem : MonoBehaviour
     public void ExitBuildMode()
     {
         IsInBuildMode = false;
-        if (cameraController) cameraController.enabled = true; // 启用相机控制
+        if (cameraController) cameraController.enabled = true;
         
         // 清理预览
         if (_preview != null)
@@ -86,9 +66,91 @@ public class PlacementSystem : MonoBehaviour
         }
         
         _currentPrefab = null;
-        DebugManager.Log("退出建造模式");
+    }    
+
+    #endregion
+
+    #region UI与输入
+
+    /// <summary>
+    /// 处理建造模式下的输入
+    /// </summary>
+    private void HandleBuildModeInput(Vector2Int cell, Vector3 worldPos)
+    {
+        // WASD 旋转控制
+        if (Input.GetKeyDown(KeyCode.A)) RotateDirCCW();
+        if (Input.GetKeyDown(KeyCode.D)) RotateDirCW();
+        if (Input.GetKeyDown(KeyCode.W)) RotateDirCW();
+        if (Input.GetKeyDown(KeyCode.S)) RotateDirCCW();
+        
+        // 放置
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!IsPointerOverUI())
+            {
+                TryPlaceBuilding(cell, worldPos);
+            }
+        }
+
+        // 退出建造
+        if (Input.GetMouseButtonDown(1))
+        {
+            // 检查是否在UI上点击，避免与拆除建筑冲突
+            if (!IsPointerOverUI())
+            {
+                ExitBuildMode();
+            }
+        }
     }
 
+    /// <summary>
+    /// 检查鼠标是否在UI上
+    /// </summary>
+    private bool IsPointerOverUI()
+    {
+        if (UnityEngine.EventSystems.EventSystem.current != null)
+        {
+            return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+        }
+        return false;
+    }    
+
+    #endregion
+    
+    private void TryPlaceBuilding(Vector2Int cell, Vector3 worldPos)
+    {
+        if (!grid.AreCellsFree(cell, _currentPrefab.size))  // 检查多格建筑的放置
+        {
+            DebugManager.LogWarning($"Cannot place building at {cell} - cells occupied");
+            return;
+        }
+        
+        var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
+        
+        // 设置方向（如果是可定向建筑，多格建筑一般不可定向）
+        if (building is IOrientable orientable)
+        {
+            orientable.SetDirection(_currentDir);
+        }
+        
+        building.OnPlaced(grid, cell);
+        DebugManager.Log($"Placed {building.GetType().Name} at {cell} facing {_currentDir}");
+    }    
+
+    private void TryRemoveAt(Vector2Int cell)
+    {
+        var building = grid.GetBuildingAt(cell);
+        if (building != null)
+        {
+            building.OnRemoved();
+            DebugManager.Log($"Removed building at {cell}");
+        }
+        else
+        {
+            DebugManager.LogWarning($"No building to remove at {cell}");
+        }
+    }
+    
     /// <summary>
     /// 更新预览建筑的位置和状态
     /// </summary>
@@ -115,95 +177,6 @@ public class PlacementSystem : MonoBehaviour
         {
             bool canPlace = grid.IsFree(cell);
             _preview.SetPreview(canPlace);
-        }
-    }
-
-    /// <summary>
-    /// 处理建造模式下的输入
-    /// </summary>
-    private void HandleBuildModeInput(Vector2Int cell, Vector3 worldPos)
-    {
-        // WASD 旋转控制
-        if (Input.GetKeyDown(KeyCode.A)) RotateDirCCW();
-        if (Input.GetKeyDown(KeyCode.D)) RotateDirCW();
-        if (Input.GetKeyDown(KeyCode.W)) RotateDirCW();
-        if (Input.GetKeyDown(KeyCode.S)) RotateDirCCW();
-        
-        // ESC键退出建造模式
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            ExitBuildMode();
-            return;
-        }
-        
-        // 鼠标操作
-        if (Input.GetMouseButtonDown(0))
-        {
-            TryPlaceBuilding(cell, worldPos);
-        }
-
-        // 鼠标右键取消建造模式
-        if (Input.GetMouseButtonDown(1))
-        {
-            // 检查是否在UI上点击，避免与拆除建筑冲突
-            if (!IsPointerOverUI())
-            {
-                ExitBuildMode();
-                return;
-            }
-        }
-    }
-
-    /// <summary>
-    /// 检查鼠标是否在UI上
-    /// </summary>
-    private bool IsPointerOverUI()
-    {
-        // 使用EventSystem检查是否点击在UI上
-        if (UnityEngine.EventSystems.EventSystem.current != null)
-        {
-            return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
-        }
-        return false;
-    }
-
-    /// <summary>
-    /// 尝试放置建筑
-    /// </summary>
-    private void TryPlaceBuilding(Vector2Int cell, Vector3 worldPos)
-    {
-        if (!grid.IsFree(cell)) 
-        {
-            DebugManager.LogWarning($"Cannot place building at {cell} - cell occupied");
-            return;
-        }
-
-        var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
-        
-        // 设置方向（如果是可定向建筑）
-        if (building is IOrientable orientable)
-        {
-            orientable.SetDirection(_currentDir);
-        }
-        
-        building.OnPlaced(grid, cell);
-        DebugManager.Log($"Placed {building.GetType().Name} at {cell} facing {_currentDir}");
-    }
-
-    /// <summary>
-    /// 尝试移除指定位置的建筑
-    /// </summary>
-    private void TryRemoveAt(Vector2Int cell)
-    {
-        var building = grid.GetBuildingAt(cell);
-        if (building != null)
-        {
-            building.OnRemoved();
-            DebugManager.Log($"Removed building at {cell}");
-        }
-        else
-        {
-            DebugManager.LogWarning($"No building to remove at {cell}");
         }
     }
 
@@ -266,20 +239,5 @@ public class PlacementSystem : MonoBehaviour
             _currentDir = Vector2Int.right;
         
         DebugManager.Log($"Rotated direction to: {_currentDir}");
-    }
-
-    /// <summary>
-    /// 在屏幕上显示模式提示
-    /// </summary>
-    void OnGUI()
-    {
-        if (!IsInBuildMode) return;
-
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 20;
-        style.normal.textColor = Color.green;
-        
-        GUI.Label(new Rect(10, 10, 300, 30), "建造模式 - 右键取消", style);
-        GUI.Label(new Rect(10, 40, 300, 30), "WASD: 旋转  鼠标左键: 放置", style);
     }
 }

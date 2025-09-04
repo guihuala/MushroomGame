@@ -5,15 +5,19 @@ public abstract class Building : MonoBehaviour
     protected TileGridService grid;
     protected Vector2Int cell;
 
+    // 新增的占地尺寸
+    public Vector2Int size = Vector2Int.one;  // 默认1x1的建筑
+
     public virtual void OnPlaced(TileGridService g, Vector2Int c)
     {
-        grid = g; cell = c;
-        grid.OccupyCell(cell, this);
+        grid = g; 
+        cell = c;
+        grid.OccupyCells(cell, size, this);  // 占用多格
     }
 
     public virtual void OnRemoved()
     {
-        grid.ReleaseCell(cell);
+        grid.ReleaseCells(cell, size);  // 释放多格
         Destroy(gameObject);
     }
 

@@ -108,8 +108,6 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
                 };
 
                 _buffer.Enqueue(payload);  // 将物品加入缓冲区
-
-
                 
                 DebugManager.Log($"Miner at {cell} produced {payload.amount}x {payload.item?.name}", this);
             }

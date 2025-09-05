@@ -8,15 +8,13 @@ public class SingletonPersistent<T> : MonoBehaviour where T : MonoBehaviour
 
     protected virtual void Awake()
     {
-        if (instance)
+        if (instance != null)
         {
             Destroy(gameObject);
-        }
-        else
-        {
-            instance = this as T;
+            return;
         }
 
+        instance = this as T;
         DontDestroyOnLoad(gameObject);
     }
 }

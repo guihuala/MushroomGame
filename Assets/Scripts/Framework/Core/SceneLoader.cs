@@ -22,11 +22,8 @@ public class SceneLoader : SingletonPersistent<SceneLoader>
     private AsyncOperation loadingOperation;
     private bool isLoading = false;
 
-    protected override void Awake()
+    private void Start()
     {
-        base.Awake();
-        DontDestroyOnLoad(gameObject);
-        
         // 初始化加载界面
         if (loadingCanvas != null)
         {

@@ -43,18 +43,17 @@ public class PlacementSystem : MonoBehaviour
     public KeyCode holdToEraseSecondary = KeyCode.RightAlt;    // 按住即临时擦除（副，可设为 None）
     public KeyCode exitBuildKey = KeyCode.Escape;              // 退出建造模式
 
-    private bool IsHoldEraseActive()                            // <<<
+    private bool IsHoldEraseActive()
     {
         bool primary = holdToErasePrimary != KeyCode.None && Input.GetKey(holdToErasePrimary);
         bool secondary = holdToEraseSecondary != KeyCode.None && Input.GetKey(holdToEraseSecondary);
         return primary || secondary;
     }
 
-    private bool EraseActive => _mode == BrushMode.Erase || IsHoldEraseActive();   // <<<
-
-    // ===== HUD 选项 =====
+    private bool EraseActive => _mode == BrushMode.Erase || IsHoldEraseActive();
+    
     [Header("HUD 设置")]
-    public bool showHUD = true;                                 // 显示状态面板           // <<<
+    public bool showHUD = true;                                 // 显示状态面板
     public Vector2 hudAnchor = new Vector2(12, 12);             // 左下角偏移（像素）
     public float hudLine = 18f;                                 // 行高
     public float hudWidth = 360f;                               // 面板宽
@@ -249,39 +248,28 @@ public class PlacementSystem : MonoBehaviour
         if (_currentPreview != null)
             _currentPreview.SetDirection(direction);
     }
-
-    // 单点放置
-    private void TryPlaceBuilding(Vector2Int cell, Vector3 worldPos)
+    
+    // ===== 放置：工具函数 =====
+    private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
     {
+        if (grid.GetBuildingAt(cell) != null)
+        {
+            _dragLastCell = cell;
+            return;
+        }
+
         if (!grid.AreCellsFree(cell, _currentPrefab.size))
         {
-            DebugManager.LogWarning($"Cannot place building at {cell} - cells occupied");
+            _dragLastCell = cell;
             return;
         }
 
         var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
-
-        if (building is IOrientable orientable)
-            orientable.SetDirection(_currentDir);
-
         building.OnPlaced(grid, cell);
-
-        _dragLastCell = cell;
-        _dragLastBuilding = building;
-    }
-
-    // ===== 放置：工具函数 =====
-    private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
-    {
-        if (grid.GetBuildingAt(cell) != null) { _dragLastCell = cell; return; }
-        if (!grid.AreCellsFree(cell, _currentPrefab.size)) { _dragLastCell = cell; return; }
-
-        var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
-
         if (building is IOrientable orientable)
-            orientable.SetDirection(dirForThis);
-
-        building.OnPlaced(grid, cell);
+        {
+            orientable.SetDirection(dirForThis); // 先放置再设置方向，确认已经grid赋值
+        }
 
         // 让上一格朝向这一格，形成连续链（仅当上一格也可转向）
         if (adjustPrev && _dragLastBuilding is IOrientable prevOrient)
@@ -370,8 +358,7 @@ public class PlacementSystem : MonoBehaviour
         return UnityEngine.EventSystems.EventSystem.current != null &&
                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
     }
-
-    // ===== HUD：即刻可用的状态面板（无需预制） =====         // <<<
+    
     void OnGUI()
     {
         if (!IsInBuildMode || !showHUD) return;

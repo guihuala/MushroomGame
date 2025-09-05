@@ -3,7 +3,7 @@ using UnityEngine;
 public abstract class Building : MonoBehaviour
 {
     protected TileGridService grid;
-    protected Vector2Int cell;
+    public Vector2Int cell;
     
     public Vector2Int size = Vector2Int.one;  // 默认1x1的建筑
 

@@ -44,3 +44,6 @@ TagManager:
   - name: Buildings
     uniqueID: 2591314991
     locked: 0
+  - name: Preview
+    uniqueID: 1947656227
+    locked: 0

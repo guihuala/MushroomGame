@@ -16211,11 +16211,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   previewValidColor: {r: 0, g: 1, b: 0, a: 0.5}
   previewInvalidColor: {r: 1, g: 0, b: 0, a: 0.5}
+  eraseValidColor: {r: 1, g: 0, b: 0, a: 0.35}
+  eraseInvalidColor: {r: 1, g: 0, b: 0, a: 0.15}
   mainCam: {fileID: 1234201018}
   grid: {fileID: 1376572709}
   cameraController: {fileID: 1234201020}
   buildingListManager: {fileID: 11400000, guid: 7b5a1a7eb011b498d863ca34453f342a, type: 2}
   previewPrefab: {fileID: 8217599763905349018, guid: 94f4b6ce01fdb43b9a12791dacbb5a85, type: 3}
+  eraseToggleKey: 120
+  holdToErasePrimary: 308
+  holdToEraseSecondary: 307
+  exitBuildKey: 27
+  showHUD: 1
+  hudAnchor: {x: 12, y: 12}
+  hudLine: 18
+  hudWidth: 360
 --- !u!156049354 &1376572711
 Grid:
   m_ObjectHideFlags: 0

@@ -11,16 +11,16 @@ public class HubPort : IItemPort
         _hub = hub;
     }
 
-    public bool CanPull => true; // 不支持拉取
-    public bool CanPush => false;  // 只能接收
+    public bool CanProvide => true;
+    public bool CanReceive => false;
 
-    public bool TryPull(ref ItemPayload payload)
+    public bool TryReceive(in ItemPayload payload)
     {
         return _hub.ReceiveItem(payload); // 将物品接收进hub
     }
 
-    public bool TryPush(in ItemPayload payload)
+    public bool TryProvide(ref ItemPayload payload)
     {
-        return false; // 将物品接收进hub
+        return false;
     }
 }

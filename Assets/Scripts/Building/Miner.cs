@@ -18,8 +18,20 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     private readonly Queue<ItemPayload> _buffer = new(); // 简易缓冲
     private const int BUFFER_LIMIT = 3;
     
-    public bool CanPull => false; // 矿机不能拉取，只能推送
-    public bool CanPush => _buffer.Count > 0; // 有物品时可以推送
+    public bool CanProvide => _buffer.Count > 0; // 我能提供物品
+    public bool CanReceive => false;             // 我不能接收物品
+    public bool TryReceive(in ItemPayload payload)
+    {
+        return false; // 矿机不接收物品
+    }
+
+    public bool TryProvide(ref ItemPayload payload)
+    {
+        if (_buffer.Count == 0) return false;
+    
+        payload = _buffer.Dequeue(); // 提供物品给调用者
+        return true;
+    }
     
     public override void OnPlaced(TileGridService g, Vector2Int c)
     {
@@ -55,16 +67,6 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
         if (_source == null)
             Debug.LogWarning($"Miner at {cell} found no resource.");
     }
-    
-    public bool TryPull(ref ItemPayload payload)
-    {
-        return false; // 矿机不拉取
-    }
-
-    public bool TryPush(in ItemPayload payload)
-    {
-        return false; // 矿机不能接收推送，只能推送出去
-    }
 
     private void TryFlushBuffer()
     {
@@ -73,11 +75,10 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
         var targetCell = cell + outDir;
         var outPort = grid.GetPortAt(targetCell);
 
-        if (outPort != null && outPort.CanPull) // 目标位置尝试拉取
+        if (outPort != null && outPort.CanReceive) // 下游能接收
         {
             ItemPayload payload = _buffer.Peek();
-            ;
-            if (outPort.TryPull(ref payload))
+            if (outPort.TryProvide(ref payload)) // 下游从我这里拉取
             {
                 _buffer.Dequeue();
             }

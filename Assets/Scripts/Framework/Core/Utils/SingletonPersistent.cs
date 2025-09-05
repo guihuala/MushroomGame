@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// 持久化的泛型单例基类
-/// </summary>
-/// <typeparam name="T"></typeparam>
 public class SingletonPersistent<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T instance;
@@ -12,7 +8,6 @@ public class SingletonPersistent<T> : MonoBehaviour where T : MonoBehaviour
 
     protected virtual void Awake()
     {
-
         if (instance)
         {
             Destroy(gameObject);
@@ -21,6 +16,7 @@ public class SingletonPersistent<T> : MonoBehaviour where T : MonoBehaviour
         {
             instance = this as T;
         }
+
         DontDestroyOnLoad(gameObject);
     }
 }

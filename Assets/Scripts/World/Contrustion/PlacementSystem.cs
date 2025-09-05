@@ -265,11 +265,12 @@ public class PlacementSystem : MonoBehaviour
         }
 
         var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
-        building.OnPlaced(grid, cell);
+        
         if (building is IOrientable orientable)
         {
             orientable.SetDirection(dirForThis); // 先放置再设置方向，确认已经grid赋值
         }
+        building.OnPlaced(grid, cell);
 
         // 让上一格朝向这一格，形成连续链（仅当上一格也可转向）
         if (adjustPrev && _dragLastBuilding is IOrientable prevOrient)

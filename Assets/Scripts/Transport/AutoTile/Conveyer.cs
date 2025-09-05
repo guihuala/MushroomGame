@@ -9,14 +9,13 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
     private readonly Queue<ItemPayload> _buffer = new();
     private const int BUFFER_CAPACITY = 3;
 
-    // 下游连接缓存（用于快速推送）
+    // 下游连接缓存
     private IItemPort _connectedOutputPort = null;
     private Vector2Int _connectedDirection = Vector2Int.zero;
 
     // 给物品图标动画的路径点
     private readonly List<Vector3> _conveyorPath = new();
-
-    // 防抖：一帧只跑一次 AutoTile
+    
     private int _lastAutoTileFrame = -1;
     
     private static Vector2Int RotCW  (Vector2Int v) => new Vector2Int(v.y, -v.x);
@@ -58,6 +57,8 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
 
     private void OnNeighborChangedMsg(params object[] args)
     {
+        if (this == null || !gameObject.activeInHierarchy) return;
+    
         if (args.Length > 0 && args[0] is Vector2Int changed)
         {
             // 只关心四邻
@@ -77,9 +78,6 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
         outDir = dir;
         inDir  = -dir;
         transform.right = new Vector3(outDir.x, outDir.y, 0f);
-        BuildLocalPath();
-        FindBestOutputConnection_ByRouter();
-        Debug.Log($"[SetDirection] {cell} out:{outDir} in:{inDir}");
     }
 
     /// <summary>只触发邻居自检，并在末尾重连下游+刷新路径</summary>
@@ -106,15 +104,15 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
     public bool TryReceive(in ItemPayload payload)
     {
         if (_buffer.Count >= BUFFER_CAPACITY) return false;
-
-        // 入列时生成图标动画一次
+        
         _buffer.Enqueue(payload);
 
         if (payload.item != null)
         {
-            BuildLocalPath(); // 确保路径最新
+            BuildLocalPath();
             float half = grid.cellSize * 0.5f;
-            Vector3 start = grid.CellToWorld(cell) - new Vector3(inDir.x, inDir.y, 0f) * half;
+            Vector3 start = grid.CellToWorld(cell) + new Vector3(inDir.x, inDir.y, 0f) * half;
+            // 创建图标动画
             var icon = ItemIconManager.Instance.CreateItemIcon(payload.item, start);
             var anim = icon.AddComponent<ItemFlowAnimation>();
             anim.Init(start, _conveyorPath);
@@ -123,7 +121,7 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
         return true;
     }
 
-    public bool TryProvide(ref ItemPayload payload) // 改为 ref
+    public bool TryProvide(ref ItemPayload payload)
     {
         if (_buffer.Count == 0) return false;
     
@@ -136,17 +134,15 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
         if (_buffer.Count == 0) return;
 
         if (!IsCurrentConnectionValid())
-        {
             FindBestOutputConnection_ByRouter();
-        }
-
-        if (_connectedOutputPort != null && _connectedOutputPort.CanReceive) // 下游能接收
+        
+        if (_connectedOutputPort != null && _connectedOutputPort.CanReceive)
         {
             var pkg = _buffer.Peek();
-            if (_connectedOutputPort.TryProvide(ref pkg)) // 下游从我这里拉取
+            if (_connectedOutputPort.TryReceive(in pkg))
             {
-                _buffer.Dequeue(); // 直接弹出，不需要再调用TryProvide
-                Debug.Log($"[Tick] {cell} -> {cell + _connectedDirection}");
+                DebugManager.Log($"conveyor send {pkg} -> {cell + outDir}");
+                _buffer.Dequeue();
             }
         }
     }
@@ -155,7 +151,7 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
 
     #region 连接选择 / 校验 / 路径
     
-    private bool IsCurrentConnectionValid()
+    private bool IsCurrentConnectionValid() // 验证现在的接口是否合法
     {
         if (_connectedOutputPort == null) return false;
         var targetCell = cell + _connectedDirection;
@@ -164,36 +160,43 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
                TransportCompat.DownAccepts(_connectedDirection, current);
     }
 
-    /// <summary>
-    /// 由“路由器”规则选择下游：前、右、左；跳过回头；用集中兼容判断
-    /// </summary>
     public void FindBestOutputConnection_ByRouter()
     {
         _connectedOutputPort = null;
-        _connectedDirection = Vector2Int.zero;
+        _connectedDirection  = Vector2Int.zero;
 
         var forward = outDir;
         var right   = RotCW(outDir);
         var left    = RotCCW(outDir);
         var candidates = new[] { forward, right, left };
 
+        // 先记住原方向，除非确实连上再修改
+        var originalOut = outDir;
+
         foreach (var d in candidates)
         {
-            if (IsOpp(d, inDir)) continue; // 禁止回头
+            if (d == inDir) continue;
 
             var target = cell + d;
-            var port = grid.GetPortAt(target);
+            var port   = grid.GetPortAt(target);
             
-            outDir = d;
-            _connectedDirection = d;
-            _connectedOutputPort = port;
-            transform.right = new Vector3(outDir.x, outDir.y, 0f);
-            BuildLocalPath();
-            Debug.Log($"[FindBest] {cell} connected -> {target} dir:{d}");
-            return;
+            // 只有“下游能接收”时才确认方向与连接
+            if (TransportCompat.DownAccepts(d, port))
+            {
+                outDir                = d;
+                _connectedDirection   = d;
+                _connectedOutputPort  = port;
+                transform.right       = new Vector3(outDir.x, outDir.y, 0f);
+                BuildLocalPath();
+                Debug.Log($"[FindBest] {cell} connected -> {target} dir:{d}");
+                return;
+            }
         }
 
-        // 没接上也刷新可视（防止路径旧态）
+        // 三个方向都不通：保持原朝向，只刷新可视路径
+        outDir = originalOut;
+        _connectedOutputPort = null;
+        _connectedDirection  = Vector2Int.zero;
         BuildLocalPath();
     }
 
@@ -209,7 +212,7 @@ public class Conveyor : Building, ITickable, IItemPort, IOrientable, IAutoTiler
 
         _conveyorPath.Add(inPoint);
 
-        // 拐弯时插入中心点；直线（inDir == -outDir）不插入
+        // 拐弯时插入中心点；
         if (!(inDir == -outDir))
             _conveyorPath.Add(center);
 

@@ -28,13 +28,11 @@ public static class AutoTileSystem
             {
                 nb.outDir = dAB;
                 nb.ApplyDirAndRebuild();
-                Debug.Log($"[AutoTile] fix nb.out -> me, nb:{nb.cell} now in:{nb.inDir} out:{nb.outDir}");
             }
             else if (me.outDir == dBA && nb.inDir != dAB)
             {
                 nb.inDir = dAB;
                 nb.ApplyDirAndRebuild();
-                Debug.Log($"[AutoTile] fix nb.in <- me, nb:{nb.cell} now in:{nb.inDir} out:{nb.outDir}");
             }
         }
 

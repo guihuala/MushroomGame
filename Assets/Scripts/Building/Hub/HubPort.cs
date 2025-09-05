@@ -10,17 +10,14 @@ public class HubPort : IItemPort
         Cell = cell;
         _hub = hub;
     }
-
-    public bool CanProvide => true;
-    public bool CanReceive => false;
+    
+    public bool CanProvide => false;  // Hub 只吃不出
+    public bool CanReceive => true;
 
     public bool TryReceive(in ItemPayload payload)
     {
-        return _hub.ReceiveItem(payload); // 将物品接收进hub
+        return _hub.ReceiveItem(payload);
     }
 
-    public bool TryProvide(ref ItemPayload payload)
-    {
-        return false;
-    }
+    public bool TryProvide(ref ItemPayload payload) => false;
 }

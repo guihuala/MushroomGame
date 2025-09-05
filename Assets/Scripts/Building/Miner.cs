@@ -63,9 +63,6 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
         var hit = Physics2D.OverlapPoint(pos, nodeMask);
         var node = hit ? hit.GetComponent<ResourceNode>() : null;
         _source = node;
-
-        if (_source == null)
-            Debug.LogWarning($"Miner at {cell} found no resource.");
     }
 
     private void TryFlushBuffer()
@@ -75,12 +72,12 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
         var targetCell = cell + outDir;
         var outPort = grid.GetPortAt(targetCell);
 
-        if (outPort != null && outPort.CanReceive) // 下游能接收
+        if (outPort != null && outPort.CanReceive)
         {
             ItemPayload payload = _buffer.Peek();
-            if (outPort.TryProvide(ref payload)) // 下游从我这里拉取
+            if (outPort.TryReceive(in payload))
             {
-                _buffer.Dequeue();
+                _buffer.Dequeue(); 
             }
         }
     }
@@ -91,8 +88,7 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
         {
             return;
         }
-
-        // 累积时间，达到指定的 cycleTime 时采集一包资源
+        
         _t += dt;
 
         if (_buffer.Count < BUFFER_LIMIT && _t >= cycleTime)

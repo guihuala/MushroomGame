@@ -55,8 +55,7 @@ public class Hub : MonoBehaviour
         }
 
         _storage.Add(payload);
-        DebugManager.Log($"Hub received {payload.amount}x {payload.item?.name}", this);
-        
+
         OnItemReceived?.Invoke(payload);
 
         return true;

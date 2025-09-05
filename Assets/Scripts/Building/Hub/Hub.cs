@@ -19,7 +19,6 @@ public class Hub : MonoBehaviour
     {
         grid = FindObjectOfType<TileGridService>();
         centerCell = grid.WorldToCell(transform.position);
-        DebugManager.Log($"{centerCell}");
 
         RegisterInitialPorts();
     }

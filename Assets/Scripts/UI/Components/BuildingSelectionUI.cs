@@ -182,8 +182,6 @@ public class BuildingSelectionUI : MonoBehaviour
                 placementSystem.EnterBuildMode();
             }
         }
-        
-        DebugManager.Log($"Selected building: {buildingData.buildingName}");
     }
     
     /// <summary>

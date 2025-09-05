@@ -256,14 +256,11 @@ public class TileGridService : MonoBehaviour
                 building.OnNeighborChanged();
             }
         }
-    
-        DebugManager.Log($"Notified neighbors of change at {changedCell}", this);
     }
     
     private void NotifyBuildingPlaced(Vector2Int cell, Building building)
     {
         MsgCenter.SendMsg(MsgConst.MSG_BUILDING_PLACED, cell, building);
-        DebugManager.Log($"Building placed at {cell}: {building.GetType().Name}", this);
     }   
     
     private void NotifyBuildingRemoved(Vector2Int cell)

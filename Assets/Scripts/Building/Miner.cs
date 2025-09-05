@@ -88,7 +88,6 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     {
         if (_source == null)
         {
-            DebugManager.LogWarning($"Miner at {cell} has no resource source", this);
             return;
         }
 
@@ -107,12 +106,10 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
                     worldPos = grid.CellToWorld(cell)
                 };
 
-                _buffer.Enqueue(payload);  // 将物品加入缓冲区
-                
-                DebugManager.Log($"Miner at {cell} produced {payload.amount}x {payload.item?.name}", this);
+                _buffer.Enqueue(payload); // 将物品加入缓冲区
             }
 
-            _t = 0f;  // 重置计时器
+            _t = 0f; // 重置计时器
         }
 
         // 尝试将物品从缓冲区推送到目标

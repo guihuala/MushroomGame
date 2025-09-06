@@ -6,8 +6,7 @@ public struct ItemStack
 {
     public ItemDef item;
     public int amount;
-
-    public bool IsEmpty => item == null || amount <= 0;
+    
     public int CanTake(int want) => Mathf.Min(want, amount);
     public int CanGive(int want)
     {

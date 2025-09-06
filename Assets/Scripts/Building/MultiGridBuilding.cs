@@ -3,26 +3,72 @@ using System.Collections.Generic;
 
 public class MultiGridBuilding : Building
 {
-    protected List<ItemPayload> storage = new();  // 存储物品的容器
+    // 管理输入输出端口
+    public Dictionary<Vector2Int, IItemPort> inputPorts = new Dictionary<Vector2Int, IItemPort>();
+    public Dictionary<Vector2Int, IItemPort> outputPorts = new Dictionary<Vector2Int, IItemPort>();
 
     // 物品接收方法
     public virtual bool ReceiveItem(in ItemPayload payload)
     {
-        // 可以扩展逻辑，比如存储物品的数量限制等
-        storage.Add(payload);
-        return true;
+        // 处理物品接收逻辑，具体逻辑根据建筑类型不同而定
+        return true; // 这里可以根据需求进行扩展
     }
 
     // 物品输出方法
     public virtual bool ProvideItem(ref ItemPayload payload)
     {
-        // 如果有物品可以提供，提供第一个物品
-        if (storage.Count > 0)
+        // 处理物品输出逻辑，具体逻辑根据建筑类型不同而定
+        return true; // 这里可以根据需求进行扩展
+    }
+
+    // 注册输入端口和输出端口
+    public void RegisterPort(Vector2Int cell, IItemPort port, bool isInput)
+    {
+        if (isInput)
         {
-            payload = storage[0];  // 获取第一个物品
-            storage.RemoveAt(0);    // 移除该物品
-            return true;
+            inputPorts[cell] = port;  // 输入端口
         }
-        return false;
+        else
+        {
+            outputPorts[cell] = port; // 输出端口
+        }
+    }
+
+    // 卸载输入输出端口
+    public void UnregisterPort(Vector2Int cell, bool isInput)
+    {
+        if (isInput)
+        {
+            inputPorts.Remove(cell);  // 卸载输入端口
+        }
+        else
+        {
+            outputPorts.Remove(cell);  // 卸载输出端口
+        }
+    }
+
+    // 更新旋转时的端口位置
+    public void RotatePorts(float angle)
+    {
+        Dictionary<Vector2Int, IItemPort> rotatedInputPorts = new Dictionary<Vector2Int, IItemPort>();
+        Dictionary<Vector2Int, IItemPort> rotatedOutputPorts = new Dictionary<Vector2Int, IItemPort>();
+
+        // 旋转输入端口
+        foreach (var port in inputPorts)
+        {
+            Vector2Int rotatedPosition = RotateCell(port.Key, angle);
+            rotatedInputPorts[rotatedPosition] = port.Value;
+        }
+
+        // 旋转输出端口
+        foreach (var port in outputPorts)
+        {
+            Vector2Int rotatedPosition = RotateCell(port.Key, angle);
+            rotatedOutputPorts[rotatedPosition] = port.Value;
+        }
+
+        // 更新端口字典
+        inputPorts = rotatedInputPorts;
+        outputPorts = rotatedOutputPorts;
     }
 }

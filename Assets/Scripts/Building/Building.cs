@@ -3,9 +3,9 @@ using UnityEngine;
 public abstract class Building : MonoBehaviour
 {
     protected TileGridService grid;
-    public Vector2Int cell;
-    public Vector2Int size = Vector2Int.one;  // 默认1x1的建筑
-    public Vector2Int anchor = new Vector2Int(0, 0);  // 锚点作为相对位置
+    public Vector2Int cell;           // 建筑的起始格子坐标
+    public Vector2Int size = Vector2Int.one; // 默认1x1的建筑
+    public Vector2Int anchor = new Vector2Int(0, 0);  // 锚点位置（相对位置）
 
     public virtual void OnPlaced(TileGridService g, Vector2Int c)
     {
@@ -27,19 +27,18 @@ public abstract class Building : MonoBehaviour
     // 旋转建筑及其端口
     public void RotateBuilding(float angle)
     {
-        // 旋转建筑的占用格子
         Vector2Int[] occupiedCells = GetOccupiedCells();
         Vector2Int[] rotatedCells = RotateCells(occupiedCells, angle);
 
         // 更新建筑的位置
-        foreach (var cell in occupiedCells)
+        foreach (var c in occupiedCells)
         {
-            grid.ReleaseCells(cell, Vector2Int.one);
+            grid.ReleaseCells(c, Vector2Int.one);
         }
 
-        foreach (var cell in rotatedCells)
+        foreach (var c in rotatedCells)
         {
-            grid.OccupyCells(cell, Vector2Int.one, this);
+            grid.OccupyCells(c, Vector2Int.one, this);
         }
     }
 
@@ -59,9 +58,8 @@ public abstract class Building : MonoBehaviour
     }
 
     // 旋转单个格子
-    private Vector2Int RotateCell(Vector2Int originalCell, float angle)
+    public Vector2Int RotateCell(Vector2Int originalCell, float angle)
     {
-        // 根据锚点和旋转角度来计算新的位置
         float rad = Mathf.Deg2Rad * angle;
         float cos = Mathf.Cos(rad);
         float sin = Mathf.Sin(rad);

@@ -14,6 +14,9 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
 
     // 数据存储
     private readonly List<BeltItem> _items = new();
+    // 属性
+    public IReadOnlyList<BeltItem> Items => _items;
+    
     private IItemPort _connectedOutputPort;
     private Vector2Int _connectedDirection;
 
@@ -21,9 +24,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
     private int _lastAutoTileFrame = -1;
     private static Vector2Int RotCW(Vector2Int v) => new(v.y, -v.x);
     private static Vector2Int RotCCW(Vector2Int v) => new(-v.y, v.x);
-
-    // 属性（供渲染器等用）
-    public IReadOnlyList<BeltItem> Items => _items;
+    
     public Vector2Int Direction => outDir;
 
     public bool CanProvide => _items.Count > 0 && _items[0].pos >= 0.95f;

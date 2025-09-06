@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// 检查环路之类的
 public class BeltScheduler : MonoBehaviour
 {
     [SerializeField] private TileGridService grid; // 拖引用或运行时查找

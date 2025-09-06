@@ -10,21 +10,19 @@ public static class TransportCompat
             return false;
         }
         
-        DebugManager.Log($"DownAccepts: {down}");
         switch (down)
         {
-            case Conveyor c: 
-                bool accepts = d == -c.inDir;
-                return accepts;
+            case Conveyer c: 
+                return d == -c.inDir; // 方向相反才能接收
                 
             case Miner: 
-                return false;
+                return false; // 矿机不接收物品
                 
             case HubPort:
-                return true;
+                return true; // Hub总是可以接收
                 
             default: 
-                return true;
+                return true; // 其他建筑默认可以接收
         }
     }
 
@@ -38,27 +36,28 @@ public static class TransportCompat
         
         switch (up)
         {
-            case Conveyor c: 
-                bool feeds = c.outDir == dirToA;
-                return feeds;
+            case Conveyer c: 
+                return c.outDir == dirToA; // 传送带输出方向要匹配
                 
             case Miner m: 
-                bool minerFeeds = m.outDir == dirToA;
-                return minerFeeds;
+                return m.outDir == dirToA; // 矿机输出方向要匹配
                 
             default: 
-                return true;
+                return true; // 其他建筑默认可以提供
         }
     }
 
-    public static bool IsAnchored(TileGridService g, Conveyor a)
+    public static bool IsAnchored(TileGridService g, Conveyer a)
     {
+        // 检查下游是否能接收
         var down = g.GetPortAt(a.cell + a.outDir);
         bool downAccepts = DownAccepts(a.outDir, down);
         
+        // 检查上游是否能提供
         var up = g.GetPortAt(a.cell - a.inDir);
         bool upFeeds = UpFeeds(a.inDir, up);
 
+        // 只要有一端连接成功就算锚定
         return downAccepts || upFeeds;
     }
 }

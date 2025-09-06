@@ -140,8 +140,8 @@ public class PlacementSystem : MonoBehaviour
             _currentPreview.SetDirection(_currentDir);
 
             // 放置：空=可；擦除：有物=可
-            bool ok = !EraseActive ? grid.IsFree(cell)
-                                   : (grid.GetBuildingAt(cell) != null);
+            bool ok = !EraseActive ? grid.AreCellsFree(cell, _currentPrefab.size) // 修改这里以判断多格占地
+                : (grid.GetBuildingAt(cell) != null);
             _currentPreview.SetPreviewState(ok);
         }
     }
@@ -252,12 +252,7 @@ public class PlacementSystem : MonoBehaviour
     // ===== 放置：工具函数 =====
     private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
     {
-        if (grid.GetBuildingAt(cell) != null)
-        {
-            _dragLastCell = cell;
-            return;
-        }
-
+        // 判断整个建筑的占地范围
         if (!grid.AreCellsFree(cell, _currentPrefab.size))
         {
             _dragLastCell = cell;
@@ -265,11 +260,12 @@ public class PlacementSystem : MonoBehaviour
         }
 
         var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
-        
+    
         if (building is IOrientable orientable)
         {
             orientable.SetDirection(dirForThis); // 先放置再设置方向，确认已经grid赋值
         }
+
         building.OnPlaced(grid, cell);
 
         // 让上一格朝向这一格，形成连续链（仅当上一格也可转向）
@@ -358,41 +354,5 @@ public class PlacementSystem : MonoBehaviour
     {
         return UnityEngine.EventSystems.EventSystem.current != null &&
                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
-    }
-    
-    void OnGUI()
-    {
-        if (!IsInBuildMode || !showHUD) return;
-
-        if (_hudStyle == null)
-        {
-            _hudStyle = new GUIStyle(GUI.skin.box) { fontSize = 12, alignment = TextAnchor.UpperLeft };
-            _hudHeader = new GUIStyle(GUI.skin.label) { fontSize = 14, fontStyle = FontStyle.Bold };
-            _hudSmall = new GUIStyle(GUI.skin.label) { fontSize = 12, normal = { textColor = new Color(1,1,1,0.85f) } };
-        }
-
-        float x = hudAnchor.x, y = Screen.height - hudAnchor.y - 5 * hudLine;
-        GUILayout.BeginArea(new Rect(x, y, hudWidth, 7 * hudLine), GUIContent.none, _hudStyle);
-        GUILayout.Label("Build Mode", _hudHeader);
-
-        string modeStr = EraseActive ? "ERASE (X 切换 / 按住设置键临时擦除)" : "PLACE (X 切换)";
-        string sel = _currentPrefab ? _currentPrefab.GetType().Name : "(none)";
-        string dir = $"({_currentDir.x},{_currentDir.y})";
-
-        GUILayout.Label($"Mode : {modeStr}", _hudSmall);
-        GUILayout.Label($"Prefab : {sel}", _hudSmall);
-        GUILayout.Label($"Dir (WASD) : {dir}", _hudSmall);
-        GUILayout.Space(4);
-        string holdInfo = $"Hold-to-Erase : {KeyToString(holdToErasePrimary)}" +
-                          (holdToEraseSecondary != KeyCode.None ? $" / {KeyToString(holdToEraseSecondary)}" : "");
-        GUILayout.Label(holdInfo, _hudSmall);
-        GUILayout.Label($"Exit : Right Mouse / {exitBuildKey}", _hudSmall);
-        GUILayout.EndArea();
-    }
-
-    private string KeyToString(KeyCode k)
-    {
-        if (k == KeyCode.None) return "None";
-        return k.ToString();
     }
 }

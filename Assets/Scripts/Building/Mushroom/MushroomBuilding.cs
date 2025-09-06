@@ -140,7 +140,7 @@ public class MushroomBuilding : Building, IItemPort, ITickable
             {
                 item = output.item,
                 amount = output.amount,
-                worldPos = grid.CellToWorld(cell)
+                
             };
             
             _outputBuffer.Enqueue(payload);

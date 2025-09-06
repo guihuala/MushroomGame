@@ -184,6 +184,34 @@ public class TileGridService : MonoBehaviour
 
     #region 放置格子操作与邻居有关操作
 
+    public void RotateBuilding(Building building, float angle)
+    {
+        // 获取建筑的所有占用格子
+        Vector2Int[] occupiedCells = building.GetOccupiedCells();
+        
+        // 占用旋转后的格子
+        foreach (var cell in occupiedCells)
+        {
+            _buildings.Remove(cell);
+            _buildableCache.Remove(cell);
+        }
+
+        building.RotateBuilding(angle);
+
+        Vector2Int[] rotatedCells = building.GetOccupiedCells();
+        foreach (var cell in rotatedCells)
+        {
+            _buildings[cell] = building;
+            _buildableCache[cell] = false;
+        }
+
+        // 重新计算邻居
+        foreach (var cell in rotatedCells)
+        {
+            NotifyNeighborsOfChange(cell);
+        }
+    }
+    
     public bool AreCellsFree(Vector2Int startCell, Vector2Int size)
     {
         for (int x = startCell.x; x < startCell.x + size.x; x++)

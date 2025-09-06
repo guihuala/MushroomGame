@@ -264,36 +264,4 @@ public class Hub : MonoBehaviour
         
         return 0f;
     }
-
-    // 调试用：手动设置阶段
-    public void SetStage(int stageIndex)
-    {
-        if (stageIndex >= 0 && stageIndex < stages.Count)
-        {
-            currentStageIndex = stageIndex;
-            UpdateStageVisuals();
-        }
-    }
-
-    // 调试用：手动完成当前阶段
-    public void DebugCompleteCurrentStage()
-    {
-        if (!isFinalStageComplete && currentStageIndex < stages.Count)
-        {
-            // 临时添加所需物品以满足条件
-            var currentStage = stages[currentStageIndex];
-            foreach (var requirement in currentStage.requirements)
-            {
-                if (_storage.ContainsKey(requirement.item))
-                {
-                    _storage[requirement.item] = requirement.requiredAmount;
-                }
-                else
-                {
-                    _storage[requirement.item] = requirement.requiredAmount;
-                }
-            }
-            CheckStageCompletion();
-        }
-    }
 }

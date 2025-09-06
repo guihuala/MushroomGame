@@ -228,8 +228,8 @@ public class BuildingSelectionUI : MonoBehaviour
     {
         switch (category)
         {
-            case BuildingCategory.Production: return "生产";
-            case BuildingCategory.Logistics: return "物流";
+            case BuildingCategory.Production: return "Production";
+            case BuildingCategory.Logistics: return "Logistics";
             default: return category.ToString();
         }
     }

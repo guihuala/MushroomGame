@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2975372669769039078}
   - component: {fileID: 7335108824167549670}
   - component: {fileID: 3588446602138790399}
+  - component: {fileID: 5675723019725739722}
   m_Layer: 5
   m_Name: InventoryInfo
   m_TagString: Untagged
@@ -73,6 +74,21 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5675723019725739722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2774643663466619003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84b6a5c9a097041a7afb506161497613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemIcon: {fileID: 6581367957797266378}
+  quantityText: {fileID: 4446267969476483801}
+  backgroundImage: {fileID: 0}
 --- !u!1 &3295411761867900200
 GameObject:
   m_ObjectHideFlags: 0
@@ -139,7 +155,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: c386ad0a7c6294e8f92a84165a0ab10f, type: 3}
     m_FontSize: 36
     m_FontStyle: 0
     m_BestFit: 0

@@ -6,4 +6,5 @@ public class MsgConst
     public const int MSG_NEIGHBOR_CHANGED = 4; // 邻居变化事件
     public const int MSG_CONVEYOR_PLACED = 5;
     public const int MSG_CONVEYOR_REMOVED = 6;
+    public const int MSG_HUB_CLICKED = 7;
 }

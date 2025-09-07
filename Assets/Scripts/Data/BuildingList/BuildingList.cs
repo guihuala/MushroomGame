@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BuildingList", menuName = "Building System/Building List")]
-public class BuildingListManager : ScriptableObject
+public class BuildingList : ScriptableObject
 {
     public List<BuildingData> allBuildings = new List<BuildingData>();
     

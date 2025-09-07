@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class HudController : MonoBehaviour
 {
     [SerializeField] private Button pauseButton;
+    [SerializeField] private Button techTreeButton;
     [SerializeField] private Hub hub;
 
     [Header("HUD Inventory Display")]
@@ -25,6 +26,7 @@ public class HudController : MonoBehaviour
     void Awake()
     {
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
+        techTreeButton.onClick.AddListener(OnTechTreeButtonClicked);
     }
 
     private void Start()
@@ -132,19 +134,25 @@ public class HudController : MonoBehaviour
     private void ShowMushroomSelectionPanel(params object[] args)
     {
         Vector2Int targetCell = (Vector2Int)args[0];
-        List<Building> mushrooms = GetUnlockedMushrooms();
+        List<BuildingData> mushrooms = GetUnlockedMushrooms();
         mushroomSelectionPanel.ShowMushroomPanel(mushrooms, targetCell);
     }
 
-    private List<Building> GetUnlockedMushrooms()
+    private List<BuildingData> GetUnlockedMushrooms()
     {
-        return TechTreeManager.Instance.GetUnlockedBuildings().Where(b => b is MushroomBuilding).ToList();
+        return TechTreeManager.Instance.GetUnlockedBuildingsByCategory(BuildingCategory.Mushroom);
     }
 
     private void OnPauseButtonClicked()
     {
         UIManager.Instance.OpenPanel("PausePanel");
     }
+
+    private void OnTechTreeButtonClicked()
+    {
+        UIManager.Instance.OpenPanel("TechTreePanel");
+    }
+    
 
     private void HandleInventoryChanged()
     {

@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class BuildingSelectionUI : MonoBehaviour
 {
     [Header("引用")]
     public PlacementSystem placementSystem;
-    public BuildingListManager buildingListManager;
+    [FormerlySerializedAs("buildingListManager")] public BuildingList buildingList;
     
     [Header("UI预制体")]
     public GameObject categoryTabPrefab;
@@ -45,13 +46,13 @@ public class BuildingSelectionUI : MonoBehaviour
     /// </summary>
     private void InitializeUI()
     {
-        if (buildingListManager == null || placementSystem == null) return;
+        if (buildingList == null || placementSystem == null) return;
         
         // 按分类组织建筑
         buildingsByCategory = new Dictionary<BuildingCategory, List<BuildingData>>();
-        foreach (var category in buildingListManager.GetAllCategories())
+        foreach (var category in buildingList.GetAllCategories())
         {
-            buildingsByCategory[category] = buildingListManager.GetBuildingsByCategory(category);
+            buildingsByCategory[category] = buildingList.GetBuildingsByCategory(category);
         }
         
         CreateCategoryTabs();

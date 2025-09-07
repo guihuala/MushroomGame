@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e003bda3e62914f91b3068428068b917, type: 3}
+  m_Name: test
+  m_EditorClassIdentifier: 
+  nodes:
+  - building: {fileID: 11400000, guid: 1769c3bdf986b4979a7699b4b8197795, type: 2}
+    unlockCost:
+    - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
+      amount: 1
+    prerequisites:
+    - {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
+    editorPosition: {x: 0, y: 0}
+  - building: {fileID: 0}
+    unlockCost: []
+    prerequisites: []
+    editorPosition: {x: 0, y: 0}
+  initialUnlocks:
+  - {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
+  - {fileID: 11400000, guid: 61ab971223d074d0c9fe13007ed9db64, type: 2}

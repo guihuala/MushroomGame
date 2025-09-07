@@ -8,7 +8,7 @@ public class MushroomSelectionPanel : MonoBehaviour
     public GameObject panel;
     public Transform mushroomsContainer;
     public Button mushroomButtonPrefab;
-    private List<Building> availableMushrooms = new List<Building>();
+    private List<BuildingData> availableMushrooms = new List<BuildingData>();
 
     private TileGridService grid;
     private Vector2Int targetCell;  // 记录目标位置，玩家选择蘑菇后放置
@@ -19,7 +19,7 @@ public class MushroomSelectionPanel : MonoBehaviour
         panel.SetActive(false);
     }
 
-    public void ShowMushroomPanel(List<Building> mushrooms, Vector2Int cell)
+    public void ShowMushroomPanel(List<BuildingData> mushrooms, Vector2Int cell)
     {
         availableMushrooms = mushrooms;
         targetCell = cell;
@@ -43,19 +43,19 @@ public class MushroomSelectionPanel : MonoBehaviour
     }
 
     // 玩家选择蘑菇后，放置蘑菇并关闭面板
-    private void OnMushroomSelected(Building selectedMushroom)
+    private void OnMushroomSelected(BuildingData selectedMushroom)
     {
         PlaceMushroom(selectedMushroom);
         HidePanel();
     }
 
     // 放置蘑菇
-    private void PlaceMushroom(Building mushroom)
+    private void PlaceMushroom(BuildingData mushroom)
     {
         // 检查目标格子是否可以放置蘑菇
         if (mushroom != null && availableMushrooms.Contains(mushroom))
         {
-            var mushroomInstance = Instantiate(mushroom, grid.CellToWorld(targetCell), Quaternion.identity);
+            var mushroomInstance = Instantiate(mushroom.prefab, grid.CellToWorld(targetCell), Quaternion.identity);
             mushroomInstance.OnPlaced(grid, targetCell);  // 设置位置和网格
         }
     }

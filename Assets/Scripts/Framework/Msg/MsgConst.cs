@@ -23,7 +23,10 @@ public class MsgConst
     public const int UI_TASK_PANEL_UPDATE = 4001;
     public const int UI_HUD_INVENTORY_UPDATE = 4002;
     
-    // ========== 游戏状态消息 (5000-5999) ==========
-    public const int GAME_PAUSED = 5001;
-    public const int GAME_RESUMED = 5002;
+    // ========== 科技树消息 (5000-5999) ==========
+    public const int BUILDING_UNLOCKED = 5001;
+    
+    // ========== 游戏状态消息 (6000-6999) ==========
+    public const int GAME_PAUSED = 6001;
+    public const int GAME_RESUMED = 6002;
 }

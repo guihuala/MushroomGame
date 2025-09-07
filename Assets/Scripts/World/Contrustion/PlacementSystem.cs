@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Serialization;
 
 public class PlacementSystem : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class PlacementSystem : MonoBehaviour
     public Camera mainCam;
     public TileGridService grid;
     public CameraController cameraController;
-    public BuildingListManager buildingListManager;
+    [FormerlySerializedAs("buildingListManager")] public BuildingList buildingList;
 
     [Header("预览预制件")]
     public GameObject previewPrefab;
@@ -185,8 +186,8 @@ public class PlacementSystem : MonoBehaviour
 
     private BuildingData GetBuildingDataForCurrentPrefab()
     {
-        if (buildingListManager == null || _currentPrefab == null) return null;
-        foreach (var bd in buildingListManager.allBuildings)
+        if (buildingList == null || _currentPrefab == null) return null;
+        foreach (var bd in buildingList.allBuildings)
         {
             if (bd.prefab != null && bd.prefab.GetType() == _currentPrefab.GetType())
                 return bd;
@@ -396,10 +397,10 @@ public class PlacementSystem : MonoBehaviour
 
     public void SelectIndex(int idx)
     {
-        if (buildingListManager == null || buildingListManager.allBuildings.Count == 0) return;
+        if (buildingList == null || buildingList.allBuildings.Count == 0) return;
 
-        SelectedIndex = Mathf.Clamp(idx, 1, buildingListManager.allBuildings.Count);
-        if (SelectedIndex <= buildingListManager.allBuildings.Count)
-            SetCurrentBuilding(buildingListManager.allBuildings[SelectedIndex - 1].prefab);
+        SelectedIndex = Mathf.Clamp(idx, 1, buildingList.allBuildings.Count);
+        if (SelectedIndex <= buildingList.allBuildings.Count)
+            SetCurrentBuilding(buildingList.allBuildings[SelectedIndex - 1].prefab);
     }
 }

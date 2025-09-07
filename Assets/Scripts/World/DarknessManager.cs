@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DarknessManager : Singleton<DarknessManager>
+public class DarknessManager : Singleton<DarknessManager>,IManager
 {
     [Header("黑暗视觉效果")]
     public Material darknessMaterial;
@@ -16,6 +16,15 @@ public class DarknessManager : Singleton<DarknessManager>
     // 黑暗等级缓存
     private Dictionary<Vector2Int, float> _cellDarknessLevels = new Dictionary<Vector2Int, float>();
 
+    // 初始化方法
+    public void Initialize()
+    {
+        DebugManager.Log("DarknessManager initialized");
+        _updateTimer = updateInterval;
+        _cellDarknessLevels.Clear();
+        InitializeMaterial();
+    }
+    
     void Start()
     {
         _updateTimer = updateInterval;

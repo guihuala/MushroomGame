@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TickManager : Singleton<TickManager>
+public class TickManager : Singleton<TickManager>,IManager
 {
     private readonly List<ITickable> _tickables = new();
     private float _accumulatedTime = 0f;
@@ -9,6 +9,15 @@ public class TickManager : Singleton<TickManager>
     [Header("Tick Settings")]
     public float minTickInterval = 0.1f; // 默认100毫秒
 
+    // 初始化方法
+    public void Initialize()
+    {
+        DebugManager.Log("TickManager initialized");
+        
+        _accumulatedTime = 0f;
+        _tickables.Clear();
+    }
+    
     public void Register(ITickable t)
     {
         if (t != null && !_tickables.Contains(t)) _tickables.Add(t);

@@ -16,12 +16,20 @@ public struct ItemStack
     }
 }
 
-public class InventoryManager : Singleton<InventoryManager>
+public class InventoryManager : Singleton<InventoryManager>,IManager
 {
     [Header("Storage Settings")]
-    public int maxStorage = 999;
+    public int maxStorage = 99999;
 
     private Dictionary<ItemDef, int> _inventory = new Dictionary<ItemDef, int>();
+    
+    // 初始化方法
+    public void Initialize()
+    {
+        DebugManager.Log("InventoryManager initialized");
+        // 清空库存并重置
+        ClearInventory();
+    }
     
     // 添加物品到库存
     public bool AddItem(ItemDef item, int amount)
@@ -141,20 +149,7 @@ public class InventoryManager : Singleton<InventoryManager>
         _inventory.Clear();
         MsgCenter.SendMsgAct(MsgConst.INVENTORY_CHANGED);
     }
-
-    // 初始化库存
-    public void InitializeWithItems(List<ItemStack> initialItems)
-    {
-        ClearInventory();
-        foreach (var itemStack in initialItems)
-        {
-            if (itemStack.item != null && itemStack.amount > 0)
-            {
-                AddItem(itemStack.item, itemStack.amount);
-            }
-        }
-    }
-
+    
     // 尝试从库存中取出指定数量的物品
     public bool TryTakeItems(ItemDef item, int amount, out ItemStack takenStack)
     {

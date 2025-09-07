@@ -35686,11 +35686,7 @@ GameObject:
   m_Component:
   - component: {fileID: 677476665}
   - component: {fileID: 677476664}
-  - component: {fileID: 677476668}
-  - component: {fileID: 677476670}
-  - component: {fileID: 677476671}
   - component: {fileID: 677476672}
-  - component: {fileID: 677476673}
   m_Layer: 0
   m_Name: -----GameCore-----
   m_TagString: Untagged
@@ -35710,6 +35706,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d30559bc90bef4ddf8b5d4420bb486e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  managersPrefab: {fileID: 3672668951708238811, guid: 47d4b23283434458892f9496b6bb9603, type: 3}
 --- !u!4 &677476665
 Transform:
   m_ObjectHideFlags: 0
@@ -35725,47 +35722,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &677476668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677476663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed9253ff4c26046debb642a5d0ed3ed3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  minTickInterval: 0.05
---- !u!114 &677476670
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677476663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44e254b7c1b29451eaf4591bcc750589, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &677476671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677476663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cd6dac59c199448cb369146ff4227d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  darknessMaterial: {fileID: 2100000, guid: 226097618a32c45fea1ac97fd7966c3f, type: 2}
-  updateInterval: 0.1
-  maxLights: 50
-  darknessColor: {r: 0, g: 0, b: 0, a: 0.8}
 --- !u!114 &677476672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35789,19 +35745,6 @@ MonoBehaviour:
   horizontalAxis: Horizontal
   verticalAxis: Vertical
   zoomAxis: Mouse ScrollWheel
---- !u!114 &677476673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677476663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04780b9b7d668489cadcdbc4c356fd89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxStorage: 99999
 --- !u!1001 &818930257
 PrefabInstance:
   m_ObjectHideFlags: 0

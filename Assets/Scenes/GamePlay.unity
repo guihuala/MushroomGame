@@ -35686,11 +35686,11 @@ GameObject:
   m_Component:
   - component: {fileID: 677476665}
   - component: {fileID: 677476664}
-  - component: {fileID: 677476667}
   - component: {fileID: 677476668}
   - component: {fileID: 677476670}
   - component: {fileID: 677476671}
   - component: {fileID: 677476672}
+  - component: {fileID: 677476673}
   m_Layer: 0
   m_Name: -----GameCore-----
   m_TagString: Untagged
@@ -35725,24 +35725,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &677476667
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677476663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37c493ba159374da1aa7c1b468764b8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tipTextPrefab: {fileID: 4961126027869319054, guid: 901b847cd31b54a8b9bc27615e469c7e, type: 3}
-  uiCanvas: {fileID: 652770273}
-  alwaysOnTop: 1
-  fadeInDuration: 0.2
-  fadeOutDuration: 0.15
-  scaleFrom: 0.8
 --- !u!114 &677476668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35807,6 +35789,19 @@ MonoBehaviour:
   horizontalAxis: Horizontal
   verticalAxis: Vertical
   zoomAxis: Mouse ScrollWheel
+--- !u!114 &677476673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677476663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04780b9b7d668489cadcdbc4c356fd89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxStorage: 99999
 --- !u!1001 &818930257
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35876,6 +35871,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6094401601146422401, guid: 5b66218dcfa144ebaad65e9c474c5bb9, type: 3}
+      propertyPath: initialItems.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6094401601146422401, guid: 5b66218dcfa144ebaad65e9c474c5bb9, type: 3}
       propertyPath: stages.Array.data[0].stageName
       value: 1
       objectReference: {fileID: 0}
@@ -35896,6 +35895,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6094401601146422401, guid: 5b66218dcfa144ebaad65e9c474c5bb9, type: 3}
+      propertyPath: initialItems.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
+    - target: {fileID: 6094401601146422401, guid: 5b66218dcfa144ebaad65e9c474c5bb9, type: 3}
       propertyPath: stages.Array.data[0].stageSprite
       value: 
       objectReference: {fileID: 1854740926, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
@@ -35903,6 +35906,10 @@ PrefabInstance:
       propertyPath: stages.Array.data[1].stageSprite
       value: 
       objectReference: {fileID: 1607662853, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+    - target: {fileID: 6094401601146422401, guid: 5b66218dcfa144ebaad65e9c474c5bb9, type: 3}
+      propertyPath: initialItems.Array.data[0].amount
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6094401601146422401, guid: 5b66218dcfa144ebaad65e9c474c5bb9, type: 3}
       propertyPath: stages.Array.data[0].requirements.Array.size
       value: 1

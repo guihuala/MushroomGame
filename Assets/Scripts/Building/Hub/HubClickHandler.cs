@@ -21,7 +21,7 @@ public class HubClickHandler : MonoBehaviour, IPointerClickHandler
     {
         if (eventData.button == PointerEventData.InputButton.Left && _hub != null)
         {
-            MsgCenter.SendMsg(MsgConst.MSG_HUB_CLICKED, _hub);
+            MsgCenter.SendMsg(MsgConst.HUB_CLICKED, _hub);
         }
     }
     

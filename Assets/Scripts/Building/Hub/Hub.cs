@@ -25,7 +25,6 @@ public class Hub : MonoBehaviour
     
     private Vector2Int centerCell;
     private readonly List<HubPort> _ports = new();
-    private readonly Dictionary<ItemDef, int> _storage = new(); // 改为字典存储，分类计数
 
     [Header("Storage")]
     public int maxStorage = 999;
@@ -37,10 +36,6 @@ public class Hub : MonoBehaviour
     
     [Header("Initial Items")]
     public List<ItemStack> initialItems = new();
-    
-    public event Action<ItemPayload> OnItemReceived;
-    public event Action<int> OnStageCompleted; // 阶段完成事件，参数为阶段索引
-    public event Action OnAllStagesComplete;
 
     void Start()
     {
@@ -48,40 +43,17 @@ public class Hub : MonoBehaviour
         centerCell = grid.WorldToCell(transform.position);
 
         RegisterInitialPorts();
-        InitializeStorage();
         InitializeCurrentStage();
+        AddInitialItemsToInventory();
     }
     
-    private void InitializeStorage()
-    {
-        _storage.Clear();
-        // 初始化所有可能物品的存储计数为0
-        foreach (var stage in stages)
-        {
-            foreach (var requirement in stage.requirements)
-            {
-                if (!_storage.ContainsKey(requirement.item))
-                {
-                    _storage[requirement.item] = 0;
-                }
-            }
-        }
-        
-        AddInitialItems();
-    }
-    
-    private void AddInitialItems()
+    private void AddInitialItemsToInventory()
     {
         foreach (var initialItem in initialItems)
         {
             if (initialItem.item != null && initialItem.amount > 0)
             {
-                var payload = new ItemPayload
-                {
-                    item = initialItem.item,
-                    amount = initialItem.amount
-                };
-                ReceiveItem(payload);
+                InventoryManager.Instance.AddItemStack(initialItem);
             }
         }
     }
@@ -119,28 +91,25 @@ public class Hub : MonoBehaviour
 
     public bool ReceiveItem(in ItemPayload payload)
     {
-        if (GetTotalItemCount() >= maxStorage)
+        if (InventoryManager.Instance.GetTotalItemCount() >= maxStorage)
         {
             DebugManager.LogWarning("Hub storage full!", this);
             return false;
         }
 
-        // 添加到存储
-        if (_storage.ContainsKey(payload.item))
-        {
-            _storage[payload.item] += payload.amount;
-        }
-        else
-        {
-            _storage[payload.item] = payload.amount;
-        }
-
-        OnItemReceived?.Invoke(payload);
+        // 添加到全局库存管理器
+        bool success = InventoryManager.Instance.AddItem(payload.item, payload.amount);
         
-        // 检查当前阶段任务是否完成
-        CheckStageCompletion();
+        if (success)
+        {
+            // 发送物品接收消息
+            MsgCenter.SendMsg(MsgConst.HUB_ITEM_RECEIVED, payload);
+            
+            // 检查当前阶段任务是否完成
+            CheckStageCompletion();
+        }
 
-        return true;
+        return success;
     }
 
     private void CheckStageCompletion()
@@ -153,7 +122,7 @@ public class Hub : MonoBehaviour
         // 检查所有需求是否满足
         foreach (var requirement in currentStage.requirements)
         {
-            int currentAmount = GetItemCount(requirement.item);
+            int currentAmount = InventoryManager.Instance.GetItemCount(requirement.item);
             if (currentAmount < requirement.requiredAmount)
             {
                 stageComplete = false;
@@ -173,15 +142,11 @@ public class Hub : MonoBehaviour
         var currentStage = stages[currentStageIndex];
         foreach (var requirement in currentStage.requirements)
         {
-            _storage[requirement.item] -= requirement.requiredAmount;
-            if (_storage[requirement.item] <= 0)
-            {
-                _storage.Remove(requirement.item);
-            }
+            InventoryManager.Instance.RemoveItem(requirement.item, requirement.requiredAmount);
         }
         
-        // 触发阶段完成事件
-        OnStageCompleted?.Invoke(currentStageIndex);
+        // 发送阶段完成消息
+        MsgCenter.SendMsg(MsgConst.HUB_STAGE_COMPLETED, currentStageIndex);
         
         // 移动到下一阶段或完成所有阶段
         if (currentStageIndex < stages.Count - 1)
@@ -192,7 +157,7 @@ public class Hub : MonoBehaviour
         else
         {
             isFinalStageComplete = true;
-            OnAllStagesComplete?.Invoke();
+            MsgCenter.SendMsgAct(MsgConst.HUB_ALL_STAGES_COMPLETE);
             DebugManager.Log("All hub stages completed!", this);
         }
     }
@@ -226,21 +191,16 @@ public class Hub : MonoBehaviour
         }
     }
 
-    // 查询当前物品数量
+    // 查询当前物品数量（从InventoryManager获取）
     public int GetItemCount(ItemDef item)
     {
-        return _storage.ContainsKey(item) ? _storage[item] : 0;
+        return InventoryManager.Instance.GetItemCount(item);
     }
 
     // 获取所有物品总数量
     public int GetTotalItemCount()
     {
-        int total = 0;
-        foreach (var count in _storage.Values)
-        {
-            total += count;
-        }
-        return total;
+        return InventoryManager.Instance.GetTotalItemCount();
     }
 
     // 获取当前阶段信息

@@ -9,7 +9,6 @@ public class HudController : MonoBehaviour
     [SerializeField] private Button pauseButton;
     [SerializeField] private Hub hub;
 
-
     [Header("HUD Inventory Display")]
     [SerializeField] private Transform inventoryContainer;
     [SerializeField] private GameObject inventoryItemPrefab;
@@ -30,34 +29,30 @@ public class HudController : MonoBehaviour
 
     private void Start()
     {
-        MsgCenter.RegisterMsg(MsgConst.MSG_SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
-        
-        if (hub != null)
-        {
-            hub.OnItemReceived += HandleItemReceived;
-            hub.OnStageCompleted += HandleStageCompleted;
-            InitializeHudInventory();
-        }
+        // 注册消息中心事件
+        MsgCenter.RegisterMsg(MsgConst.SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
+        MsgCenter.RegisterMsg(MsgConst.HUB_CLICKED, OnHubClicked);
+        MsgCenter.RegisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
+        MsgCenter.RegisterMsgAct(MsgConst.INVENTORY_CHANGED, HandleInventoryChanged);
+        MsgCenter.RegisterMsg(MsgConst.HUB_STAGE_COMPLETED, HandleStageCompleted);
+
+        InitializeHudInventory();
 
         // 初始化任务面板
         if (taskPanel != null)
         {
             taskPanel.Initialize(hub);
         }
-
-        MsgCenter.RegisterMsg(MsgConst.MSG_HUB_CLICKED, OnHubClicked);
     }
 
     private void OnDestroy()
     {
-        if (hub != null)
-        {
-            hub.OnItemReceived -= HandleItemReceived;
-            hub.OnStageCompleted -= HandleStageCompleted;
-        }
-        
-        MsgCenter.UnregisterMsg(MsgConst.MSG_SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
-        MsgCenter.UnregisterMsg(MsgConst.MSG_HUB_CLICKED, OnHubClicked);
+        // 注销消息中心事件
+        MsgCenter.UnregisterMsg(MsgConst.SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
+        MsgCenter.UnregisterMsg(MsgConst.HUB_CLICKED, OnHubClicked);
+        MsgCenter.UnregisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
+        MsgCenter.UnregisterMsgAct(MsgConst.INVENTORY_CHANGED, HandleInventoryChanged);
+        MsgCenter.UnregisterMsg(MsgConst.HUB_STAGE_COMPLETED, HandleStageCompleted);
     }
 
     private void InitializeHudInventory()
@@ -67,7 +62,7 @@ public class HudController : MonoBehaviour
         ClearHudItems();
 
         var allItems = GetAllItemsInHub();
-        var sortedItems = allItems.OrderByDescending(item => hub.GetItemCount(item)).ToList();
+        var sortedItems = allItems.OrderByDescending(item => InventoryManager.Instance.GetItemCount(item)).ToList();
 
         foreach (var item in sortedItems)
         {
@@ -129,7 +124,7 @@ public class HudController : MonoBehaviour
     {
         if (_hudItems.ContainsKey(item))
         {
-            int currentAmount = hub.GetItemCount(item);
+            int currentAmount = InventoryManager.Instance.GetItemCount(item);
             _hudItems[item].UpdateDisplay(currentAmount);
         }
     }
@@ -151,28 +146,44 @@ public class HudController : MonoBehaviour
         UIManager.Instance.OpenPanel("PausePanel");
     }
 
-    private void HandleItemReceived(ItemPayload payload)
+    private void HandleInventoryChanged()
     {
-        if (payload.item != null)
+        UpdateAllHudItems();
+        
+        // 更新任务面板
+        taskPanel?.UpdateTaskPanelProgress();
+    }
+
+    private void HandleItemAdded(params object[] args)
+    {
+        if (args.Length > 0 && args[0] is ItemDef item)
         {
-            if (_hudItems.ContainsKey(payload.item))
+            if (!_hudItems.ContainsKey(item))
             {
-                UpdateHudItemDisplay(payload.item);
+                // 检查这个物品是否在当前阶段的需求中
+                var currentStage = hub.GetCurrentStage();
+                if (currentStage != null && currentStage.requirements.Any(r => r.item == item))
+                {
+                    CreateHudItemSlot(item);
+                }
             }
             else
             {
-                CreateHudItemSlot(payload.item);
+                UpdateHudItemDisplay(item);
             }
 
-            // 更新任务面板
-            taskPanel?.UpdateTaskItemDisplay(payload.item);
+            // 更新任务面板的特定物品显示
+            taskPanel?.UpdateTaskItemDisplay(item);
         }
     }
 
-    private void HandleStageCompleted(int stageIndex)
+    private void HandleStageCompleted(params object[] args)
     {
-        InitializeHudInventory();
-        taskPanel?.UpdateTaskPanelProgress();
+        if (args.Length > 0 && args[0] is int stageIndex)
+        {
+            InitializeHudInventory();
+            taskPanel?.UpdateTaskPanelProgress();
+        }
     }
 
     private void OnHubClicked(params object[] args)
@@ -185,6 +196,7 @@ public class HudController : MonoBehaviour
 
     private void Update()
     {
+        // 减少更新频率，每60帧更新一次
         if (Time.frameCount % 60 == 0 && _isInitialized)
         {
             UpdateAllHudItems();

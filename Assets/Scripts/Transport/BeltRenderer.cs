@@ -18,8 +18,8 @@ public class BeltRenderer : MonoBehaviour
 
     void Start()
     {
-        MsgCenter.RegisterMsg(MsgConst.MSG_CONVEYOR_PLACED, OnPlaced);
-        MsgCenter.RegisterMsg(MsgConst.MSG_CONVEYOR_REMOVED, OnRemoved);
+        MsgCenter.RegisterMsg(MsgConst.CONVEYOR_PLACED, OnPlaced);
+        MsgCenter.RegisterMsg(MsgConst.CONVEYOR_REMOVED, OnRemoved);
 
         // 场景已有的传送带纳入
         foreach (var c in FindObjectsOfType<Conveyer>())
@@ -28,8 +28,8 @@ public class BeltRenderer : MonoBehaviour
 
     void OnDestroy()
     {
-        MsgCenter.UnregisterMsg(MsgConst.MSG_CONVEYOR_PLACED, OnPlaced);
-        MsgCenter.UnregisterMsg(MsgConst.MSG_CONVEYOR_REMOVED, OnRemoved);
+        MsgCenter.UnregisterMsg(MsgConst.CONVEYOR_PLACED, OnPlaced);
+        MsgCenter.UnregisterMsg(MsgConst.CONVEYOR_REMOVED, OnRemoved);
     }
 
     void LateUpdate()

@@ -43,15 +43,15 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
         base.OnPlaced(g, c);
         grid.RegisterPort(cell, this);
  
-        MsgCenter.RegisterMsg(MsgConst.MSG_NEIGHBOR_CHANGED, OnNeighborChangedMsg);
-        MsgCenter.SendMsg(MsgConst.MSG_CONVEYOR_PLACED, this);
+        MsgCenter.RegisterMsg(MsgConst.NEIGHBOR_CHANGED, OnNeighborChangedMsg);
+        MsgCenter.SendMsg(MsgConst.CONVEYOR_PLACED, this);
         AutoTile();
     }
 
     public override void OnRemoved()
     {
-        MsgCenter.SendMsg(MsgConst.MSG_CONVEYOR_REMOVED, this);
-        MsgCenter.UnregisterMsg(MsgConst.MSG_NEIGHBOR_CHANGED, OnNeighborChangedMsg);
+        MsgCenter.SendMsg(MsgConst.CONVEYOR_REMOVED, this);
+        MsgCenter.UnregisterMsg(MsgConst.NEIGHBOR_CHANGED, OnNeighborChangedMsg);
         
         grid.UnregisterPort(cell, this);
         _connectedOutputPort = null;

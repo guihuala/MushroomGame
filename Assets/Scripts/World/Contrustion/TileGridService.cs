@@ -275,7 +275,7 @@ public class TileGridService : MonoBehaviour
             var neighborCell = changedCell + dir;
         
             // 发送邻居变化消息
-            MsgCenter.SendMsg(MsgConst.MSG_NEIGHBOR_CHANGED, neighborCell);
+            MsgCenter.SendMsg(MsgConst.NEIGHBOR_CHANGED, neighborCell);
         
             // 如果有建筑，也通知具体的建筑
             var building = GetBuildingAt(neighborCell);
@@ -288,12 +288,12 @@ public class TileGridService : MonoBehaviour
     
     private void NotifyBuildingPlaced(Vector2Int cell, Building building)
     {
-        MsgCenter.SendMsg(MsgConst.MSG_BUILDING_PLACED, cell, building);
+        MsgCenter.SendMsg(MsgConst.BUILDING_PLACED, cell, building);
     }   
     
     private void NotifyBuildingRemoved(Vector2Int cell)
     {
-        MsgCenter.SendMsg(MsgConst.MSG_BUILDING_REMOVED, cell);
+        MsgCenter.SendMsg(MsgConst.BUILDING_REMOVED, cell);
         DebugManager.Log($"Building removed from {cell}", this);
     }
     

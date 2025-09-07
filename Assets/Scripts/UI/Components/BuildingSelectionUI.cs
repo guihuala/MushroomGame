@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class BuildingSelectionUI : MonoBehaviour
 {
@@ -128,7 +127,7 @@ public class BuildingSelectionUI : MonoBehaviour
                 nameText.text = buildingData.buildingName;
             }
             
-            BuildingData data = buildingData; // 局部变量避免闭包问题
+            BuildingData data = buildingData;
             button.onClick.AddListener(() => OnBuildingSelected(data));
             
             buildingButtons.Add(button);
@@ -145,10 +144,8 @@ public class BuildingSelectionUI : MonoBehaviour
     {
         currentCategory = category;
         
-        // 更新页签颜色
         UpdateCategoryTabsVisual();
-        
-        // 显示该分类的建筑按钮
+
         ShowBuildingsInCategory(category);
     }
     

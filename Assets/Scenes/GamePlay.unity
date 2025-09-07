@@ -13712,7 +13712,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 6
-      m_TileSpriteIndex: 6
+      m_TileSpriteIndex: 7
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 0
@@ -13982,7 +13982,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 6
-      m_TileSpriteIndex: 6
+      m_TileSpriteIndex: 7
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 0
@@ -13992,7 +13992,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 6
-      m_TileSpriteIndex: 6
+      m_TileSpriteIndex: 7
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 0
@@ -14002,7 +14002,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 6
-      m_TileSpriteIndex: 6
+      m_TileSpriteIndex: 7
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 0
@@ -14971,10 +14971,10 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 4
-    m_Data: {fileID: 423362023, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
+  - m_RefCount: 4
+    m_Data: {fileID: 223821821, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   - m_RefCount: 3
     m_Data: {fileID: 307379102, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   - m_RefCount: 161
@@ -35673,6 +35673,99 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &546590906
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 546590908}
+  - component: {fileID: 546590907}
+  m_Layer: 0
+  m_Name: Weather
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &546590907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546590906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c596e4076d82f4726a5cb6a34e5f0298, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minTemperature: -10
+  maxTemperature: 30
+  minHumidity: 0
+  maxHumidity: 100
+  weatherConditions:
+  - type: 0
+    minTemperature: -10
+    maxTemperature: 30
+    minHumidity: 0
+    maxHumidity: 60
+    particleEffect: {fileID: 19832936, guid: 07f5c6ab5ca0f27418214773e67ba707, type: 3}
+    skyColor: {r: 0.5424528, g: 1, b: 1, a: 1}
+    ambientLightColor: {r: 1, g: 1, b: 1, a: 1}
+    ambientIntensity: 1
+  - type: 1
+    minTemperature: 10
+    maxTemperature: 30
+    minHumidity: 60
+    maxHumidity: 80
+    particleEffect: {fileID: 19838284, guid: 1b25ebb13de7ff142b435809fbd5690f, type: 3}
+    skyColor: {r: 0, g: 1, b: 1, a: 1}
+    ambientLightColor: {r: 1, g: 1, b: 1, a: 1}
+    ambientIntensity: 1
+  - type: 2
+    minTemperature: 10
+    maxTemperature: 30
+    minHumidity: 80
+    maxHumidity: 100
+    particleEffect: {fileID: 4721115142536811375, guid: f9767af79e89148f0ab28f3cfeff257f, type: 3}
+    skyColor: {r: 0, g: 1, b: 1, a: 1}
+    ambientLightColor: {r: 1, g: 1, b: 1, a: 1}
+    ambientIntensity: 1
+  - type: 3
+    minTemperature: -10
+    maxTemperature: 10
+    minHumidity: 60
+    maxHumidity: 80
+    particleEffect: {fileID: 4817948806901723937, guid: 8192f32f7b6474bbbb75bd0d8ae43aa4, type: 3}
+    skyColor: {r: 0, g: 1, b: 1, a: 1}
+    ambientLightColor: {r: 1, g: 1, b: 1, a: 1}
+    ambientIntensity: 1
+  weatherChangeInterval: 5
+  transitionDuration: 5
+  skyBackground: {fileID: 1710568520}
+  mainCamera: {fileID: 1234201018}
+  currentTemperature: 0
+  currentHumidity: 0
+  currentWeather: 0
+  previousWeather: 0
+--- !u!4 &546590908
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546590906}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 7.45, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 677476665}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &548831050
 GameObject:
   m_ObjectHideFlags: 0
@@ -36019,7 +36112,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 546590908}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &677476672
@@ -36836,7 +36930,7 @@ MonoBehaviour:
   edgeScrolling: 1
   edgeThreshold: 20
   zoomSpeed: 5
-  minZoom: 5
+  minZoom: 6
   maxZoom: 10
   zoomLerpSpeed: 10
   enableBounds: 1

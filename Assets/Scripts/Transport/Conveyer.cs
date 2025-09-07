@@ -11,7 +11,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
     public float transferThreshold = 0.95f; // 传输阈值
 
     [Header("容量限制")] public int maxItems = 3;
-
+    
     // 数据存储
     private readonly List<BeltItem> _items = new();
     // 属性
@@ -29,19 +29,20 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
 
     public bool CanProvide => _items.Count > 0 && _items[0].pos >= 0.95f;
     public bool CanReceive => _items.Count < maxItems;
-
+    
     public Vector3 GetWorldPosition()
     {
         return grid != null ? grid.CellToWorld(cell) : transform.position;
     }
+    
 
     #region 生命周期
-
+    
     public override void OnPlaced(TileGridService g, Vector2Int c)
     {
         base.OnPlaced(g, c);
         grid.RegisterPort(cell, this);
-        TickManager.Instance.Register(this);
+ 
         MsgCenter.RegisterMsg(MsgConst.MSG_NEIGHBOR_CHANGED, OnNeighborChangedMsg);
         MsgCenter.SendMsg(MsgConst.MSG_CONVEYOR_PLACED, this);
         AutoTile();
@@ -51,7 +52,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
     {
         MsgCenter.SendMsg(MsgConst.MSG_CONVEYOR_REMOVED, this);
         MsgCenter.UnregisterMsg(MsgConst.MSG_NEIGHBOR_CHANGED, OnNeighborChangedMsg);
-        TickManager.Instance?.Unregister(this);
+        
         grid.UnregisterPort(cell, this);
         _connectedOutputPort = null;
         base.OnRemoved();
@@ -107,7 +108,6 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
         if (!CanReceive) return false;
 
         var payload = payloadIn;
-        // 视觉目标：本带“格中心”
         payload.worldPos = GetWorldPosition();
 
         _items.Add(new BeltItem(payload) { pos = 0f });

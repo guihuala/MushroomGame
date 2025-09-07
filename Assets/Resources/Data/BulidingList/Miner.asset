@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
   m_Name: Miner
   m_EditorClassIdentifier: 
-  buildingName: "\u91C7\u96C6\u5668"
-  description: "\u6211\u662F\u91C7\u96C6\u5668"
+  buildingName: miner
+  description: 
   icon: {fileID: 21300000, guid: ae5143af020f548a7b516f50dd7937cd, type: 3}
   prefab: {fileID: 4677449544429423496, guid: 6008c1be3b662426f829a1056c283fd1, type: 3}
   category: 0

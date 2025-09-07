@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class PlacementSystem : MonoBehaviour
 {
@@ -9,6 +10,12 @@ public class PlacementSystem : MonoBehaviour
     [Header("擦除模式预览颜色")]
     public Color eraseValidColor = new Color(1, 0, 0, 0.35f);
     public Color eraseInvalidColor = new Color(1, 0, 0, 0.15f);
+
+    [Header("动画设置")]
+    public float previewMoveDuration = 0.2f;
+    public float previewRotateDuration = 0.3f;
+    public Ease moveEase = Ease.OutQuad;
+    public Ease rotateEase = Ease.OutBack;
 
     [Header("组件")]
     public Camera mainCam;
@@ -24,6 +31,8 @@ public class PlacementSystem : MonoBehaviour
     private Building _currentPrefab;
     private Vector2Int _currentDir = Vector2Int.right;
     private Color _origValid, _origInvalid;
+    private Tween _currentMoveTween;
+    private Tween _currentRotateTween;
 
     public int SelectedIndex { get; private set; } = 1;
     public bool IsInBuildMode { get; private set; } = false;
@@ -37,30 +46,19 @@ public class PlacementSystem : MonoBehaviour
     private enum BrushMode { Place, Erase }
     private BrushMode _mode = BrushMode.Place;
 
-    [Header("快捷键")]
-    public KeyCode eraseToggleKey = KeyCode.X;                 // 切换放置/擦除
-    public KeyCode holdToErasePrimary = KeyCode.LeftAlt;       // 按住即临时擦除（主）
-    public KeyCode holdToEraseSecondary = KeyCode.RightAlt;    // 按住即临时擦除（副，可设为 None）
-    public KeyCode exitBuildKey = KeyCode.Escape;              // 退出建造模式
+    private InputManager _input;
 
-    private bool IsHoldEraseActive()
-    {
-        bool primary = holdToErasePrimary != KeyCode.None && Input.GetKey(holdToErasePrimary);
-        bool secondary = holdToEraseSecondary != KeyCode.None && Input.GetKey(holdToEraseSecondary);
-        return primary || secondary;
-    }
-
-    private bool EraseActive => _mode == BrushMode.Erase || IsHoldEraseActive();
-    
     [Header("HUD 设置")]
-    public bool showHUD = true;                                 // 显示状态面板
-    public Vector2 hudAnchor = new Vector2(12, 12);             // 左下角偏移（像素）
-    public float hudLine = 18f;                                 // 行高
-    public float hudWidth = 360f;                               // 面板宽
-    private GUIStyle _hudStyle, _hudHeader, _hudSmall;          // 样式缓存
+    public bool showHUD = true;
+    public Vector2 hudAnchor = new Vector2(12, 12);
+    public float hudLine = 18f;
+    public float hudWidth = 360f;
+    private GUIStyle _hudStyle, _hudHeader, _hudSmall;
 
     void Start()
     {
+        _input = InputManager.Instance;
+        
         if (!mainCam) mainCam = Camera.main;
         if (!cameraController) cameraController = FindObjectOfType<CameraController>();
         ExitBuildMode();
@@ -70,7 +68,7 @@ public class PlacementSystem : MonoBehaviour
     {
         if (!IsInBuildMode) return;
 
-        var mouseWorld = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        var mouseWorld = mainCam.ScreenToWorldPoint(_input.GetMousePosition());
         var cell = grid.WorldToCell(mouseWorld);
         var worldPos = grid.CellToWorld(cell);
 
@@ -98,12 +96,18 @@ public class PlacementSystem : MonoBehaviour
         _isDragging = false;
         _dragLastBuilding = null;
         _mode = BrushMode.Place;
+
+        // 清理所有动画
+        _currentMoveTween?.Kill();
+        _currentRotateTween?.Kill();
     }
 
     private void ClearPreview()
     {
         if (_currentPreview != null)
         {
+            _currentMoveTween?.Kill();
+            _currentRotateTween?.Kill();
             Destroy(_currentPreview.gameObject);
             _currentPreview = null;
         }
@@ -120,7 +124,7 @@ public class PlacementSystem : MonoBehaviour
         }
         else
         {
-            _currentPreview.transform.position = worldPos;
+            SmoothMovePreview(worldPos);
         }
 
         if (_currentPreview != null)
@@ -137,13 +141,19 @@ public class PlacementSystem : MonoBehaviour
                 _currentPreview.invalidColor = _origInvalid;
             }
 
-            _currentPreview.SetDirection(_currentDir);
-
-            // 放置：空=可；擦除：有物=可
-            bool ok = !EraseActive ? grid.AreCellsFree(cell, _currentPrefab.size) // 修改这里以判断多格占地
+            bool ok = !EraseActive ? grid.AreCellsFree(cell, _currentPrefab.size)
                 : (grid.GetBuildingAt(cell) != null);
             _currentPreview.SetPreviewState(ok);
         }
+    }
+
+    private void SmoothMovePreview(Vector3 targetPosition)
+    {
+        if (_currentPreview == null) return;
+
+        _currentMoveTween?.Kill();
+        _currentMoveTween = _currentPreview.transform.DOMove(targetPosition, previewMoveDuration)
+            .SetEase(moveEase);
     }
 
     private void CreatePreview(Vector3 position)
@@ -184,24 +194,26 @@ public class PlacementSystem : MonoBehaviour
         return null;
     }
 
-    // ========== 输入 ==========
+    private bool EraseActive => _mode == BrushMode.Erase || _input.IsHoldEraseActive();
+
+    // ========== 输入处理 ==========
     private void HandleBuildModeInput(Vector2Int cell, Vector3 worldPos)
     {
-        // 方向键
-        if (Input.GetKeyDown(KeyCode.W)) SetDirection(Vector2Int.up);
-        if (Input.GetKeyDown(KeyCode.S)) SetDirection(Vector2Int.down);
-        if (Input.GetKeyDown(KeyCode.A)) SetDirection(Vector2Int.left);
-        if (Input.GetKeyDown(KeyCode.D)) SetDirection(Vector2Int.right);
-
-        // 模式切换（放置/擦除）
-        if (Input.GetKeyDown(eraseToggleKey))
+        // 旋转预览
+        if (_input.IsRotatePressed())
         {
-            _mode = (_mode == BrushMode.Place) ? BrushMode.Erase : BrushMode.Place;
-            _dragLastBuilding = null; // 切模式清除链
+            RotatePreview();
         }
 
-        // 左键拖动：连续放置或擦除
-        if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
+        // 模式切换（放置/擦除）
+        if (_input.IsEraseTogglePressed())
+        {
+            _mode = (_mode == BrushMode.Place) ? BrushMode.Erase : BrushMode.Place;
+            _dragLastBuilding = null;
+        }
+
+        // 左键拖动
+        if (_input.IsBuildActionPressed() && !_input.IsPointerOverUI())
         {
             _isDragging = true;
             _dragLastCell = cell;
@@ -216,43 +228,86 @@ public class PlacementSystem : MonoBehaviour
             }
         }
 
-        if (_isDragging && Input.GetMouseButton(0) && !IsPointerOverUI())
+        if (_isDragging && _input.IsBuildActionHeld() && !_input.IsPointerOverUI())
         {
             if (cell != _dragLastCell)
             {
                 if (EraseActive) StepAndEraseAlongPath(_dragLastCell, cell);
-                else             StepAndPlaceAlongPath(_dragLastCell, cell);
+                else StepAndPlaceAlongPath(_dragLastCell, cell);
             }
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (_input.IsBuildActionReleased())
         {
             _isDragging = false;
             _dragLastBuilding = null;
         }
 
-        // 取消/退出建造模式：右键或 Esc（HUD 有提示）
-        if (Input.GetMouseButtonDown(1) && !IsPointerOverUI())
+        // 取消/退出建造模式
+        if (_input.IsBuildCancelled() && !_input.IsPointerOverUI())
         {
             ExitBuildMode();
         }
-        if (Input.GetKeyDown(exitBuildKey))
+        if (_input.IsExitBuildPressed())
         {
             ExitBuildMode();
         }
     }
 
-    private void SetDirection(Vector2Int direction)
+    private void RotatePreview()
+    {
+        // 旋转方向：右→下→左→上→右...
+        Vector2Int[] rotationCycle = new Vector2Int[]
+        {
+            Vector2Int.right,
+            Vector2Int.down,
+            Vector2Int.left,
+            Vector2Int.up
+        };
+
+        int currentIndex = System.Array.IndexOf(rotationCycle, _currentDir);
+        int nextIndex = (currentIndex + 1) % rotationCycle.Length;
+        SetDirection(rotationCycle[nextIndex], true);
+    }
+
+    private void SetDirection(Vector2Int direction, bool animate = false)
     {
         _currentDir = direction;
+        
         if (_currentPreview != null)
-            _currentPreview.SetDirection(direction);
+        {
+            if (animate)
+            {
+                // 使用 DOTween 平滑旋转
+                _currentRotateTween?.Kill();
+                
+                // 计算目标旋转角度
+                float targetAngle = GetRotationAngleFromDirection(direction);
+                Vector3 targetRotation = new Vector3(0, 0, targetAngle);
+                
+                _currentRotateTween = _currentPreview.transform.DORotate(targetRotation, previewRotateDuration)
+                    .SetEase(rotateEase)
+                    .OnComplete(() => _currentPreview.SetDirection(direction));
+            }
+            else
+            {
+                _currentPreview.SetDirection(direction);
+            }
+        }
+    }
+
+    private float GetRotationAngleFromDirection(Vector2Int direction)
+    {
+        if (direction == Vector2Int.right) return 0f;
+        if (direction == Vector2Int.down) return 90f;
+        if (direction == Vector2Int.left) return 180f;
+        if (direction == Vector2Int.up) return 270f;
+        return 0f;
     }
     
-    // ===== 放置：工具函数 =====
+    // ===== 放置和擦除逻辑保持不变 =====
     private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
     {
-        // 判断整个建筑的占地范围
         if (!grid.AreCellsFree(cell, _currentPrefab.size))
         {
             _dragLastCell = cell;
@@ -263,12 +318,11 @@ public class PlacementSystem : MonoBehaviour
     
         if (building is IOrientable orientable)
         {
-            orientable.SetDirection(dirForThis); // 先放置再设置方向，确认已经grid赋值
+            orientable.SetDirection(dirForThis);
         }
 
         building.OnPlaced(grid, cell);
 
-        // 让上一格朝向这一格，形成连续链（仅当上一格也可转向）
         if (adjustPrev && _dragLastBuilding is IOrientable prevOrient)
         {
             var delta = cell - _dragLastCell;
@@ -307,11 +361,10 @@ public class PlacementSystem : MonoBehaviour
         }
     }
 
-    // ===== 擦除：工具函数 =====
     private void EraseOne(Vector2Int cell)
     {
         var b = grid.GetBuildingAt(cell);
-        if (b != null) b.OnRemoved();  // TileGridService 会通知邻居
+        if (b != null) b.OnRemoved();
         _dragLastCell = cell;
     }
 
@@ -348,11 +401,5 @@ public class PlacementSystem : MonoBehaviour
         SelectedIndex = Mathf.Clamp(idx, 1, buildingListManager.allBuildings.Count);
         if (SelectedIndex <= buildingListManager.allBuildings.Count)
             SetCurrentBuilding(buildingListManager.allBuildings[SelectedIndex - 1].prefab);
-    }
-
-    private bool IsPointerOverUI()
-    {
-        return UnityEngine.EventSystems.EventSystem.current != null &&
-               UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
     }
 }

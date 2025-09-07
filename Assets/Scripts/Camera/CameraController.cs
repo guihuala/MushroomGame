@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 public class CameraController : MonoBehaviour
 {
@@ -28,8 +25,11 @@ public class CameraController : MonoBehaviour
     private Vector3 _dragOrigin;
     private bool _isDragging = false;
 
+    private InputManager _input;
+
     private void Awake()
     {
+        _input = InputManager.Instance;
         _camera = GetComponent<Camera>();
         if (_camera == null)
         {
@@ -42,11 +42,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        // 检查是否在建造模式，如果是则禁用相机控制
-        if (IsInBuildMode())
-        {
-            return;
-        }
+        if (IsInBuildMode()) return;
         
         HandleKeyboardMovement();
         HandleMouseDrag();
@@ -57,50 +53,36 @@ public class CameraController : MonoBehaviour
         ClampPosition();
     }
 
-    /// <summary>
-    /// 检查是否处于建造模式
-    /// </summary>
     private bool IsInBuildMode()
     {
         var placementSystem = FindObjectOfType<PlacementSystem>();
         return placementSystem != null && placementSystem.IsInBuildMode;
     }
 
-    /// <summary>
-    /// 处理键盘移动
-    /// </summary>
     private void HandleKeyboardMovement()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        Vector2 movementInput = _input.GetCameraMovementInput();
         
-        if (horizontal != 0f || vertical != 0f)
+        if (movementInput != Vector2.zero)
         {
-            Vector3 movement = new Vector3(horizontal, vertical, 0f) * keyboardMoveSpeed * Time.deltaTime;
+            Vector3 movement = new Vector3(movementInput.x, movementInput.y, 0f) * keyboardMoveSpeed * Time.deltaTime;
             _targetPosition += movement;
         }
     }
-    
 
-    /// <summary>
-    /// 处理鼠标拖拽
-    /// </summary>
     private void HandleMouseDrag()
     {
-        // 开始拖拽
-        if (Input.GetMouseButtonDown(2)) // 中键拖拽
+        if (_input.IsCameraDragStarted())
         {
             _dragOrigin = GetMouseWorldPosition();
             _isDragging = true;
         }
         
-        // 结束拖拽
-        if (Input.GetMouseButtonUp(2))
+        if (_input.IsCameraDragEnded())
         {
             _isDragging = false;
         }
         
-        // 拖拽中
         if (_isDragging)
         {
             Vector3 difference = _dragOrigin - GetMouseWorldPosition();
@@ -108,12 +90,9 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 处理缩放
-    /// </summary>
     private void HandleZoom()
     {
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        float scroll = _input.GetZoomInput();
         if (scroll != 0f)
         {
             if (_camera.orthographic)
@@ -129,17 +108,11 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 应用移动
-    /// </summary>
     private void ApplyMovement()
     {
         transform.position = Vector3.Lerp(transform.position, _targetPosition, moveSpeed * Time.deltaTime);
     }
 
-    /// <summary>
-    /// 应用缩放
-    /// </summary>
     private void ApplyZoom()
     {
         if (_camera.orthographic)
@@ -152,14 +125,10 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 限制位置在边界内
-    /// </summary>
     private void ClampPosition()
     {
         if (!enableBounds) return;
         
-        // 根据当前缩放级别计算实际边界
         float effectiveMinX = minBounds.x + GetCameraWidth() / 2f;
         float effectiveMaxX = maxBounds.x - GetCameraWidth() / 2f;
         float effectiveMinY = minBounds.y + GetCameraHeight() / 2f;
@@ -169,9 +138,6 @@ public class CameraController : MonoBehaviour
         _targetPosition.y = Mathf.Clamp(_targetPosition.y, effectiveMinY, effectiveMaxY);
     }
 
-    /// <summary>
-    /// 获取相机视野宽度（世界单位）
-    /// </summary>
     private float GetCameraWidth()
     {
         if (_camera.orthographic)
@@ -185,9 +151,6 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 获取相机视野高度（世界单位）
-    /// </summary>
     private float GetCameraHeight()
     {
         if (_camera.orthographic)
@@ -201,20 +164,14 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 获取鼠标在世界坐标中的位置
-    /// </summary>
     private Vector3 GetMouseWorldPosition()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = -transform.position.z; // 对于正交相机，z值设为相机z位置的负值
+        Vector3 mousePosition = _input.GetMousePosition();
+        mousePosition.z = -transform.position.z;
         
         return _camera.ScreenToWorldPoint(mousePosition);
     }
 
-    /// <summary>
-    /// 立即跳转到指定位置
-    /// </summary>
     public void TeleportTo(Vector3 position)
     {
         _targetPosition = position;
@@ -222,16 +179,12 @@ public class CameraController : MonoBehaviour
         ClampPosition();
     }
 
-    /// <summary>
-    /// 在Scene视图中绘制边界Gizmos
-    /// </summary>
     private void OnDrawGizmosSelected()
     {
         if (!enableBounds) return;
         
         Gizmos.color = Color.yellow;
         
-        // 绘制边界矩形
         Vector3 center = new Vector3((minBounds.x + maxBounds.x) / 2f, (minBounds.y + maxBounds.y) / 2f, 0f);
         Vector3 size = new Vector3(maxBounds.x - minBounds.x, maxBounds.y - minBounds.y, 0.1f);
         

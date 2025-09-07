@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
-  m_Name: Processor
+  m_Name: Light
   m_EditorClassIdentifier: 
-  buildingName: processor
+  buildingName: Light
   description: 
-  icon: {fileID: 21300000, guid: 25460fb93056d485bb4db30e25bffcd4, type: 3}
-  prefab: {fileID: 5262894562915171561, guid: 56c57d6dd34b54cd3a022f26c8d151d1, type: 3}
+  icon: {fileID: -1132920105, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  prefab: {fileID: 3302959437552956217, guid: 61334cb3468564f11af2367782dce51b, type: 3}
   category: 0

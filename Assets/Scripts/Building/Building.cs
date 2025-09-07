@@ -2,10 +2,9 @@ using UnityEngine;
 
 public abstract class Building : MonoBehaviour
 {
-    protected TileGridService grid;
+    public TileGridService grid;
     public Vector2Int cell;           // 建筑的起始格子坐标
     public Vector2Int size = Vector2Int.one; // 默认1x1的建筑
-    public Vector2Int anchor = new Vector2Int(0, 0);  // 锚点位置（相对位置）
 
     public virtual void OnPlaced(TileGridService g, Vector2Int c)
     {
@@ -23,6 +22,7 @@ public abstract class Building : MonoBehaviour
     public virtual void OnNeighborChanged()
     {
     }
+    
 
     // 旋转建筑及其端口
     public void RotateBuilding(float angle)

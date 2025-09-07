@@ -92,7 +92,7 @@ public class TileGridService : MonoBehaviour
     private bool CheckBuildability(Vector2Int cell)
     {
         Vector3 worldPos = CellToWorld(cell);
-
+        
         // 1. 检查是否有地面（如果启用）
         if (onlyBuildOnGround)
         {
@@ -113,7 +113,7 @@ public class TileGridService : MonoBehaviour
             }
         }
 
-        // 3. 检查是否有其他建筑（通过_buildings字典）
+        // 3. 检查是否有其他建筑
         if (_buildings.ContainsKey(cell))
         {
             return false;

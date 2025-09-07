@@ -8,7 +8,7 @@ public class HubStage
     public string stageName;
     public Sprite stageSprite;
     public List<ItemRequirement> requirements;
-    public GameObject[] stageObjectsToEnable; // 该阶段要启用的游戏对象
+    public GameObject[] stageObjectsToEnable;
 }
 
 [System.Serializable]
@@ -34,6 +34,9 @@ public class Hub : MonoBehaviour
     public List<HubStage> stages = new();
     public int currentStageIndex = 0;
     public bool isFinalStageComplete = false;
+    
+    [Header("Initial Items")]
+    public List<ItemStack> initialItems = new();
     
     public event Action<ItemPayload> OnItemReceived;
     public event Action<int> OnStageCompleted; // 阶段完成事件，参数为阶段索引
@@ -61,6 +64,24 @@ public class Hub : MonoBehaviour
                 {
                     _storage[requirement.item] = 0;
                 }
+            }
+        }
+        
+        AddInitialItems();
+    }
+    
+    private void AddInitialItems()
+    {
+        foreach (var initialItem in initialItems)
+        {
+            if (initialItem.item != null && initialItem.amount > 0)
+            {
+                var payload = new ItemPayload
+                {
+                    item = initialItem.item,
+                    amount = initialItem.amount
+                };
+                ReceiveItem(payload);
             }
         }
     }

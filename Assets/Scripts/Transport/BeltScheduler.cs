@@ -4,7 +4,7 @@ using UnityEngine;
 // 检查环路之类的
 public class BeltScheduler : MonoBehaviour
 {
-    [SerializeField] private TileGridService grid; // 拖引用或运行时查找
+    [SerializeField] private TileGridService grid;
     [SerializeField] private float tickInterval = 0.1f;
 
     private float _acc;

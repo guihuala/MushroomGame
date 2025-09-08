@@ -33,14 +33,17 @@ public class TickManager : Singleton<TickManager>,IManager
         float dt = Time.fixedDeltaTime;
         _accumulatedTime += dt;
 
-        // 只有当累积时间达到最小时间单位时才执行Tick
         if (_accumulatedTime >= minTickInterval)
         {
             int tickCount = Mathf.FloorToInt(_accumulatedTime / minTickInterval);
             _accumulatedTime -= tickCount * minTickInterval;
-            
+
             for (int i = 0; i < tickCount; i++)
             {
+                // ① 先推进所有传送带（两阶段内部由 BeltScheduler 自己处理）
+                BeltScheduler.Instance.TickOnce(minTickInterval);
+
+                // ② 再让其他建筑各自 Tick
                 for (int j = 0; j < _tickables.Count; j++)
                 {
                     _tickables[j].Tick(minTickInterval);

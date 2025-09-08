@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class BuildingSelectionUI : MonoBehaviour
 {
     [Header("引用")]
     public PlacementSystem placementSystem;
-    [FormerlySerializedAs("buildingListManager")] public BuildingList buildingList;
+    public BuildingList buildingList;
     
     [Header("UI预制体")]
     public GameObject categoryTabPrefab;

@@ -35743,7 +35743,7 @@ MonoBehaviour:
     skyColor: {r: 0, g: 1, b: 1, a: 1}
     ambientLightColor: {r: 1, g: 1, b: 1, a: 1}
     ambientIntensity: 1
-  weatherChangeInterval: 5
+  weatherChangeInterval: 60
   transitionDuration: 5
   skyBackground: {fileID: 1710568520}
   mainCamera: {fileID: 1234201018}

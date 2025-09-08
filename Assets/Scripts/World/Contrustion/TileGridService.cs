@@ -29,14 +29,9 @@ public class TileGridService : MonoBehaviour
 
     void Start()
     {
-        // 自动查找Tilemap如果未设置
         if (groundTilemap == null)
         {
             groundTilemap = FindObjectOfType<Tilemap>();
-            if (groundTilemap != null)
-            {
-                DebugManager.Log($"自动找到地面Tilemap: {groundTilemap.name}", this);
-            }
         }
     }
 
@@ -124,7 +119,6 @@ public class TileGridService : MonoBehaviour
     
     private bool CheckGroundTile(Vector2Int cell, Vector3 worldPos)
     {
-        // 优先使用Tilemap检查
         if (groundTilemap != null)
         {
             Vector3Int tilemapCell = groundTilemap.WorldToCell(worldPos);
@@ -136,7 +130,6 @@ public class TileGridService : MonoBehaviour
     
     private bool CheckObstacles(Vector2Int cell, Vector3 worldPos)
     {
-        // 检查障碍物Tilemap
         if (obstacleTilemap != null)
         {
             Vector3Int tilemapCell = obstacleTilemap.WorldToCell(worldPos);
@@ -148,34 +141,74 @@ public class TileGridService : MonoBehaviour
         
         return false;
     }
-
-    /// <summary>
-    /// 检查是否接触到地表层（用于蘑菇等需要接触地表的建筑）
-    /// </summary>
-    public bool IsTouchingSurface(Vector2Int cell)
+    
+    public bool CanBuildAt(Vector2Int cell, Building building)
     {
-        if (!checkSurface) return true;
-        
-        Vector2Int targetCell = new Vector2Int(cell.x, cell.y);
-        Vector3 belowWorldPos = CellToWorld(targetCell);
-
-        if (surfaceTilemap != null)
+        return CheckBuildabilityWithBuilding(cell, building);
+    }
+    
+    public bool AreCellsFree(Vector2Int startCell, Vector2Int size, Building building)
+    {
+        for (int x = startCell.x; x < startCell.x + size.x; x++)
         {
-            Vector3Int belowTilemapCell = surfaceTilemap.WorldToCell(belowWorldPos);
-            if (surfaceTilemap.HasTile(belowTilemapCell))
+            for (int y = startCell.y; y < startCell.y + size.y; y++)
             {
-                return true;
+                Vector2Int c = new Vector2Int(x, y);
+                if (!CanBuildAt(c, building) || _buildings.ContainsKey(c))
+                    return false;
             }
         }
+        return true;
+    }
+    
+    private bool CheckBuildabilityWithBuilding(Vector2Int cell, Building building)
+    {
+        Vector3 worldPos = CellToWorld(cell);
+        if (checkObstacles && CheckObstacles(cell, worldPos)) return false;
+        if (_buildings.ContainsKey(cell)) return false;
 
-        return false;
-    }    
+        // 图层探测
+        bool hasGround = false;
+        if (groundTilemap != null)
+        {
+            Vector3Int gCell = groundTilemap.WorldToCell(worldPos);
+            hasGround = groundTilemap.HasTile(gCell);
+        }
 
+        bool hasSurface = false;
+        if (surfaceTilemap != null)
+        {
+            Vector3Int sCell = surfaceTilemap.WorldToCell(worldPos);
+            hasSurface = surfaceTilemap.HasTile(sCell);
+        }
+        
+        var zone = (building != null) ? building.buildZone : BuildZone.GroundOnly;
+
+        switch (zone)
+        {
+            case BuildZone.GroundOnly:
+                // 普通建筑：必须在地面
+                if (onlyBuildOnGround && !hasGround) return false;
+                return hasGround;
+
+            case BuildZone.SurfaceOnly:
+                // 蘑菇：必须接触地表
+                if (checkSurface && !hasSurface) return false;
+                return hasSurface;
+
+            case BuildZone.Both:
+                // 两者任意其一即可
+                bool okGround = !onlyBuildOnGround || hasGround;
+                bool okSurface = !checkSurface || hasSurface;
+                return (hasGround && okGround) || (hasSurface && okSurface);
+
+            default:
+                return false;
+        }
+    }
+    
     #endregion
-
-    /// <summary>
-    /// 获取指定位置的建筑
-    /// </summary>
+    
     public Building GetBuildingAt(Vector2Int cell)
     {
         _buildings.TryGetValue(cell, out var building);
@@ -303,8 +336,7 @@ public class TileGridService : MonoBehaviour
 
     public void RegisterPort(Vector2Int cell, IItemPort port)
     {
-        // 允许在已占用的建筑格上注册端口
-        // 端口是格子的"功能"，并不额外占地
+        // 允许在已占用的建筑格上注册端口。端口是格子的"功能"，并不额外占地
         _ports[cell] = port;
     }
 
@@ -316,9 +348,6 @@ public class TileGridService : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 获取指定网格的物品端口
-    /// </summary>
     public IItemPort GetPortAt(Vector2Int cell)
     {
         if (_ports.TryGetValue(cell, out var port))

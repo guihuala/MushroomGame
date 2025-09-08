@@ -1,28 +1,37 @@
 using UnityEngine;
 
+public enum BuildZone
+{
+    GroundOnly, // 只能在 groundTilemap 上
+    SurfaceOnly, // 只能在 surfaceTilemap 上（地表/地表以上）
+    Both // ground 或 surface 都可
+}
+
 public abstract class Building : MonoBehaviour
 {
+    [Header("建造限制")] public BuildZone buildZone = BuildZone.GroundOnly; // 普通建筑默认 GroundOnly
+    
     public TileGridService grid;
-    public Vector2Int cell;           // 建筑的起始格子坐标
+    public Vector2Int cell; // 建筑的起始格子坐标
     public Vector2Int size = Vector2Int.one; // 默认1x1的建筑
 
     public virtual void OnPlaced(TileGridService g, Vector2Int c)
     {
         grid = g;
         cell = c;
-        grid.OccupyCells(cell, size, this);  // 占用多格
+        grid.OccupyCells(cell, size, this); // 占用多格
     }
 
     public virtual void OnRemoved()
     {
-        grid.ReleaseCells(cell, size);  // 释放多格
+        grid.ReleaseCells(cell, size); // 释放多格
         Destroy(gameObject);
     }
 
     public virtual void OnNeighborChanged()
     {
     }
-    
+
 
     // 旋转建筑及其端口
     public void RotateBuilding(float angle)
@@ -54,6 +63,7 @@ public abstract class Building : MonoBehaviour
                 occupiedCells[index++] = new Vector2Int(cell.x + x, cell.y + y);
             }
         }
+
         return occupiedCells;
     }
 
@@ -80,6 +90,7 @@ public abstract class Building : MonoBehaviour
         {
             rotatedCells[i] = RotateCell(cells[i], angle);
         }
+
         return rotatedCells;
     }
 }

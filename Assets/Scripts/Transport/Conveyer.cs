@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Conveyer : Building, ITickable, IItemPort, IOrientable
+public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
 {
     [Header("传送带设置")] public float beltSpeed = 1.0f; // 每秒移动的格子数
     public Vector2Int inDir = Vector2Int.left;
     public Vector2Int outDir = Vector2Int.right;
 
     [Header("物品间距设置")] public float itemSpacing = 0.3f; // 物品之间的最小间距（0-1之间）
-    public float transferThreshold = 0.95f; // 传输阈值
 
     [Header("容量限制")] public int maxItems = 3;
     
@@ -34,7 +33,25 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
     {
         return grid != null ? grid.CellToWorld(cell) : transform.position;
     }
+
+    #region IBeltNode
+
+    public Vector2Int Cell   => cell;
+    public Vector2Int InDir  => inDir;
+    public Vector2Int OutDir => outDir;
     
+    public void StepMove(float dt)
+    {
+        UpdateItemPositions(dt);
+    }
+
+    public void StepTransfer()
+    {
+        TryTransferFirstItem();
+        ClampItemPositions();
+    }
+
+    #endregion
 
     #region 生命周期
     
@@ -46,6 +63,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
         MsgCenter.RegisterMsg(MsgConst.NEIGHBOR_CHANGED, OnNeighborChangedMsg);
         MsgCenter.SendMsg(MsgConst.CONVEYOR_PLACED, this);
         AutoTile();
+        BeltScheduler.Instance.RebuildAllPaths();
     }
 
     public override void OnRemoved()
@@ -54,6 +72,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
         MsgCenter.UnregisterMsg(MsgConst.NEIGHBOR_CHANGED, OnNeighborChangedMsg);
         
         grid.UnregisterPort(cell, this);
+        BeltScheduler.Instance.RebuildAllPaths();
         _connectedOutputPort = null;
         base.OnRemoved();
     }
@@ -82,6 +101,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
         outDir = dir;
         inDir = -dir;
         UpdateVisualDirection();
+        BeltScheduler.Instance.RebuildAllPaths();
     }
 
     public void AutoTile()
@@ -101,7 +121,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
 
     #endregion
 
-    #region 物品传输接口（格中心逻辑）
+    #region 物品传输接口
 
     public bool TryReceive(in ItemPayload payloadIn)
     {
@@ -125,33 +145,38 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
     #endregion
 
     #region Tick逻辑
-
-    public void Tick(float dt)
-    {
-        UpdateItemPositions(dt);
-        TryTransferFirstItem();
-        ClampItemPositions();
-    }
-
+    
     private void UpdateItemPositions(float dt)
     {
         float moveDistance = dt * beltSpeed;
+        
+        var nextPort = grid.GetPortAt(cell + outDir);
 
-        bool hasValidOutput = IsCurrentConnectionValid() && _connectedOutputPort != null &&
-                              _connectedOutputPort.CanReceive;
+        bool hasValidOutput = false;
+
+        if (nextPort is Conveyer nextBelt)
+        {
+            // 带→带：只要下一带“头部留出 itemSpacing”，就视为可输出
+            if (nextBelt.Items.Count == 0) hasValidOutput = true;
+            else hasValidOutput = nextBelt.Items[0].pos >= itemSpacing;
+        }
+        else
+        {
+            // 带→建筑
+            hasValidOutput = IsCurrentConnectionValid() && _connectedOutputPort != null &&
+                             _connectedOutputPort.CanReceive;
+        }
 
         for (int i = 0; i < _items.Count; i++)
         {
             var item = _items[i];
 
-            // 物品的最大移动限制
             float maxAllowed = i == 0 ? float.MaxValue : _items[i - 1].pos - itemSpacing;
 
             bool isLast = i == _items.Count - 1;
             if (isLast && !hasValidOutput)
                 maxAllowed = Mathf.Min(maxAllowed, 1f - itemSpacing);
 
-            // 平滑的增加位置，避免闪烁
             item.pos = Mathf.Min(item.pos + moveDistance, maxAllowed);
 
             item.payload.worldPos = GetWorldPosition();
@@ -161,7 +186,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
 
     private void TryTransferFirstItem()
     {
-        if (_items.Count == 0 || _items[0].pos < transferThreshold) return;
+        if (_items.Count == 0) return;
 
         Vector2Int nextCell = cell + outDir;
         var nextPort = grid.GetPortAt(nextCell);
@@ -229,8 +254,7 @@ public class Conveyer : Building, ITickable, IItemPort, IOrientable
     }
 
     #endregion
-
-    // ========= 带->带 接收 =========
+    
     public bool TryAcceptFromNeighbour(Conveyer from)
     {
         if (!HasSpaceForIncoming()) return false;

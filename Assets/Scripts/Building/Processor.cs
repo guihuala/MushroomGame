@@ -336,20 +336,4 @@ public class Processor : Building, ITickable, IItemPort, IOrientable
     }
 
     #endregion
-
-    #region 调试信息
-
-    private void OnGUI()
-    {
-        if (Camera.main && Vector3.Distance(transform.position, Camera.main.transform.position) < 5f)
-        {
-            Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-            GUI.Label(new Rect(screenPos.x, Screen.height - screenPos.y, 200, 100), 
-                     $"Input: {GetTotalInputCount()}/{inputBufferSize}\n" +
-                     $"Output: {GetTotalOutputCount()}/{outputBufferSize}\n" +
-                     $"Progress: {(isProducing ? (productionProgress / recipe.productionTime * 100f).ToString("F1") + "%" : "Idle")}");
-        }
-    }
-
-    #endregion
 }

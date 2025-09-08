@@ -10,7 +10,7 @@ public class ItemPort : IItemPort
 {
     public Vector2Int Cell { get; private set; }
     public PortType PortType { get; private set; }
-    private readonly MultiGridBuilding _building;  // 与该端口关联的建筑
+    private readonly MultiGridBuilding _building;
 
     public ItemPort(Vector2Int cell, MultiGridBuilding building, PortType portType)
     {
@@ -19,29 +19,18 @@ public class ItemPort : IItemPort
         PortType = portType;
     }
 
-    // 输入端口
-    public bool CanReceive => PortType == PortType.Input;
+    internal void SetCell(Vector2Int newCell) // 新增：允许旋转时更新位置
+    {
+        Cell = newCell;
+    }
 
-    // 输出端口
+    public bool CanReceive => PortType == PortType.Input;
     public bool CanProvide => PortType == PortType.Output;
 
-    // 接收物品（仅适用于输入端口）
     public bool TryReceive(in ItemPayload payload)
-    {
-        if (CanReceive)
-        {
-            return _building.ReceiveItem(payload);  // 调用建筑的接收方法
-        }
-        return false;
-    }
+        => CanReceive && _building.ReceiveItem(payload);
 
-    // 提供物品（仅适用于输出端口）
     public bool TryProvide(ref ItemPayload payload)
-    {
-        if (CanProvide)
-        {
-            return _building.ProvideItem(ref payload);  // 调用建筑的提供方法
-        }
-        return false;
-    }
+        => CanProvide && _building.ProvideItem(ref payload);
 }
+

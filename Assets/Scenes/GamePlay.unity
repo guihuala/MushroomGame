@@ -37688,9 +37688,6 @@ MonoBehaviour:
   groundTilemap: {fileID: 453790162}
   surfaceTilemap: {fileID: 1342414367}
   obstacleTilemap: {fileID: 0}
-  onlyBuildOnGround: 1
-  checkObstacles: 1
-  checkSurface: 1
 --- !u!114 &1376572710
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37705,10 +37702,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   previewValidColor: {r: 0, g: 1, b: 0, a: 0.5}
   previewInvalidColor: {r: 1, g: 0, b: 0, a: 0.5}
-  eraseValidColor: {r: 1, g: 0, b: 0, a: 0.35}
-  eraseInvalidColor: {r: 1, g: 0, b: 0, a: 0.15}
-  previewMoveDuration: 0.2
-  previewRotateDuration: 0.3
+  eraseValidColor: {r: 0.8699622, g: 0, b: 1, a: 0.35}
+  eraseInvalidColor: {r: 0.95149136, g: 0, b: 1, a: 0.15}
+  previewMoveDuration: 0.1
+  previewRotateDuration: 0.1
   moveEase: 6
   rotateEase: 27
   mainCam: {fileID: 1234201018}
@@ -37716,10 +37713,6 @@ MonoBehaviour:
   cameraController: {fileID: 1234201020}
   buildingList: {fileID: 11400000, guid: 7b5a1a7eb011b498d863ca34453f342a, type: 2}
   previewPrefab: {fileID: 8217599763905349018, guid: 94f4b6ce01fdb43b9a12791dacbb5a85, type: 3}
-  showHUD: 1
-  hudAnchor: {x: 12, y: 12}
-  hudLine: 18
-  hudWidth: 360
 --- !u!156049354 &1376572711
 Grid:
   m_ObjectHideFlags: 0
@@ -37777,7 +37770,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 1376572709}
-  tickInterval: 0.1
 --- !u!114 &1376572715
 MonoBehaviour:
   m_ObjectHideFlags: 0

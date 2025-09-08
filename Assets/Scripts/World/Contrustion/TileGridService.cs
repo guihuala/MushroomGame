@@ -14,26 +14,14 @@ public class TileGridService : MonoBehaviour
     public Tilemap groundTilemap; // 引用地形Tilemap
     public Tilemap surfaceTilemap; // 地表层Tilemap
     public Tilemap obstacleTilemap; // 引用障碍物Tilemap
-
-    [Header("建造设置")]
-    public bool onlyBuildOnGround = true; // 是否只能在地面上建造
-    public bool checkObstacles = true; // 是否检查障碍物
-    public bool checkSurface = true; // 是否检查地表接触
-
+    
     // 存储建筑和端口的字典
     private readonly Dictionary<Vector2Int, Building> _buildings = new();
     private readonly Dictionary<Vector2Int, IItemPort> _ports = new();
 
     // 缓存已检查的格子建造权限
     private readonly Dictionary<Vector2Int, bool> _buildableCache = new();
-
-    void Start()
-    {
-        if (groundTilemap == null)
-        {
-            groundTilemap = FindObjectOfType<Tilemap>();
-        }
-    }
+    
 
     #region 坐标转换和检查
 
@@ -83,29 +71,23 @@ public class TileGridService : MonoBehaviour
     #endregion
     
     #region 检查权限
-    
+
     private bool CheckBuildability(Vector2Int cell)
     {
         Vector3 worldPos = CellToWorld(cell);
-        
-        // 1. 检查是否有地面（如果启用）
-        if (onlyBuildOnGround)
-        {
-            bool hasGround = CheckGroundTile(cell, worldPos);
-            if (!hasGround)
-            {
-                return false;
-            }
-        }
 
-        // 2. 检查是否有障碍物（如果启用）
-        if (checkObstacles)
+        // 1. 检查是否有地面
+        bool hasGround = CheckGroundTile(cell, worldPos);
+        if (!hasGround)
         {
-            bool hasObstacle = CheckObstacles(cell, worldPos);
-            if (hasObstacle)
-            {
-                return false;
-            }
+            return false;
+        }
+        
+        // 2. 检查是否有障碍物
+        bool hasObstacle = CheckObstacles(cell, worldPos);
+        if (hasObstacle)
+        {
+            return false;
         }
 
         // 3. 检查是否有其他建筑
@@ -164,7 +146,7 @@ public class TileGridService : MonoBehaviour
     private bool CheckBuildabilityWithBuilding(Vector2Int cell, Building building)
     {
         Vector3 worldPos = CellToWorld(cell);
-        if (checkObstacles && CheckObstacles(cell, worldPos)) return false;
+        if (CheckObstacles(cell, worldPos)) return false;
         if (_buildings.ContainsKey(cell)) return false;
 
         // 图层探测
@@ -188,18 +170,18 @@ public class TileGridService : MonoBehaviour
         {
             case BuildZone.GroundOnly:
                 // 普通建筑：必须在地面
-                if (onlyBuildOnGround && !hasGround) return false;
+                if (!hasGround) return false;
                 return hasGround;
 
             case BuildZone.SurfaceOnly:
                 // 蘑菇：必须接触地表
-                if (checkSurface && !hasSurface) return false;
+                if (!hasSurface) return false;
                 return hasSurface;
 
             case BuildZone.Both:
                 // 两者任意其一即可
-                bool okGround = !onlyBuildOnGround || hasGround;
-                bool okSurface = !checkSurface || hasSurface;
+                bool okGround = hasGround;
+                bool okSurface = hasSurface;
                 return (hasGround && okGround) || (hasSurface && okSurface);
 
             default:

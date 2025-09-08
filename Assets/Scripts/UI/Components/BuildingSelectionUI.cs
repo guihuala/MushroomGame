@@ -227,6 +227,7 @@ public class BuildingSelectionUI : MonoBehaviour
         {
             case BuildingCategory.Production: return "Production";
             case BuildingCategory.Logistics: return "Logistics";
+            case BuildingCategory.Mushroom: return "Mushroom";
             default: return category.ToString();
         }
     }

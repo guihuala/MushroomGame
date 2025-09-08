@@ -2,14 +2,14 @@ using UnityEngine;
 
 public enum BuildZone
 {
-    GroundOnly, // 只能在 groundTilemap 上
-    SurfaceOnly, // 只能在 surfaceTilemap 上（地表/地表以上）
-    Both // ground 或 surface 都可
+    GroundOnly,
+    SurfaceOnly,
+    Both
 }
 
 public abstract class Building : MonoBehaviour
 {
-    [Header("建造限制")] public BuildZone buildZone = BuildZone.GroundOnly; // 普通建筑默认 GroundOnly
+    [Header("建造限制")] public BuildZone buildZone = BuildZone.GroundOnly;
     
     public TileGridService grid;
     public Vector2Int cell; // 建筑的起始格子坐标
@@ -31,7 +31,6 @@ public abstract class Building : MonoBehaviour
     public virtual void OnNeighborChanged()
     {
     }
-
 
     // 旋转建筑及其端口
     public void RotateBuilding(float angle)

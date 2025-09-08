@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
-  m_Name: Distributor
+  m_Name: Filter
   m_EditorClassIdentifier: 
-  buildingName: Distributor
+  buildingName: Filter
   description: 
-  icon: {fileID: -1013712471, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
-  prefab: {fileID: 7700215471067707054, guid: 0c44f174fd197410f9acb5410f8f686c, type: 3}
+  icon: {fileID: -793955535, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  prefab: {fileID: 8859230656384483213, guid: 54d836db7f67a44a296320f247be7da8, type: 3}
   category: 1

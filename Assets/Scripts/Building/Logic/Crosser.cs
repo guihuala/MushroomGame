@@ -1,13 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 交叉器（Crosser）：允许两条传送带在同一格交叉而互不干涉。
-/// 规则：来自某一侧的物品，会沿相同轴向“直行”到对侧（不拐弯，不合并）。
-/// - 单格端口（在本格注册 IItemPort）
-/// - TickManager 驱动；按 pushesPerSecond 节流逐方向推送
-/// - 自动根据 payload.worldPos 推断来货方向并路由
-/// </summary>
 public class Crosser : Building, IItemPort, ITickable, IOrientable
 {
     [Header("方向")]

@@ -26,8 +26,6 @@ public class InventoryManager : Singleton<InventoryManager>,IManager
     // 初始化方法
     public void Initialize()
     {
-        DebugManager.Log("InventoryManager initialized");
-        // 清空库存并重置
         ClearInventory();
     }
     

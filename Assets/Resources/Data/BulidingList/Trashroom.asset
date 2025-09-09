@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
   m_Name: Trashroom
   m_EditorClassIdentifier: 
-  buildingName: 
+  buildingName: Trashroom
   description: 
-  icon: {fileID: 0}
-  prefab: {fileID: 0}
-  category: 0
+  icon: {fileID: -1962746484, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  prefab: {fileID: 7477967300382333871, guid: 4315fc7608b8640a59732e001f6c7507, type: 3}
+  category: 2

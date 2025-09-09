@@ -23,6 +23,12 @@ public class BuildingSelectionUI : MonoBehaviour
     public Color normalButtonColor = new Color(1, 1, 1, 0.35f);
     public Color selectedButtonColor = Color.white;
     
+    [Header("建筑详情栏")]
+    public GameObject buildingDetailsPanel;    // 建筑详情面板
+    public Text buildingNameText;              // 建筑名称文本
+    public Text buildingDescriptionText;       // 建筑描述文本
+    public Image buildingIconImage;            // 建筑图标图片
+ 
     private Dictionary<BuildingCategory, List<BuildingData>> buildingsByCategory;
     private BuildingCategory currentCategory = BuildingCategory.Production;
     private BuildingData currentSelectedBuilding;
@@ -32,8 +38,10 @@ public class BuildingSelectionUI : MonoBehaviour
     
     void Start()
     {
+        CloseBuildingDetails();
         InitializeUI();
     }
+
     
     void Update()
     {
@@ -59,64 +67,59 @@ public class BuildingSelectionUI : MonoBehaviour
         SelectCategory(BuildingCategory.Production);
     }
     
-    /// <summary>
-    /// 创建分类页签
-    /// </summary>
     private void CreateCategoryTabs()
     {
         if (categoryTabsContainer == null || categoryTabPrefab == null) return;
-        
+    
         // 清空现有页签
         foreach (Transform child in categoryTabsContainer)
         {
             Destroy(child.gameObject);
         }
         categoryTabButtons.Clear();
-        
+    
         // 创建新页签
         foreach (var category in buildingsByCategory.Keys)
         {
             if (buildingsByCategory[category].Count == 0) continue;
-            
+        
             var tabGO = Instantiate(categoryTabPrefab, categoryTabsContainer);
             var tabButton = tabGO.GetComponent<Button>();
-            var tabText = tabGO.GetComponentInChildren<Text>();
-            
-            if (tabText != null)
+            var tabImage = tabGO.transform.GetChild(0).GetComponent<Image>();
+            var tabIcon = GetCategoryIcon(category);
+        
+            if (tabImage != null && tabIcon != null)
             {
-                tabText.text = GetCategoryDisplayName(category);
+                tabImage.sprite = tabIcon;
             }
-            
-            BuildingCategory cat = category; // 局部变量避免闭包问题
+
+            BuildingCategory cat = category;
             tabButton.onClick.AddListener(() => SelectCategory(cat));
-            
+
             categoryTabButtons.Add(tabButton);
         }
     }
-    
+
     /// <summary>
     /// 创建建筑按钮
     /// </summary>
     private void CreateBuildingButtons()
     {
         if (buildingButtonsContainer == null || buildingButtonPrefab == null) return;
-        
-        // 清空现有按钮
+
         foreach (Transform child in buildingButtonsContainer)
         {
             Destroy(child.gameObject);
         }
         buildingButtons.Clear();
         
-        // 为每个建筑创建按钮
         foreach (var buildingData in buildingsByCategory.Values.SelectMany(x => x))
         {
             var buttonGO = Instantiate(buildingButtonPrefab, buildingButtonsContainer);
             var button = buttonGO.GetComponent<Button>();
-            var iconImage = buttonGO.GetComponentInChildren<Image>();
+            var iconImage = buttonGO.transform.GetChild(0).GetComponent<Image>();
             var nameText = buttonGO.GetComponentInChildren<Text>();
             
-            // 设置按钮内容
             if (iconImage != null && buildingData.icon != null)
             {
                 iconImage.sprite = buildingData.icon;
@@ -131,8 +134,7 @@ public class BuildingSelectionUI : MonoBehaviour
             button.onClick.AddListener(() => OnBuildingSelected(data));
             
             buildingButtons.Add(button);
-            
-            // 初始隐藏所有按钮，按分类显示
+
             buttonGO.SetActive(false);
         }
     }
@@ -167,18 +169,22 @@ public class BuildingSelectionUI : MonoBehaviour
     private void OnBuildingSelected(BuildingData buildingData)
     {
         currentSelectedBuilding = buildingData;
-        
+
         // 设置放置系统
         if (placementSystem != null && buildingData.prefab != null)
         {
             placementSystem.SetCurrentBuilding(buildingData.prefab);
-            
+
             // 如果不在建造模式，进入建造模式
             if (!placementSystem.IsInBuildMode)
             {
                 placementSystem.EnterBuildMode();
+                currentSelectedBuilding = buildingData;
             }
         }
+
+        // 显示建筑详情
+        ShowBuildingDetails(buildingData);
     }
     
     /// <summary>
@@ -186,7 +192,6 @@ public class BuildingSelectionUI : MonoBehaviour
     /// </summary>
     private void UpdateSelectionVisuals()
     {
-        // 更新建筑按钮选择状态
         for (int i = 0; i < buildingButtons.Count; i++)
         {
             var buildingData = buildingsByCategory.Values.SelectMany(x => x).ElementAt(i);
@@ -217,18 +222,35 @@ public class BuildingSelectionUI : MonoBehaviour
             }
         }
     }
-    
-    /// <summary>
-    /// 获取分类显示名称
-    /// </summary>
-    private string GetCategoryDisplayName(BuildingCategory category)
+ 
+    private Sprite GetCategoryIcon(BuildingCategory category)
     {
         switch (category)
         {
-            case BuildingCategory.Production: return "Production";
-            case BuildingCategory.Logistics: return "Logistics";
-            case BuildingCategory.Mushroom: return "Mushroom";
-            default: return category.ToString();
+            case BuildingCategory.Production:
+                return Resources.Load<Sprite>("Icons/ProductionIcon");
+            case BuildingCategory.Logistics:
+                return Resources.Load<Sprite>("Icons/LogisticsIcon");
+            case BuildingCategory.Mushroom:
+                return Resources.Load<Sprite>("Icons/MushroomIcon");
+            default:
+                return null;
+        }
+    }
+
+    private void ShowBuildingDetails(BuildingData buildingData)
+    {
+        buildingDetailsPanel.SetActive(true); // 显示详情栏
+        buildingNameText.text = buildingData.buildingName;
+        buildingDescriptionText.text = buildingData.description;
+        buildingIconImage.sprite = buildingData.icon;
+    }
+    
+    private void CloseBuildingDetails()
+    {
+        if (buildingDetailsPanel != null)
+        {
+            buildingDetailsPanel.SetActive(false);
         }
     }
 }

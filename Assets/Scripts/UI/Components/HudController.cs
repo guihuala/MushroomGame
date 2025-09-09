@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,50 +7,60 @@ using UnityEngine.UI;
 
 public class HudController : MonoBehaviour
 {
+    [Header("UI组件")]
     [SerializeField] private Button pauseButton;
     [SerializeField] private Button techTreeButton;
     [SerializeField] private Hub hub;
 
-    [Header("HUD Inventory Display")]
+    [SerializeField] private Transform inventoryPanel;
     [SerializeField] private Transform inventoryContainer;
     [SerializeField] private GameObject inventoryItemPrefab;
+    [SerializeField] private Button toggleInventoryButton;
 
-    [Header("Task Panel Reference")]
     [SerializeField] private TaskPanel taskPanel;
+    
+    [Header("收缩设置")]
+    public float slideSpeed = 10f;  // 控制收缩和展开的速度
+    public float hiddenX = -600f;   // 收缩后的 X 坐标
+    public float shownX = 0f;       // 展开后的 X 坐标
 
-    [Header("Mushroom Selection")]
+    private bool isInventoryOpen = true;  // 标记面板是否展开
+    
     public MushroomSelectionPanel mushroomSelectionPanel;
 
     private Dictionary<ItemDef, InventoryHudItem> _hudItems = new Dictionary<ItemDef, InventoryHudItem>();
     private bool _isInitialized = false;
 
+    #region 生命周期
+
     void Awake()
     {
+        toggleInventoryButton.onClick.AddListener(ToggleInventoryPanel);
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
         techTreeButton.onClick.AddListener(OnTechTreeButtonClicked);
     }
 
     private void Start()
     {
-        // 注册消息中心事件
         MsgCenter.RegisterMsg(MsgConst.SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
         MsgCenter.RegisterMsg(MsgConst.HUB_CLICKED, OnHubClicked);
         MsgCenter.RegisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
         MsgCenter.RegisterMsgAct(MsgConst.INVENTORY_CHANGED, HandleInventoryChanged);
         MsgCenter.RegisterMsg(MsgConst.HUB_STAGE_COMPLETED, HandleStageCompleted);
 
-        InitializeHudInventory();
-
-        // 初始化任务面板
+        InitializeInventory();
+        
         if (taskPanel != null)
         {
             taskPanel.Initialize(hub);
         }
+
+        inventoryContainer.GetComponent<RectTransform>().anchoredPosition = new Vector2(shownX,
+            inventoryContainer.GetComponent<RectTransform>().anchoredPosition.y);
     }
 
     private void OnDestroy()
     {
-        // 注销消息中心事件
         MsgCenter.UnregisterMsg(MsgConst.SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
         MsgCenter.UnregisterMsg(MsgConst.HUB_CLICKED, OnHubClicked);
         MsgCenter.UnregisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
@@ -57,25 +68,44 @@ public class HudController : MonoBehaviour
         MsgCenter.UnregisterMsg(MsgConst.HUB_STAGE_COMPLETED, HandleStageCompleted);
     }
 
-    private void InitializeHudInventory()
+    #endregion
+
+    #region 按钮
+
+    private void OnPauseButtonClicked()
+    {
+        UIManager.Instance.OpenPanel("PausePanel");
+    }
+
+    private void OnTechTreeButtonClicked()
+    {
+        UIManager.Instance.OpenPanel("TechTreePanel");
+    }
+
+    #endregion
+
+    #region 库存
+
+    private void InitializeInventory()
     {
         if (inventoryContainer == null || inventoryItemPrefab == null) return;
 
-        ClearHudItems();
+        ClearItems();
+        
+        var allItems = InventoryManager.Instance.GetAllItemStacks();
+        var sortedItems = allItems.OrderByDescending(item => item.amount).ToList(); // 按数量排序
 
-        var allItems = GetAllItemsInHub();
-        var sortedItems = allItems.OrderByDescending(item => InventoryManager.Instance.GetItemCount(item)).ToList();
-
-        foreach (var item in sortedItems)
+        foreach (var itemStack in sortedItems)
         {
-            CreateHudItemSlot(item);
+            CreateItemSlot(itemStack);
         }
 
         _isInitialized = true;
     }
 
-    private void ClearHudItems()
+    private void ClearItems()
     {
+        // 清空所有现有物品槽
         foreach (Transform child in inventoryContainer)
         {
             Destroy(child.gameObject);
@@ -83,51 +113,119 @@ public class HudController : MonoBehaviour
         _hudItems.Clear();
     }
 
-    private HashSet<ItemDef> GetAllItemsInHub()
+    private void CreateItemSlot(ItemStack itemStack)
     {
-        HashSet<ItemDef> items = new HashSet<ItemDef>();
-        
-        var currentStage = hub.GetCurrentStage();
-        if (currentStage != null && currentStage.requirements != null)
-        {
-            foreach (var requirement in currentStage.requirements)
-            {
-                if (requirement.item != null)
-                {
-                    items.Add(requirement.item);
-                }
-            }
-        }
-        return items;
-    }
-
-    private void CreateHudItemSlot(ItemDef item)
-    {
+        // 创建物品槽
         GameObject slotObj = Instantiate(inventoryItemPrefab, inventoryContainer);
         InventoryHudItem hudItem = slotObj.GetComponent<InventoryHudItem>();
-        
+
         if (hudItem != null)
         {
-            hudItem.Initialize(item);
-            _hudItems[item] = hudItem;
-            UpdateHudItemDisplay(item);
+            hudItem.Initialize(itemStack.item);  // 初始化物品槽
+            _hudItems[itemStack.item] = hudItem;  // 保存到 _hudItems 字典
+            UpdateItemDisplay(itemStack.item);    // 更新物品显示
         }
     }
 
-    private void UpdateAllHudItems()
+    private void UpdateAllItems()
     {
+        // 更新所有物品显示
         foreach (var item in _hudItems.Keys.ToList())
         {
-            UpdateHudItemDisplay(item);
+            UpdateItemDisplay(item);
         }
     }
 
-    private void UpdateHudItemDisplay(ItemDef item)
+    private void UpdateItemDisplay(ItemDef item)
     {
         if (_hudItems.ContainsKey(item))
         {
+            // 获取库存中的物品数量
             int currentAmount = InventoryManager.Instance.GetItemCount(item);
-            _hudItems[item].UpdateDisplay(currentAmount);
+            _hudItems[item].UpdateDisplay(currentAmount);  // 更新物品槽
+        }
+    }
+    
+    #region 收缩与展开
+    
+    public void ToggleInventoryPanel()
+    {
+        if (isInventoryOpen)
+        {
+            StartCoroutine(SlideInventoryPanel(hiddenX));  // 收缩
+        }
+        else
+        {
+            StartCoroutine(SlideInventoryPanel(shownX));  // 展开
+        }
+
+        // 切换状态
+        isInventoryOpen = !isInventoryOpen;
+    }
+    
+    private IEnumerator SlideInventoryPanel(float targetX)
+    {
+        RectTransform rt = inventoryPanel.GetComponent<RectTransform>();
+        Vector2 currentPos = rt.anchoredPosition;
+        Vector2 targetPos = new Vector2(targetX, currentPos.y);
+
+        float timeElapsed = 0f;
+
+        while (timeElapsed < 1f)
+        {
+            rt.anchoredPosition = Vector2.Lerp(currentPos, targetPos, timeElapsed);
+            timeElapsed += Time.deltaTime * slideSpeed;
+            yield return null;
+        }
+
+        rt.anchoredPosition = targetPos;  // 确保最终位置准确
+    }
+
+    #endregion
+
+    #endregion
+
+    #region 消息处理
+
+    private void HandleInventoryChanged()
+    {
+        UpdateAllItems();
+        
+        taskPanel?.UpdateTaskPanelProgress();
+    }
+
+    private void HandleItemAdded(params object[] args)
+    {
+        if (args.Length > 0 && args[0] is ItemDef item)
+        {
+            int itemCount = InventoryManager.Instance.GetItemCount(item);
+
+            ItemStack itemStack = new ItemStack
+            {
+                item = item,
+                amount = itemCount
+            };
+            
+            if (!_hudItems.ContainsKey(item))
+            {
+                CreateItemSlot(itemStack);  // 创建物品槽
+            }
+            else
+            {
+                UpdateItemDisplay(item);  // 更新物品显示
+            }
+
+            taskPanel?.UpdateTaskItemDisplay(item);
+        }
+    }
+
+
+    private void HandleStageCompleted(params object[] args)
+    {
+        if (args.Length > 0 && args[0] is int stageIndex)
+        {
+            InitializeInventory();
+            taskPanel?.UpdateTaskPanelProgress();
         }
     }
 
@@ -143,57 +241,6 @@ public class HudController : MonoBehaviour
         return TechTreeManager.Instance.GetUnlockedBuildingsByCategory(BuildingCategory.Mushroom);
     }
 
-    private void OnPauseButtonClicked()
-    {
-        UIManager.Instance.OpenPanel("PausePanel");
-    }
-
-    private void OnTechTreeButtonClicked()
-    {
-        UIManager.Instance.OpenPanel("TechTreePanel");
-    }
-    
-
-    private void HandleInventoryChanged()
-    {
-        UpdateAllHudItems();
-        
-        // 更新任务面板
-        taskPanel?.UpdateTaskPanelProgress();
-    }
-
-    private void HandleItemAdded(params object[] args)
-    {
-        if (args.Length > 0 && args[0] is ItemDef item)
-        {
-            if (!_hudItems.ContainsKey(item))
-            {
-                // 检查这个物品是否在当前阶段的需求中
-                var currentStage = hub.GetCurrentStage();
-                if (currentStage != null && currentStage.requirements.Any(r => r.item == item))
-                {
-                    CreateHudItemSlot(item);
-                }
-            }
-            else
-            {
-                UpdateHudItemDisplay(item);
-            }
-
-            // 更新任务面板的特定物品显示
-            taskPanel?.UpdateTaskItemDisplay(item);
-        }
-    }
-
-    private void HandleStageCompleted(params object[] args)
-    {
-        if (args.Length > 0 && args[0] is int stageIndex)
-        {
-            InitializeHudInventory();
-            taskPanel?.UpdateTaskPanelProgress();
-        }
-    }
-
     private void OnHubClicked(params object[] args)
     {
         if (args.Length > 0 && args[0] is Hub clickedHub && clickedHub == hub)
@@ -202,12 +249,5 @@ public class HudController : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        // 减少更新频率，每60帧更新一次
-        if (Time.frameCount % 60 == 0 && _isInitialized)
-        {
-            UpdateAllHudItems();
-        }
-    }
+    #endregion
 }

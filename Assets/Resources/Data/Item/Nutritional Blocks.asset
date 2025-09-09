@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22e3b6f78d1404235a546b634488b99d, type: 3}
-  m_Name: test
+  m_Name: Nutritional Blocks
   m_EditorClassIdentifier: 
-  itemId: test_item
-  displayName: test
-  icon: {fileID: 21300000, guid: 651448d2f18144787ade4c511a049dd7, type: 3}
+  itemId: Nutritional Blocks
+  displayName: 
+  icon: {fileID: 0}
   stackLimit: 100

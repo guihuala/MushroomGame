@@ -17,8 +17,10 @@ public class GenericPreview : MonoBehaviour
 
     public void SetRotationEnabled(bool enabled)
     {
+        if (_spriteRenderer == null) return; 
         _isRotationEnabled = enabled;
     }
+
 
     public void SetDirection(Vector2Int direction)
     {

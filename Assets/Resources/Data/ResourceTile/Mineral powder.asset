@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 50275919957954203be63b872707d10e, type: 3}
-  m_Name: testResource Tile
+  m_Name: Mineral powder
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 223821821, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  m_Sprite: {fileID: -1177336714, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -31,9 +31,9 @@ MonoBehaviour:
     e31: 0
     e32: 0
     e33: 1
-  m_InstancedGameObject: {fileID: 7246964042315093936, guid: fccc277f937764e2dae4c078ae13c9af, type: 3}
+  m_InstancedGameObject: {fileID: 1253903125400193509, guid: 821ab5adeba454c42abd23b546d0e5fa, type: 3}
   m_Flags: 1
   m_ColliderType: 1
-  yieldItem: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
+  yieldItem: {fileID: 11400000, guid: 56179e0d855c2412da7c94818f7c6e08, type: 2}
   infinite: 1
   baseRichness: 50

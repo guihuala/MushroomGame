@@ -129,20 +129,22 @@ public class PlacementSystem : MonoBehaviour
     {
         if (_currentPrefab == null || previewPrefab == null) return;
 
-        var previewObject = Instantiate(previewPrefab, position, Quaternion.identity);
-        _currentPreview = previewObject.GetComponent<GenericPreview>();
-        if (_currentPreview == null) _currentPreview = previewObject.AddComponent<GenericPreview>();
-        
-        _currentPreview.validColor = previewValidColor;
-        _currentPreview.invalidColor = previewInvalidColor;
-        _origValid = _currentPreview.validColor;
-        _origInvalid = _currentPreview.invalidColor;
+        if (_currentPreview == null)
+        {
+            var previewObject = Instantiate(previewPrefab, position, Quaternion.identity);
+            _currentPreview = previewObject.GetComponent<GenericPreview>();
+            if (_currentPreview == null) _currentPreview = previewObject.AddComponent<GenericPreview>();
 
-        _currentPreview.SetDirection(_currentDir);
-        _currentPreview.SetSize(_currentPrefab.size);
-        SetPreviewIcon();
+            _currentPreview.validColor = previewValidColor;
+            _currentPreview.invalidColor = previewInvalidColor;
+            _origValid = _currentPreview.validColor;
+            _origInvalid = _currentPreview.invalidColor;
+
+            _currentPreview.SetDirection(_currentDir);
+            _currentPreview.SetSize(_currentPrefab.size);
+            SetPreviewIcon();
+        }
     }
-
 
     private void SetPreviewIcon()
     {
@@ -262,14 +264,6 @@ public class PlacementSystem : MonoBehaviour
         if (_input.IsExitBuildPressed()) ExitBuildMode();
     }
     
-    private float GetRotationAngleFromDirection(Vector2Int direction)
-    {
-        if (direction == Vector2Int.right) return 0f;
-        if (direction == Vector2Int.down) return 90f;
-        if (direction == Vector2Int.left) return 180f;
-        if (direction == Vector2Int.up) return 270f;
-        return 0f;
-    }
     #endregion
 
     #region 放置/擦除

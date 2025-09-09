@@ -10,8 +10,9 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
 
     [Header("资源检测")]
     public ResourceTilemapService tileService;
-    public LayerMask nodeMask;  // 用于检测资源节点的遮罩
-
+    public LayerMask nodeMask;
+    public List<ItemDef> allowedResourceTypes;
+    
     private IResourceSource _source;  // 绑定的资源节点
     private float _t;  // 用于计时的变量
     private readonly Queue<ItemPayload> _buffer = new(); // 简易缓冲
@@ -87,7 +88,7 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     {
         if (_buffer.Count >= BUFFER_LIMIT || _t < cycleTime) return;
 
-        if (_source.TryConsumeOnce())
+        if (_source.TryConsumeOnce() && CanMineResource(_source.YieldItem))
         {
             var payload = new ItemPayload
             {
@@ -116,6 +117,18 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
                 _buffer.Dequeue();
             }
         }
+    }
+
+    #endregion
+    
+    #region 资源采集判断
+
+    private bool CanMineResource(ItemDef resource)
+    {
+        if (allowedResourceTypes == null || allowedResourceTypes.Count == 0)
+            return true;
+
+        return allowedResourceTypes.Contains(resource);
     }
 
     #endregion

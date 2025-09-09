@@ -5,7 +5,7 @@ public class BuildingData : ScriptableObject
 {
     [Header("基本信息")]
     public string buildingName;
-    public string description;
+    [TextArea] public string description;
     public Sprite icon;
     public Building prefab;
     

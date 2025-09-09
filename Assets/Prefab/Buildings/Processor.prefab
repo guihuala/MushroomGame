@@ -53,7 +53,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -97,9 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4f6ba273c2f945d9bc733978ba199f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buildZone: 0
+  grid: {fileID: 0}
   cell: {x: 0, y: 0}
   size: {x: 1, y: 1}
-  anchor: {x: 0, y: 0}
   recipe: {fileID: 11400000, guid: 71f9e342d59d94010b807f556c244095, type: 2}
   inDir: {x: -1, y: 0}
   outDir: {x: 1, y: 0}

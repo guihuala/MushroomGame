@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3275518248168605768}
   - component: {fileID: 620177880423639404}
-  - component: {fileID: 2168771974066223389}
   - component: {fileID: 8881270999556699430}
   - component: {fileID: 2086828126524929869}
   m_Layer: 0
@@ -48,22 +47,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxStorage: 99999
---- !u!114 &2168771974066223389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3672668951708238811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cd6dac59c199448cb369146ff4227d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  darknessMaterial: {fileID: 0}
-  updateInterval: 0.1
-  maxLights: 50
-  darknessColor: {r: 0, g: 0, b: 0, a: 0.8}
 --- !u!114 &8881270999556699430
 MonoBehaviour:
   m_ObjectHideFlags: 0

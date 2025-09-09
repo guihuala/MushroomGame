@@ -13,14 +13,11 @@ public class PlacementSystem : MonoBehaviour
 
     [Header("动画设置")]
     public float previewMoveDuration = 0.2f;
-    public float previewRotateDuration = 0.3f;
     public Ease moveEase = Ease.OutQuad;
-    public Ease rotateEase = Ease.OutBack;
 
     [Header("组件")]
     public Camera mainCam;
     public TileGridService grid;
-    public CameraController cameraController;
     public BuildingList buildingList;
 
     [Header("预览预制件")]
@@ -51,7 +48,6 @@ public class PlacementSystem : MonoBehaviour
     {
         _input = InputManager.Instance;
         if (!mainCam) mainCam = Camera.main;
-        if (!cameraController) cameraController = FindObjectOfType<CameraController>();
         ExitBuildMode();
     }
 
@@ -73,7 +69,6 @@ public class PlacementSystem : MonoBehaviour
     public void EnterBuildMode()
     {
         IsInBuildMode = true;
-        if (cameraController) cameraController.enabled = false;
         Cursor.visible = true;
         SelectIndex(1);
     }
@@ -81,7 +76,6 @@ public class PlacementSystem : MonoBehaviour
     public void ExitBuildMode()
     {
         IsInBuildMode = false;
-        if (cameraController) cameraController.enabled = true;
 
         ClearPreview();
         _currentPrefab = null;
@@ -106,6 +100,7 @@ public class PlacementSystem : MonoBehaviour
     #endregion
 
     #region 预览
+    
     private void ClearPreview()
     {
         if (_currentPreview == null) return;
@@ -137,16 +132,17 @@ public class PlacementSystem : MonoBehaviour
         var previewObject = Instantiate(previewPrefab, position, Quaternion.identity);
         _currentPreview = previewObject.GetComponent<GenericPreview>();
         if (_currentPreview == null) _currentPreview = previewObject.AddComponent<GenericPreview>();
-
+        
         _currentPreview.validColor = previewValidColor;
         _currentPreview.invalidColor = previewInvalidColor;
         _origValid = _currentPreview.validColor;
         _origInvalid = _currentPreview.invalidColor;
 
         _currentPreview.SetDirection(_currentDir);
-        _currentPreview.SetSize(_currentPrefab.size); // 多格尺寸（视觉）
+        _currentPreview.SetSize(_currentPrefab.size);
         SetPreviewIcon();
     }
+
 
     private void SetPreviewIcon()
     {
@@ -206,6 +202,23 @@ public class PlacementSystem : MonoBehaviour
             ? grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab)
             : (grid.GetBuildingAt(cell) != null);
     }
+    
+    private void RotatePreview()
+    {
+        Vector2Int[] rotationCycle = { Vector2Int.right, Vector2Int.down, Vector2Int.left, Vector2Int.up };
+        int currentIndex = System.Array.IndexOf(rotationCycle, _currentDir);
+        int nextIndex = (currentIndex + 1) % rotationCycle.Length;
+        SetDirection(rotationCycle[nextIndex]);
+    }
+
+    private void SetDirection(Vector2Int direction)
+    {
+        _currentDir = direction;
+
+        if (_currentPreview == null) return;
+        _currentPreview.SetDirection(direction);
+    }
+
     #endregion
 
     #region 输入
@@ -248,36 +261,7 @@ public class PlacementSystem : MonoBehaviour
         if (_input.IsBuildCancelled() && !_input.IsPointerOverUI()) ExitBuildMode();
         if (_input.IsExitBuildPressed()) ExitBuildMode();
     }
-
-    private void RotatePreview()
-    {
-        Vector2Int[] rotationCycle = { Vector2Int.right, Vector2Int.down, Vector2Int.left, Vector2Int.up };
-        int currentIndex = System.Array.IndexOf(rotationCycle, _currentDir);
-        int nextIndex = (currentIndex + 1) % rotationCycle.Length;
-        SetDirection(rotationCycle[nextIndex], true);
-    }
-
-    private void SetDirection(Vector2Int direction, bool animate = false)
-    {
-        _currentDir = direction;
-        if (_currentPreview == null) return;
-
-        if (animate)
-        {
-            _currentRotateTween?.Kill();
-            float targetAngle = GetRotationAngleFromDirection(direction);
-            Vector3 targetRotation = new Vector3(0, 0, targetAngle);
-            _currentRotateTween = _currentPreview.transform
-                .DORotate(targetRotation, previewRotateDuration)
-                .SetEase(rotateEase)
-                .OnComplete(() => _currentPreview.SetDirection(direction));
-        }
-        else
-        {
-            _currentPreview.SetDirection(direction);
-        }
-    }
-
+    
     private float GetRotationAngleFromDirection(Vector2Int direction)
     {
         if (direction == Vector2Int.right) return 0f;
@@ -288,7 +272,7 @@ public class PlacementSystem : MonoBehaviour
     }
     #endregion
 
-    #region 放置/擦除（含“多格占用”修复）
+    #region 放置/擦除
     private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
     {
         // 1) 统一可行性：整块+上下文
@@ -376,8 +360,26 @@ public class PlacementSystem : MonoBehaviour
         _isDragging = false;
         _dragLastBuilding = null;
         _mode = BrushMode.Place;
-    }
+        
+        if (_currentPreview == null)
+        {
+            CreatePreview(Vector3.zero); // 使用默认位置进行实例化
+        }
 
+        // 检查建筑是否可旋转
+        var orientableBuilding = buildingPrefab as IOrientable;
+        if (orientableBuilding == null)
+        {
+            // 禁用旋转预览
+            _currentPreview.SetRotationEnabled(false);
+        }
+        else
+        {
+            // 启用旋转预览
+            _currentPreview.SetRotationEnabled(true);
+        }
+    }
+ 
     public void SelectIndex(int idx) => SelectIndexInternal(idx);
 
     #endregion

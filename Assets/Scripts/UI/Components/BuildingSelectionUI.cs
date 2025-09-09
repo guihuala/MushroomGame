@@ -41,7 +41,6 @@ public class BuildingSelectionUI : MonoBehaviour
         CloseBuildingDetails();
         InitializeUI();
     }
-
     
     void Update()
     {
@@ -179,11 +178,10 @@ public class BuildingSelectionUI : MonoBehaviour
             if (!placementSystem.IsInBuildMode)
             {
                 placementSystem.EnterBuildMode();
-                currentSelectedBuilding = buildingData;
+                placementSystem.SetCurrentBuilding(buildingData.prefab);
             }
         }
-
-        // 显示建筑详情
+        
         ShowBuildingDetails(buildingData);
     }
     

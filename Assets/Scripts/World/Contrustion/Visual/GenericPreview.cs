@@ -1,31 +1,47 @@
 using UnityEngine;
+using DG.Tweening;
 
-public class GenericPreview : MonoBehaviour, IOrientable
+public class GenericPreview : MonoBehaviour
 {
     [Header("预览设置")]
     public Color validColor = new Color(0, 1, 0, 0.5f);    // 可放置颜色
     public Color invalidColor = new Color(1, 0, 0, 0.5f);  // 不可放置颜色
-    
+    private bool _isRotationEnabled = true; // 是否允许旋转
     private SpriteRenderer _spriteRenderer;
-    private Vector2Int _currentDirection = Vector2Int.right;
-    
+
     void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         ApplyPreviewColor(validColor);
     }
-    
-    public void SetDirection(Vector2Int direction)
+
+    public void SetRotationEnabled(bool enabled)
     {
-        _currentDirection = direction;
-        transform.right = new Vector3(direction.x, direction.y, 0f);
+        _isRotationEnabled = enabled;
     }
 
-    public void SetPreviewState(bool canPlace)
+    public void SetDirection(Vector2Int direction)
     {
-        ApplyPreviewColor(canPlace ? validColor : invalidColor);
+        if (!_isRotationEnabled) return;
+        
+        float targetAngle = GetRotationAngleFromDirection(direction);
+        float currentAngle = transform.eulerAngles.z;
+
+        float deltaAngle = Mathf.DeltaAngle(currentAngle, targetAngle);
+
+        transform.DORotate(new Vector3(0, 0, targetAngle), 0.3f)
+            .SetEase(Ease.OutBack);
     }
-    
+
+    private float GetRotationAngleFromDirection(Vector2Int direction)
+    {
+        if (direction == Vector2Int.right) return 0f;
+        if (direction == Vector2Int.down) return 90f;
+        if (direction == Vector2Int.left) return 180f;
+        if (direction == Vector2Int.up) return 270f;
+        return 0f;
+    }
+
     private void ApplyPreviewColor(Color color)
     {
         if (_spriteRenderer != null)
@@ -33,20 +49,15 @@ public class GenericPreview : MonoBehaviour, IOrientable
             _spriteRenderer.color = color;
         }
     }
-    
+
     public void SetSize(Vector2Int size)
     {
-        // 可以根据建筑尺寸调整预览大小（可选）
         if (_spriteRenderer != null)
         {
-            // 这里可以根据需要调整预览的尺寸
             transform.localScale = new Vector3(size.x, size.y, 1f);
         }
     }
-    
-    /// <summary>
-    /// 设置预览图标
-    /// </summary>
+
     public void SetIcon(Sprite icon)
     {
         if (_spriteRenderer != null && icon != null)
@@ -54,6 +65,4 @@ public class GenericPreview : MonoBehaviour, IOrientable
             _spriteRenderer.sprite = icon;
         }
     }
-    
-    public Vector2Int GetCurrentDirection() => _currentDirection;
 }

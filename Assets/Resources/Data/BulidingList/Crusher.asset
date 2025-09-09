@@ -15,6 +15,6 @@ MonoBehaviour:
   buildingName: Crusher
   description: The crusher can collect ore from the soil and convert it into ore
     powder.
-  icon: {fileID: -809657034, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  icon: {fileID: 712325425, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   prefab: {fileID: 3649531574820566243, guid: 799a7904207154e00832ce3485e7a74a, type: 3}
   category: 0

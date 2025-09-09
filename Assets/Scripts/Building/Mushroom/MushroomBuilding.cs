@@ -21,6 +21,8 @@ public class MushroomBuilding : MultiGridBuilding, ITickable
     // 缓存两个端口所在外侧格
     private Vector2Int _inputPortCell;   // 第1格下方
     private Vector2Int _outputPortCell;  // 第2格下方
+    
+    private MushroomAnimator _mushroomAnimator;
 
     #region 生命周期
 
@@ -31,6 +33,8 @@ public class MushroomBuilding : MultiGridBuilding, ITickable
         portDefs.Add(new PortDefinition { localCell = new Vector2Int(1, 0), side = CellSide.Down, type = PortType.Output });
 
         buildZone = BuildZone.SurfaceOnly;
+        
+        _mushroomAnimator = GetComponent<MushroomAnimator>();
     }
 
     public override void OnPlaced(TileGridService g, Vector2Int c)
@@ -39,14 +43,6 @@ public class MushroomBuilding : MultiGridBuilding, ITickable
 
         RecalculatePortCells();
         BuildAndRegisterPorts(cell);
-
-        Debug.Log($"[Mushroom] OnPlaced cell={cell} " +
-                  $"inputPortCell={_inputPortCell}, outputPortCell={_outputPortCell}", this);
-
-        // 立即验证 grid 是否能查到这些端口
-        var inPort  = grid.GetPortAt(_inputPortCell);
-        var outPort = grid.GetPortAt(_outputPortCell);
-        Debug.Log($"[Mushroom] Grid lookup: inputPort={inPort!=null}, outputPort={outPort!=null}", this);
 
         TickManager.Instance?.Register(this);
     }
@@ -114,6 +110,12 @@ public class MushroomBuilding : MultiGridBuilding, ITickable
         TryPullInputItems();     // 从输入外侧格的邻居端口拉需要的料
         UpdateProduction(dt);    // 检查能否开工、推进进度、完成产出
         TryPushOutputItems();    // 向输出外侧格的邻居端口推产物
+        
+        // 生产时调用动画
+        if (isProducing)
+        {
+            _mushroomAnimator.PlaySquashAndStretch();  // 每次生产时调用动画
+        }
     }
 
     private void TryPullInputItems()

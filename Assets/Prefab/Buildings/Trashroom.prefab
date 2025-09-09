@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7425919192971951955}
   - component: {fileID: 444061562606330073}
   - component: {fileID: 7477967300382333871}
+  - component: {fileID: 2324035224808125801}
   m_Layer: 0
   m_Name: Trashroom
   m_TagString: Untagged
@@ -104,8 +105,21 @@ MonoBehaviour:
   outDir: {x: 1, y: 0}
   inDir: {x: -1, y: 0}
   outputItem: {fileID: 11400000, guid: df6f9f1f6074e4af3aa7d9e371cf28bf, type: 2}
-  processRate: 1
+  processRate: 5
   inputPerBatch: 1
   outputPerBatch: 1
-  inputCap: 64
-  outputCap: 64
+--- !u!114 &2324035224808125801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034816619696291648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1

@@ -1,5 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;  // 引入 DOTween 命名空间
 
+/// <summary>
+/// 垃圾桶蘑菇：接收任何物品，先累计输入物品，按速率消耗物品并转化为目标产物，
+/// 处理过程中每次生产时会播放动画（压扁恢复效果）。
+/// </summary>
 public class Trashroom : Building, IItemPort, ITickable
 {
     [Header("Direction")]
@@ -11,39 +17,66 @@ public class Trashroom : Building, IItemPort, ITickable
     public float processRate = 1f;     // 每秒处理的物品数量（即每秒转化多少物品为产物）
     public int inputPerBatch  = 1;     // 每批消耗多少输入物品
     public int outputPerBatch = 1;     // 每批生成多少目标产物
-    
+
     private float _processBudget = 0f; // 每次 Tick 后按速率消耗物品并转化为产物
+
+    // 存储累计的输入物品
+    private readonly Dictionary<ItemDef, int> _inputs = new();
+
+    // 用于控制动画的组件
+    private MushroomAnimator _mushroomAnimator;
 
     // IItemPort
     public bool CanReceive => true;    // 始终可以接收物品
     public bool CanProvide => false;   // 不提供任何物品
-    
+
     public override void OnPlaced(TileGridService g, Vector2Int c)
     {
         base.OnPlaced(g, c);
-        g.RegisterPort(cell, this);
+        g.RegisterPort(cell, this);   // 注册端口
         UpdateVisual();
-        TickManager.Instance?.Register(this);
+        TickManager.Instance?.Register(this); // 注册 Tick
+
+        // 获取动画组件
+        _mushroomAnimator = GetComponent<MushroomAnimator>();
     }
 
     public override void OnRemoved()
     {
-        TickManager.Instance?.Unregister(this);
-        grid.UnregisterPort(cell, this);
+        TickManager.Instance?.Unregister(this);  // 注销 Tick
+        grid.UnregisterPort(cell, this);         // 注销端口
         base.OnRemoved();
     }
-    
+
+    // ==== 接收物品：累积物品到内部缓冲区 ====
     public bool TryReceive(in ItemPayload payloadIn)
     {
         if (payloadIn.item == null || payloadIn.amount <= 0) return false;
 
-        // 直接把物品加入库存
-        bool ok = InventoryManager.Instance.AddItem(payloadIn.item, payloadIn.amount);
-        return ok; // 返回是否成功
+        // 累积物品
+        AddCount(_inputs, payloadIn.item, payloadIn.amount);
+        return true;
     }
 
     // 不支持被动提供
     public bool TryProvide(ref ItemPayload payload) => false;
+    
+    // 累积物品，增加物品数量
+    private void AddCount(Dictionary<ItemDef, int> dict, ItemDef item, int amount)
+    {
+        if (item == null || amount <= 0) return;
+
+        // 如果物品已经在字典中，增加它的数量
+        if (dict.ContainsKey(item))
+        {
+            dict[item] += amount;
+        }
+        else
+        {
+            // 如果物品不在字典中，添加新的物品及其数量
+            dict[item] = amount;
+        }
+    }
 
     // ==== 每Tick按速率处理物品并转化为目标产物 ====
     public void Tick(float dt)
@@ -66,15 +99,14 @@ public class Trashroom : Building, IItemPort, ITickable
                 ProduceOutput(outputPerBatch); // 生成产物
             }
         }
-
-        // 扣除预算
+        
         _processBudget -= quota;
     }
 
     // 检查是否有足够输入物品
     private bool HasAtLeastInput(int neededAmount)
     {
-        return InventoryManager.Instance.GetItemCount(outputItem) >= neededAmount;
+        return CountTotal(_inputs) >= neededAmount;
     }
 
     // 消耗指定数量的输入物品
@@ -82,10 +114,20 @@ public class Trashroom : Building, IItemPort, ITickable
     {
         if (amount <= 0) return;
 
-        bool consumed = InventoryManager.Instance.RemoveItem(outputItem, amount);
-        if (!consumed)
+        foreach (var kv in _inputs)
         {
-            Debug.LogWarning("[Trashroom] Failed to consume required input!");
+            if (kv.Value <= amount)
+            {
+                amount -= kv.Value;
+                _inputs.Remove(kv.Key);
+                if (amount <= 0) break;
+            }
+            else
+            {
+                // 扣除部分
+                _inputs[kv.Key] -= amount;
+                break;
+            }
         }
     }
 
@@ -94,14 +136,18 @@ public class Trashroom : Building, IItemPort, ITickable
     {
         if (outputItem == null || amount <= 0) return;
 
-        bool added = InventoryManager.Instance.AddItem(outputItem, amount);
-        if (!added)
-        {
-            Debug.LogWarning("[Trashroom] Failed to add output item to inventory!");
-        }
+        _mushroomAnimator.PlaySquashAndStretch();  // 每次生产时调用动画
+        DebugManager.Log("[Trashroom] Produced output");
+        InventoryManager.Instance.AddItem(outputItem, amount);
     }
-
-    // ==== 方向可视化 ====
+    
+    private static int CountTotal(Dictionary<ItemDef, int> dict)
+    {
+        int total = 0;
+        foreach (var v in dict.Values) total += v;
+        return total;
+    }
+    
     private void UpdateVisual()
     {
         transform.right = new Vector3(outDir.x, outDir.y, 0f);

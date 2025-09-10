@@ -38,11 +38,12 @@ public class GenericPreview : MonoBehaviour
     private float GetRotationAngleFromDirection(Vector2Int direction)
     {
         if (direction == Vector2Int.right) return 0f;
-        if (direction == Vector2Int.down) return 90f;
-        if (direction == Vector2Int.left) return 180f;
-        if (direction == Vector2Int.up) return 270f;
+        if (direction == Vector2Int.up)    return 90f;
+        if (direction == Vector2Int.left)  return 180f;
+        if (direction == Vector2Int.down)  return 270f;
         return 0f;
     }
+
 
     private void ApplyPreviewColor(Color color)
     {

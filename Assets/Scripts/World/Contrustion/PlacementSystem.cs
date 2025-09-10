@@ -18,6 +18,11 @@ public class PlacementSystem : MonoBehaviour
 
     [Header("预览预制件")]
     public GameObject previewPrefab;
+    
+    [Header("Cursor")]
+    [SerializeField] private Texture2D cursorDefault;   // 默认光标
+    [SerializeField] private Texture2D cursorErase;     // 拆除光标（如小锤子/橡皮）
+    [SerializeField] private Vector2 cursorHotspot = new Vector2(8, 8); // 热点（像素坐标）
 
     // 预览与当前选择
     private GenericPreview _currentPreview;
@@ -74,6 +79,11 @@ public class PlacementSystem : MonoBehaviour
         {
             HandleDefaultModeInput(cell); // 默认模式：右键清除
         }
+    }
+    
+    private void OnDisable()
+    {
+        SetEraseCursor(false);
     }
 
     #endregion
@@ -238,6 +248,7 @@ public class PlacementSystem : MonoBehaviour
         if (_input.IsRightMouseDown() && !_input.IsPointerOverUI())
         {
             ExitBuildMode();
+            SetEraseCursor(false);
             return;
         }
 
@@ -290,35 +301,38 @@ public class PlacementSystem : MonoBehaviour
     
     private void HandleDefaultModeInput(Vector2Int cell)
     {
-        // 右键按下：记录起点，进入“右键清除”流程（单击 or 框选）
+        // 右键按下：进入拆除流程 -> 切换为拆除光标
         if (_input.IsRightMouseDown() && !_input.IsPointerOverUI())
         {
             _isRightErasing = true;
             _eraseAsBox = false;
             _eraseAnchorCell = cell;
+
+            SetEraseCursor(true);   // ← 显示“拆除”鼠标
             return;
         }
 
-        // 右键按住：如果移动到其他格，进入框选模式（懒触发）
+        // 右键按住：是否转为框选，仅维持状态（光标保持拆除状态）
         if (_isRightErasing && _input.IsRightMouseHeld() && !_input.IsPointerOverUI())
         {
             if (!_eraseAsBox && cell != _eraseAnchorCell)
-            {
                 _eraseAsBox = true;
-            }
+
             return;
         }
 
-        // 右键抬起：根据是否为框选执行清除
+        // 右键抬起：执行单格或矩形拆除 -> 恢复默认光标
         if (_isRightErasing && _input.IsRightMouseUp())
         {
             if (_eraseAsBox)
-                EraseArea(_eraseAnchorCell, cell); // 框选范围清除
+                EraseArea(_eraseAnchorCell, cell);
             else
-                EraseOne(cell);                    // 单击所在格清除（也可用 _eraseAnchorCell）
+                EraseOne(cell);
 
             _isRightErasing = false;
             _eraseAsBox = false;
+
+            SetEraseCursor(false);  // ← 恢复默认鼠标
         }
     }
 
@@ -452,6 +466,19 @@ public class PlacementSystem : MonoBehaviour
     }
  
     public void SelectIndex(int idx) => SelectIndexInternal(idx);
+
+    #endregion
+
+    #region cursor
+
+    private void SetEraseCursor(bool active)
+    {
+        if (active)
+            Cursor.SetCursor(cursorErase, cursorHotspot, CursorMode.Auto);
+        else
+            Cursor.SetCursor(cursorDefault, cursorHotspot, CursorMode.Auto);
+    }
+
 
     #endregion
 }

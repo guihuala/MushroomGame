@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public enum WeatherType
 {
@@ -19,9 +20,11 @@ public class WeatherCondition
     public float minHumidity;
     public float maxHumidity;
     public ParticleSystem particleEffect;
-    public Color skyColor = Color.cyan;
+    
     public Color ambientLightColor = Color.white;
-    public float ambientIntensity = 1f;
+    [Range(0f, 2f)] public float ambientIntensity = 1f;
+    
+    public float targetEmissionRate = -1f;
 }
 
 public class WeatherManager : MonoBehaviour
@@ -29,360 +32,305 @@ public class WeatherManager : MonoBehaviour
     [Header("温度范围")]
     public float minTemperature = -10f;
     public float maxTemperature = 40f;
-    
+
     [Header("湿度范围")]
     public float minHumidity = 0f;
     public float maxHumidity = 100f;
-    
+
     [Header("天气条件设置")]
     public List<WeatherCondition> weatherConditions = new List<WeatherCondition>();
-    
+
     [Header("天气变化设置")]
     public float weatherChangeInterval = 60f;
     public float transitionDuration = 5f;
-    
-    [Header("2D天空背景引用")]
-    public SpriteRenderer skyBackground;
-    public Camera mainCamera;
-    
+
+    [Header("URP 2D Lighting")]
+    [Tooltip("场景中的 Global Light 2D（类型设为 Global）。")]
+    public Light2D globalLight;
+
     [Header("调试信息")]
     public float currentTemperature;
     public float currentHumidity;
     public WeatherType currentWeather;
     public WeatherType previousWeather;
-    
-    private Dictionary<WeatherType, ParticleSystem> activeParticles = new Dictionary<WeatherType, ParticleSystem>();
+
+    private readonly Dictionary<WeatherType, ParticleSystem> activeParticles = new();
+    private readonly Dictionary<WeatherType, float> particleBaseRate = new(); // 记录初始发射率
     private Coroutine weatherChangeCoroutine;
     private Coroutine transitionCoroutine;
     
-    // 环境设置缓存
-    private Color originalSkyColor;
+    private Color originalLightColor = Color.white;
+    private float originalLightIntensity = 1f;
     private Color originalAmbientLight;
     private float originalAmbientIntensity;
-    
+
     void Start()
     {
         CacheOriginalEnvironmentSettings();
         InitializeWeatherSystem();
-        StartWeatherChanges();
-    }
-    
-    void CacheOriginalEnvironmentSettings()
-    {
-        if (skyBackground != null)
-            originalSkyColor = skyBackground.color;
-        
-        originalAmbientLight = RenderSettings.ambientLight;
-        originalAmbientIntensity = RenderSettings.ambientIntensity;
-    }
-    
-    void InitializeWeatherSystem()
-    {
-        if (weatherConditions.Count == 0)
-        {
-            SetupDefaultWeatherConditions();
-        }
-        
-        // 预先实例化所有粒子系统并停用
-        foreach (var condition in weatherConditions)
-        {
-            if (condition.particleEffect != null)
-            {
-                ParticleSystem particleInstance = Instantiate(condition.particleEffect, transform);
-                particleInstance.gameObject.SetActive(false);
-                activeParticles.Add(condition.type, particleInstance);
-            }
-        }
-    }
-    
-    void SetupDefaultWeatherConditions()
-    {
-        // 晴朗天气
-        weatherConditions.Add(new WeatherCondition()
-        {
-            type = WeatherType.Sunny,
-            minTemperature = 20f,
-            maxTemperature = 40f,
-            minHumidity = 0f,
-            maxHumidity = 30f,
-            skyColor = new Color(0.8f, 0.9f, 1f, 1f), // 明亮的蓝色
-            ambientLightColor = new Color(1f, 1f, 0.95f, 1f), // 温暖的阳光
-            ambientIntensity = 1.2f
-        });
-        
-        // 多云天气
-        weatherConditions.Add(new WeatherCondition()
-        {
-            type = WeatherType.Cloudy,
-            minTemperature = 10f,
-            maxTemperature = 25f,
-            minHumidity = 30f,
-            maxHumidity = 60f,
-            skyColor = new Color(0.7f, 0.75f, 0.8f, 1f), // 灰蓝色
-            ambientLightColor = new Color(0.9f, 0.9f, 0.9f, 1f), // 中性光
-            ambientIntensity = 0.9f
-        });
-        
-        // 雨天
-        weatherConditions.Add(new WeatherCondition()
-        {
-            type = WeatherType.Rainy,
-            minTemperature = 5f,
-            maxTemperature = 20f,
-            minHumidity = 70f,
-            maxHumidity = 100f,
-            skyColor = new Color(0.5f, 0.6f, 0.7f, 1f), // 灰暗的蓝色
-            ambientLightColor = new Color(0.8f, 0.8f, 0.85f, 1f), // 冷色调
-            ambientIntensity = 0.7f
-        });
-        
-        // 雪天
-        weatherConditions.Add(new WeatherCondition()
-        {
-            type = WeatherType.Snowy,
-            minTemperature = -10f,
-            maxTemperature = 0f,
-            minHumidity = 60f,
-            maxHumidity = 100f,
-            skyColor = new Color(0.85f, 0.9f, 0.95f, 1f), // 明亮的蓝白色
-            ambientLightColor = new Color(0.95f, 0.95f, 1f, 1f), // 冷白色
-            ambientIntensity = 1.1f
-        });
-    }
-    
-    void StartWeatherChanges()
-    {
-        if (weatherChangeCoroutine != null)
-        {
-            StopCoroutine(weatherChangeCoroutine);
-        }
-        weatherChangeCoroutine = StartCoroutine(WeatherChangeRoutine());
-    }
-    
-    IEnumerator WeatherChangeRoutine()
-    {
-        // 初始天气
+
+        // 初始化温湿度并确定首个天气
         currentTemperature = Random.Range(minTemperature, maxTemperature);
         currentHumidity = Random.Range(minHumidity, maxHumidity);
         DetermineWeather();
         
+        ApplyWeatherEnvironment(GetWeatherCondition(currentWeather));
+
+        StartWeatherChanges();
+    }
+
+    void CacheOriginalEnvironmentSettings()
+    {
+        if (globalLight != null)
+        {
+            originalLightColor = globalLight.color;
+            originalLightIntensity = globalLight.intensity;
+        }
+
+        originalAmbientLight = RenderSettings.ambientLight;
+        originalAmbientIntensity = RenderSettings.ambientIntensity;
+    }
+
+    void InitializeWeatherSystem()
+    {
+        if (weatherConditions.Count == 0)
+            SetupDefaultWeatherConditions();
+
+        // 预实例化粒子 & 记录基础发射率
+        foreach (var condition in weatherConditions)
+        {
+            if (condition.particleEffect != null)
+            {
+                var ps = Instantiate(condition.particleEffect, transform);
+                ps.gameObject.SetActive(false);
+                activeParticles[condition.type] = ps;
+
+                var emission = ps.emission;
+                float baseRate = emission.rateOverTime.constant;
+                particleBaseRate[condition.type] = baseRate > 0 ? baseRate : 10f; // 合理默认
+            }
+        }
+
+        if (globalLight == null)
+            Debug.LogWarning("[WeatherManager] 未指定 Global Light 2D，将回退到 RenderSettings。建议绑定 Global Light 2D。");
+    }
+
+    void SetupDefaultWeatherConditions()
+    {
+        weatherConditions.Add(new WeatherCondition {
+            type = WeatherType.Sunny,
+            minTemperature = 20f, maxTemperature = 45f,
+            minHumidity = 0f,  maxHumidity = 40f,
+            ambientLightColor = new Color(1.00f, 0.98f, 0.90f, 1f), // 微暖、偏黄
+            particleEffect = Resources.Load<ParticleSystem>("Particles/Sunny"),
+            ambientIntensity  = 1.25f,
+            targetEmissionRate = 0f
+        });
+
+        weatherConditions.Add(new WeatherCondition {
+            type = WeatherType.Cloudy,
+            minTemperature = 10f, maxTemperature = 28f,
+            minHumidity = 30f, maxHumidity = 70f,
+            ambientLightColor = new Color(0.80f, 0.82f, 0.85f, 1f), // 偏冷中性
+            particleEffect = Resources.Load<ParticleSystem>("Particles/Cloudy"),
+            ambientIntensity  = 0.65f,
+            targetEmissionRate = 0f
+        });
+
+        weatherConditions.Add(new WeatherCondition {
+            type = WeatherType.Rainy,
+            minTemperature = 5f,  maxTemperature = 22f,
+            minHumidity = 70f, maxHumidity = 100f,
+            ambientLightColor = new Color(0.78f, 0.82f, 0.90f, 1f), // 稍冷、偏蓝
+            particleEffect = Resources.Load<ParticleSystem>("Particles/Rainy"),
+            ambientIntensity  = 0.70f,
+            targetEmissionRate = 30f // 下雨粒子默认发射率
+        });
+
+        weatherConditions.Add(new WeatherCondition {
+            type = WeatherType.Snowy,
+            minTemperature = -15f, maxTemperature = 2f,
+            minHumidity = 60f,  maxHumidity = 100f,
+            ambientLightColor = new Color(0.95f, 0.97f, 1.00f, 1f), // 冷白、略亮
+            particleEffect = Resources.Load<ParticleSystem>("Particles/Snowy"),
+            ambientIntensity  = 1.10f,
+            targetEmissionRate = 20f // 飘雪较轻
+        });
+    }
+
+    void StartWeatherChanges()
+    {
+        if (weatherChangeCoroutine != null)
+            StopCoroutine(weatherChangeCoroutine);
+
+        weatherChangeCoroutine = StartCoroutine(WeatherChangeRoutine());
+    }
+
+    IEnumerator WeatherChangeRoutine()
+    {
         while (true)
         {
             yield return new WaitForSeconds(weatherChangeInterval);
-            
-            // 随机生成温度和湿度（基于当前值小幅变化）
-            currentTemperature = Mathf.Clamp(
-                currentTemperature + Random.Range(-5f, 5f), 
-                minTemperature, 
-                maxTemperature
-            );
-            currentHumidity = Mathf.Clamp(
-                currentHumidity + Random.Range(-10f, 10f), 
-                minHumidity, 
-                maxHumidity
-            );
-            
-            // 根据条件确定天气
+
+            currentTemperature = Mathf.Clamp(currentTemperature + Random.Range(-5f, 5f), minTemperature, maxTemperature);
+            currentHumidity    = Mathf.Clamp(currentHumidity + Random.Range(-10f, 10f), minHumidity, maxHumidity);
+
             DetermineWeather();
         }
     }
-    
+
     void DetermineWeather()
     {
-        // 找出符合条件的天气类型
-        List<WeatherType> possibleWeathers = new List<WeatherType>();
-        
-        foreach (var condition in weatherConditions)
+        var possible = new List<WeatherType>();
+        foreach (var c in weatherConditions)
         {
-            if (currentTemperature >= condition.minTemperature && 
-                currentTemperature <= condition.maxTemperature &&
-                currentHumidity >= condition.minHumidity && 
-                currentHumidity <= condition.maxHumidity)
-            {
-                possibleWeathers.Add(condition.type);
-            }
+            if (currentTemperature >= c.minTemperature && currentTemperature <= c.maxTemperature
+             && currentHumidity    >= c.minHumidity    && currentHumidity    <= c.maxHumidity)
+                possible.Add(c.type);
         }
-        
-        // 随机选择一个符合条件的天气
-        WeatherType newWeather;
-        if (possibleWeathers.Count > 0)
-        {
-            newWeather = possibleWeathers[Random.Range(0, possibleWeathers.Count)];
-        }
-        else
-        {
-            Debug.LogWarning("没有找到符合条件的天气类型");
-            newWeather = WeatherType.Sunny;
-        }
-        
-        // 如果天气发生变化，启动过渡
+
+        WeatherType newWeather = possible.Count > 0 ? possible[Random.Range(0, possible.Count)] : WeatherType.Sunny;
+
         if (newWeather != currentWeather)
         {
             previousWeather = currentWeather;
-            currentWeather = newWeather;
-            
-            Debug.Log($"天气变化: {previousWeather} -> {currentWeather}, 温度: {currentTemperature}, 湿度: {currentHumidity}%");
-            
-            if (transitionCoroutine != null)
-            {
-                StopCoroutine(transitionCoroutine);
-            }
+            currentWeather  = newWeather;
+
+            if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
             transitionCoroutine = StartCoroutine(TransitionToNewWeather());
         }
     }
-    
+
     IEnumerator TransitionToNewWeather()
     {
-        float elapsedTime = 0f;
-        WeatherCondition fromCondition = GetWeatherCondition(previousWeather);
-        WeatherCondition toCondition = GetWeatherCondition(currentWeather);
+        float elapsed = 0f;
+        var toCondition = GetWeatherCondition(currentWeather);
         
-        // 获取当前环境设置作为起始值
-        Color startSkyColor = skyBackground != null ? skyBackground.color : Color.white;
-        Color startAmbientLight = RenderSettings.ambientLight;
-        float startAmbientIntensity = RenderSettings.ambientIntensity;
-        
-        // 淡出旧天气的粒子效果
-        if (activeParticles.ContainsKey(previousWeather) && activeParticles[previousWeather] != null)
+        Color startLightColor = (globalLight != null) ? globalLight.color : RenderSettings.ambientLight;
+        float startLightIntensity = (globalLight != null) ? globalLight.intensity : RenderSettings.ambientIntensity;
+
+        // 粒子起止发射率
+        float prevStartRate = 0f, prevTargetRate = 0f;
+        float currStartRate = 0f, currTargetRate = 0f;
+
+        if (activeParticles.TryGetValue(previousWeather, out var prevPs) && prevPs != null)
         {
-            ParticleSystem oldParticles = activeParticles[previousWeather];
-            var emission = oldParticles.emission;
-            emission.rateOverTime = 0f;
+            var em = prevPs.emission;
+            prevPs.gameObject.SetActive(true);
+            prevStartRate  = em.rateOverTime.constant;
+            prevTargetRate = 0f; // 逐步停
         }
-        
-        // 淡入新天气的粒子效果
-        if (activeParticles.ContainsKey(currentWeather) && activeParticles[currentWeather] != null)
+
+        if (activeParticles.TryGetValue(currentWeather, out var currPs) && currPs != null)
         {
-            ParticleSystem newParticles = activeParticles[currentWeather];
-            newParticles.gameObject.SetActive(true);
-            var emission = newParticles.emission;
-            emission.rateOverTime = 0f;
-            newParticles.Play();
+            var em = currPs.emission;
+            currPs.gameObject.SetActive(true);
+            currPs.Play();
+
+            currStartRate  = 0f;
+            float baseRate = (particleBaseRate.TryGetValue(currentWeather, out var br) ? br : 10f);
+            currTargetRate = (toCondition.targetEmissionRate >= 0f) ? toCondition.targetEmissionRate : baseRate;
+            em.rateOverTime = currStartRate;
         }
-        
-        while (elapsedTime < transitionDuration)
+
+        while (elapsed < transitionDuration)
         {
-            float t = elapsedTime / transitionDuration;
-            float smoothT = Mathf.SmoothStep(0f, 1f, t);
-            
-            // 平滑过渡天空颜色
-            if (skyBackground != null)
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / transitionDuration);
+
+            // Light2D 颜色/强度过渡
+            if (globalLight != null)
             {
-                skyBackground.color = Color.Lerp(startSkyColor, toCondition.skyColor, smoothT);
+                globalLight.color     = Color.Lerp(startLightColor, toCondition.ambientLightColor, t);
+                globalLight.intensity = Mathf.Lerp(startLightIntensity, toCondition.ambientIntensity, t);
             }
-            else if (mainCamera != null)
+            else
             {
-                mainCamera.backgroundColor = Color.Lerp(startSkyColor, toCondition.skyColor, smoothT);
+                RenderSettings.ambientLight     = Color.Lerp(startLightColor, toCondition.ambientLightColor, t);
+                RenderSettings.ambientIntensity = Mathf.Lerp(startLightIntensity, toCondition.ambientIntensity, t);
             }
-            
-            // 平滑过渡环境光
-            RenderSettings.ambientLight = Color.Lerp(startAmbientLight, toCondition.ambientLightColor, smoothT);
-            RenderSettings.ambientIntensity = Mathf.Lerp(startAmbientIntensity, toCondition.ambientIntensity, smoothT);
-            
-            // 平滑过渡粒子效果
-            if (activeParticles.ContainsKey(previousWeather) && activeParticles[previousWeather] != null)
+
+            // 粒子过渡
+            if (prevPs != null)
             {
-                ParticleSystem oldParticles = activeParticles[previousWeather];
-                var emission = oldParticles.emission;
-                emission.rateOverTime = Mathf.Lerp(emission.rateOverTime.constant, 0f, smoothT);
+                var em = prevPs.emission;
+                em.rateOverTime = Mathf.Lerp(prevStartRate, prevTargetRate, t);
             }
-            
-            if (activeParticles.ContainsKey(currentWeather) && activeParticles[currentWeather] != null)
+            if (currPs != null)
             {
-                ParticleSystem newParticles = activeParticles[currentWeather];
-                var emission = newParticles.emission;
-                var originalEmission = newParticles.emission;
-                emission.rateOverTime = Mathf.Lerp(0f, GetOriginalEmissionRate(newParticles), smoothT);
+                var em = currPs.emission;
+                em.rateOverTime = Mathf.Lerp(currStartRate, currTargetRate, t);
             }
-            
-            elapsedTime += Time.deltaTime;
+
+            elapsed += Time.deltaTime;
             yield return null;
         }
-        
-        // 确保最终状态正确
+
+        // 锁定终值
         ApplyWeatherEnvironment(toCondition);
-        
-        // 完全停用旧天气的粒子
-        if (activeParticles.ContainsKey(previousWeather) && activeParticles[previousWeather] != null)
+
+        if (prevPs != null)
         {
-            activeParticles[previousWeather].gameObject.SetActive(false);
+            var em = prevPs.emission;
+            em.rateOverTime = 0f;
+            prevPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            prevPs.gameObject.SetActive(false);
         }
     }
-    
-    float GetOriginalEmissionRate(ParticleSystem ps)
-    {
-        // 获取粒子系统的原始发射率
-        var emission = ps.emission;
-        if (emission.rateOverTime.constant > 0)
-            return emission.rateOverTime.constant;
-        
-        // 如果没有设置常数发射率，返回一个默认值
-        return 10f;
-    }
-    
+
     WeatherCondition GetWeatherCondition(WeatherType type)
     {
-        foreach (var condition in weatherConditions)
+        // 找不到就返回第一项，防止空引用
+        foreach (var c in weatherConditions)
+            if (c.type == type) return c;
+        return weatherConditions.Count > 0 ? weatherConditions[0] : new WeatherCondition();
+    }
+
+    void ApplyWeatherEnvironment(WeatherCondition c)
+    {
+        if (globalLight != null)
         {
-            if (condition.type == type)
+            globalLight.color     = c.ambientLightColor;
+            globalLight.intensity = c.ambientIntensity;
+        }
+        else
+        {
+            RenderSettings.ambientLight     = c.ambientLightColor;
+            RenderSettings.ambientIntensity = c.ambientIntensity;
+        }
+
+        // 只保留当前天气的粒子（如果有）
+        foreach (var kv in activeParticles)
+        {
+            bool isCurrent = kv.Key == c.type;
+            if (kv.Value == null) continue;
+
+            var em = kv.Value.emission;
+            if (isCurrent)
             {
-                return condition;
+                float baseRate = (particleBaseRate.TryGetValue(kv.Key, out var br) ? br : 10f);
+                float target   = (c.targetEmissionRate >= 0f) ? c.targetEmissionRate : baseRate;
+                em.rateOverTime = target;
+                kv.Value.gameObject.SetActive(true);
+                kv.Value.Play();
+            }
+            else
+            {
+                em.rateOverTime = 0f;
+                kv.Value.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                kv.Value.gameObject.SetActive(false);
             }
         }
-        return weatherConditions[0];
     }
-    
-    void ApplyWeatherEnvironment(WeatherCondition condition)
-    {
-        if (skyBackground != null)
-        {
-            skyBackground.color = condition.skyColor;
-        }
-        else if (mainCamera != null)
-        {
-            mainCamera.backgroundColor = condition.skyColor;
-        }
-        
-        RenderSettings.ambientLight = condition.ambientLightColor;
-        RenderSettings.ambientIntensity = condition.ambientIntensity;
-    }
-    
-    // 手动改变天气（带过渡）
-    public void ChangeWeatherManually(WeatherType weatherType)
-    {
-        previousWeather = currentWeather;
-        currentWeather = weatherType;
-        
-        if (transitionCoroutine != null)
-        {
-            StopCoroutine(transitionCoroutine);
-        }
-        transitionCoroutine = StartCoroutine(TransitionToNewWeather());
-    }
-    
-    // 停止天气变化
-    public void StopWeatherChanges()
-    {
-        if (weatherChangeCoroutine != null)
-        {
-            StopCoroutine(weatherChangeCoroutine);
-            weatherChangeCoroutine = null;
-        }
-    }
-    
+
     void OnDestroy()
     {
-        // 恢复原始环境设置
-        if (skyBackground != null)
-            skyBackground.color = originalSkyColor;
-        
-        RenderSettings.ambientLight = originalAmbientLight;
+        if (globalLight != null)
+        {
+            globalLight.color     = originalLightColor;
+            globalLight.intensity = originalLightIntensity;
+        }
+
+        RenderSettings.ambientLight     = originalAmbientLight;
         RenderSettings.ambientIntensity = originalAmbientIntensity;
-    }
-    
-    // 获取当前天气的调试信息
-    public string GetWeatherInfo()
-    {
-        return $"天气: {currentWeather}, 温度: {currentTemperature:F1}°C, 湿度: {currentHumidity:F1}%";
     }
 }

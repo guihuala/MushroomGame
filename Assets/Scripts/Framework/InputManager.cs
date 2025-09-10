@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
@@ -12,15 +12,17 @@ public class InputManager : MonoBehaviour
     public KeyCode exitBuildKey = KeyCode.Escape;
     
     [Header("建造操作输入")]
-    public KeyCode rotateKey = KeyCode.R; // 新增旋转键
-    public KeyCode buildActionKey = KeyCode.Mouse0;
-    public KeyCode cancelBuildKey = KeyCode.Mouse1;
-
+    public KeyCode rotateKey = KeyCode.R;
+    
     [Header("相机控制输入")]
-    public KeyCode cameraDragKey = KeyCode.Mouse2;
     public string horizontalAxis = "Horizontal";
     public string verticalAxis = "Vertical";
     public string zoomAxis = "Mouse ScrollWheel";
+    
+    // ===== 右键辅助：按下/按住/抬起 =====
+    public bool IsRightMouseDown() => GetMouseButtonDown(1);
+    public bool IsRightMouseHeld() => GetMouseButton(1);
+    public bool IsRightMouseUp() => GetMouseButtonUp(1);
 
     // 输入状态缓存
     private Dictionary<KeyCode, bool> _keyDownCache = new Dictionary<KeyCode, bool>();
@@ -171,6 +173,12 @@ public class InputManager : MonoBehaviour
     public bool IsBuildCancelled()
     {
         return GetMouseButtonDown(1);
+    }
+
+    // ===== 右键检测 =====
+    public bool IsRightClick()
+    {
+        return GetMouseButtonDown(1); // 1 是鼠标右键
     }
 
     // 检查是否在UI上

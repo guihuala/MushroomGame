@@ -6,11 +6,7 @@ public class PlacementSystem : MonoBehaviour
     [Header("通用预览设置")]
     public Color previewValidColor = new Color(0, 1, 0, 0.5f);
     public Color previewInvalidColor = new Color(1, 0, 0, 0.5f);
-
-    [Header("擦除模式预览颜色")]
-    public Color eraseValidColor = new Color(1, 0, 0, 0.35f);
-    public Color eraseInvalidColor = new Color(1, 0, 0, 0.15f);
-
+    
     [Header("动画设置")]
     public float previewMoveDuration = 0.2f;
     public Ease moveEase = Ease.OutQuad;
@@ -37,6 +33,17 @@ public class PlacementSystem : MonoBehaviour
     private bool _isDragging;
     private Vector2Int _dragLastCell;
     private Building _dragLastBuilding;
+    
+    // 直线绘制锁轴
+    private enum LineAxis { Free, Horizontal, Vertical }
+    private LineAxis _lineAxis = LineAxis.Free;
+    private Vector2Int _dragAnchorCell; // 鼠标按下时的锚点（确定直线轴用）
+
+    // 默认模式右键清除
+    private bool _isRightErasing;
+    private bool _eraseAsBox;
+    private Vector2Int _eraseAnchorCell;
+
 
     private enum BrushMode { Place, Erase }
     private BrushMode _mode = BrushMode.Place;
@@ -53,16 +60,22 @@ public class PlacementSystem : MonoBehaviour
 
     void Update()
     {
-        if (!IsInBuildMode) return;
-
         Vector2 mouse = _input.GetMousePosition();
         Vector3 mouseWorld = mainCam.ScreenToWorldPoint(mouse);
         Vector2Int cell = grid.WorldToCell(mouseWorld);
         Vector3 worldPos = grid.CellToWorld(cell);
 
-        UpdatePreview(worldPos, cell);
-        HandleBuildModeInput(cell, worldPos);
+        if (IsInBuildMode)
+        {
+            UpdatePreview(worldPos, cell);
+            HandleBuildModeInput(cell, worldPos);
+        }
+        else
+        {
+            HandleDefaultModeInput(cell); // 默认模式：右键清除
+        }
     }
+
     #endregion
 
     #region 模式切换
@@ -176,16 +189,8 @@ public class PlacementSystem : MonoBehaviour
     private void ApplyPreviewPalette()
     {
         if (_currentPreview == null) return;
-        if (EraseActive)
-        {
-            _currentPreview.validColor = eraseValidColor;
-            _currentPreview.invalidColor = eraseInvalidColor;
-        }
-        else
-        {
-            _currentPreview.validColor = _origValid;
-            _currentPreview.invalidColor = _origInvalid;
-        }
+        _currentPreview.validColor = _origValid;
+        _currentPreview.invalidColor = _origInvalid;
     }
 
     private void TintPreview(bool ok)
@@ -200,10 +205,9 @@ public class PlacementSystem : MonoBehaviour
     {
         if (_currentPrefab == null) return false;
         
-        return !EraseActive
-            ? grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab)
-            : (grid.GetBuildingAt(cell) != null);
+        return grid.AreCellsFree(cell, _currentPrefab.size);
     }
+
     
     private void RotatePreview()
     {
@@ -224,46 +228,100 @@ public class PlacementSystem : MonoBehaviour
     #endregion
 
     #region 输入
-    private bool EraseActive => _mode == BrushMode.Erase || _input.IsHoldEraseActive();
-
+    
     private void HandleBuildModeInput(Vector2Int cell, Vector3 worldPos)
     {
+        // 旋转
         if (_input.IsRotatePressed()) RotatePreview();
 
-        if (_input.IsEraseTogglePressed())
+        // 右键退出建造模式
+        if (_input.IsRightMouseDown() && !_input.IsPointerOverUI())
         {
-            _mode = (_mode == BrushMode.Place) ? BrushMode.Erase : BrushMode.Place;
-            _dragLastBuilding = null;
+            ExitBuildMode();
+            return;
         }
 
+        // 左键开始放置：记录锚点，锁轴状态重置
         if (_input.IsBuildActionPressed() && !_input.IsPointerOverUI())
         {
             _isDragging = true;
+            _dragAnchorCell = cell;
             _dragLastCell = cell;
+            _lineAxis = LineAxis.Free;
 
-            if (EraseActive) EraseOne(cell);
-            else PlaceOne(cell, worldPos, _currentDir, true);
+            PlaceOne(cell, worldPos, _currentDir, true);
+            return;
         }
 
+        // 拖拽连续绘制（直线锁轴）
         if (_isDragging && _input.IsBuildActionHeld() && !_input.IsPointerOverUI())
         {
             if (cell != _dragLastCell)
             {
-                if (EraseActive) StepAndEraseAlongPath(_dragLastCell, cell);
-                else StepAndPlaceAlongPath(_dragLastCell, cell);
+                // 首次移动时确定轴向
+                if (_lineAxis == LineAxis.Free)
+                {
+                    var d = cell - _dragAnchorCell;
+                    _lineAxis = (Mathf.Abs(d.x) >= Mathf.Abs(d.y)) ? LineAxis.Horizontal : LineAxis.Vertical;
+                }
+
+                // 将当前鼠标格投影到锁定轴上
+                Vector2Int projected = (_lineAxis == LineAxis.Horizontal)
+                    ? new Vector2Int(cell.x, _dragAnchorCell.y)
+                    : new Vector2Int(_dragAnchorCell.x, cell.y);
+
+                // 沿着“上一格 -> 投影格”逐格放置（保证严格直线）
+                if (projected != _dragLastCell)
+                {
+                    StepAndPlaceAlongLockedAxis(_dragLastCell, projected);
+                }
             }
+            return;
         }
 
+        // 松开结束
         if (_input.IsBuildActionReleased())
         {
             _isDragging = false;
             _dragLastBuilding = null;
+            _lineAxis = LineAxis.Free;
         }
-
-        if (_input.IsBuildCancelled() && !_input.IsPointerOverUI()) ExitBuildMode();
-        if (_input.IsExitBuildPressed()) ExitBuildMode();
     }
     
+    private void HandleDefaultModeInput(Vector2Int cell)
+    {
+        // 右键按下：记录起点，进入“右键清除”流程（单击 or 框选）
+        if (_input.IsRightMouseDown() && !_input.IsPointerOverUI())
+        {
+            _isRightErasing = true;
+            _eraseAsBox = false;
+            _eraseAnchorCell = cell;
+            return;
+        }
+
+        // 右键按住：如果移动到其他格，进入框选模式（懒触发）
+        if (_isRightErasing && _input.IsRightMouseHeld() && !_input.IsPointerOverUI())
+        {
+            if (!_eraseAsBox && cell != _eraseAnchorCell)
+            {
+                _eraseAsBox = true;
+            }
+            return;
+        }
+
+        // 右键抬起：根据是否为框选执行清除
+        if (_isRightErasing && _input.IsRightMouseUp())
+        {
+            if (_eraseAsBox)
+                EraseArea(_eraseAnchorCell, cell); // 框选范围清除
+            else
+                EraseOne(cell);                    // 单击所在格清除（也可用 _eraseAnchorCell）
+
+            _isRightErasing = false;
+            _eraseAsBox = false;
+        }
+    }
+
     #endregion
 
     #region 放置/擦除
@@ -303,7 +361,38 @@ public class PlacementSystem : MonoBehaviour
         if (b != null) b.OnRemoved();
         _dragLastCell = cell;
     }
+    
+    // 仅沿水平或垂直（锁定轴）步进放置
+    private void StepAndPlaceAlongLockedAxis(Vector2Int last, Vector2Int target)
+    {
+        var cur = last;
+        while (cur != target)
+        {
+            Vector2Int step = (target.x != cur.x)
+                ? new Vector2Int((int)Mathf.Sign(target.x - cur.x), 0)
+                : new Vector2Int(0, (int)Mathf.Sign(target.y - cur.y));
 
+            var next = cur + step;
+            PlaceOne(next, grid.CellToWorld(next), step, adjustPrev: true);
+            cur = next;
+        }
+    }
+    
+    private void EraseArea(Vector2Int start, Vector2Int end)
+    {
+        Vector2Int min = Vector2Int.Min(start, end);
+        Vector2Int max = Vector2Int.Max(start, end);
+
+        for (int x = min.x; x <= max.x; x++)
+        {
+            for (int y = min.y; y <= max.y; y++)
+            {
+                Vector2Int cell = new Vector2Int(x, y);
+                EraseOne(cell);  // 按区域清除
+            }
+        }
+    }
+    
     private void StepAndPlaceAlongPath(Vector2Int last, Vector2Int target)
     {
         var cur = last;
@@ -312,18 +401,6 @@ public class PlacementSystem : MonoBehaviour
             Vector2Int move = StepToward(cur, target);
             var next = cur + move;
             PlaceOne(next, grid.CellToWorld(next), move, adjustPrev: true);
-            cur = next;
-        }
-    }
-
-    private void StepAndEraseAlongPath(Vector2Int last, Vector2Int target)
-    {
-        var cur = last;
-        while (cur != target)
-        {
-            Vector2Int move = StepToward(cur, target);
-            var next = cur + move;
-            EraseOne(next);
             cur = next;
         }
     }

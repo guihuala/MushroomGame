@@ -5,9 +5,7 @@ public class CameraController : MonoBehaviour
     [Header("移动设置")]
     public float moveSpeed = 5f;
     public float keyboardMoveSpeed = 10f;
-    public bool edgeScrolling = true;
-    public float edgeThreshold = 20f;
-    
+
     [Header("缩放设置")]
     public float zoomSpeed = 5f;
     public float minZoom = 5f;
@@ -23,7 +21,6 @@ public class CameraController : MonoBehaviour
     private Vector3 _targetPosition;
     private float _targetZoom;
     private Vector3 _dragOrigin;
-    private bool _isDragging = false;
 
     private InputManager _input;
 
@@ -42,23 +39,14 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        if (IsInBuildMode()) return;
-        
         HandleKeyboardMovement();
-        HandleMouseDrag();
         HandleZoom();
         
         ApplyMovement();
         ApplyZoom();
         ClampPosition();
     }
-
-    private bool IsInBuildMode()
-    {
-        var placementSystem = FindObjectOfType<PlacementSystem>();
-        return placementSystem != null && placementSystem.IsInBuildMode;
-    }
-
+    
     private void HandleKeyboardMovement()
     {
         Vector2 movementInput = _input.GetCameraMovementInput();
@@ -69,27 +57,7 @@ public class CameraController : MonoBehaviour
             _targetPosition += movement;
         }
     }
-
-    private void HandleMouseDrag()
-    {
-        if (_input.IsCameraDragStarted())
-        {
-            _dragOrigin = GetMouseWorldPosition();
-            _isDragging = true;
-        }
-        
-        if (_input.IsCameraDragEnded())
-        {
-            _isDragging = false;
-        }
-        
-        if (_isDragging)
-        {
-            Vector3 difference = _dragOrigin - GetMouseWorldPosition();
-            _targetPosition += difference;
-        }
-    }
-
+    
     private void HandleZoom()
     {
         float scroll = _input.GetZoomInput();
@@ -162,14 +130,6 @@ public class CameraController : MonoBehaviour
             float distance = Mathf.Abs(transform.position.z);
             return 2f * distance * Mathf.Tan(_camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
         }
-    }
-
-    private Vector3 GetMouseWorldPosition()
-    {
-        Vector3 mousePosition = _input.GetMousePosition();
-        mousePosition.z = -transform.position.z;
-        
-        return _camera.ScreenToWorldPoint(mousePosition);
     }
 
     public void TeleportTo(Vector3 position)

@@ -40,12 +40,12 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     public Vector2Int InDir  => inDir;
     public Vector2Int OutDir => outDir;
     
-    public void StepMove(float dt)
+    public virtual void StepMove(float dt)
     {
         UpdateItemPositions(dt);
     }
 
-    public void StepTransfer()
+    public virtual void StepTransfer()
     {
         TryTransferFirstItem();
         ClampItemPositions();

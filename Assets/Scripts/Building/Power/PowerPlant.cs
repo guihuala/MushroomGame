@@ -16,6 +16,15 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
 
     public bool CanReceive => true;
     public bool CanProvide => false;
+    
+    [Header("电力覆盖")]
+    public float coverageRange = 5f;
+
+    [Header("范围可视化")]
+    public bool showRingOnHover = true;
+    public Color ringColor = new Color(1f, 0.85f, 0.2f, 0.5f);
+    public int ringSegments = 64;
+    private LineRenderer _ring;
 
     public override void OnPlaced(TileGridService g, Vector2Int c)
     {
@@ -23,6 +32,8 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
         g.RegisterPort(cell, this);
         PowerManager.Instance.AddPowerSource(this);
         TickManager.Instance?.Register(this);
+        EnsureRing();
+        SetRingVisible(false);
     }
 
     public override void OnRemoved()
@@ -30,8 +41,42 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
         PowerManager.Instance.RemovePowerSource(this);
         TickManager.Instance?.Unregister(this);
         grid.UnregisterPort(cell, this);
+        DestroyRing();
         base.OnRemoved();
     }
+
+    private void EnsureRing()
+    {
+        if (_ring != null) return;
+        _ring = gameObject.AddComponent<LineRenderer>();
+        _ring.loop = true;
+        _ring.useWorldSpace = false;
+        _ring.widthMultiplier = 0.05f;
+        _ring.material = new Material(Shader.Find("Sprites/Default"));
+        _ring.startColor = _ring.endColor = ringColor;
+        _ring.positionCount = ringSegments;
+
+        for (int i = 0; i < ringSegments; i++)
+        {
+            float t = i / (float)ringSegments * Mathf.PI * 2f;
+            _ring.SetPosition(i, new Vector3(Mathf.Cos(t), Mathf.Sin(t), 0f) * coverageRange);
+        }
+        _ring.sortingOrder = 5000; // 保证在上层
+    }
+
+    private void DestroyRing()
+    {
+        if (_ring != null) Destroy(_ring);
+    }
+
+    private void SetRingVisible(bool v)
+    {
+        if (_ring) _ring.enabled = v && showRingOnHover;
+    }
+
+    private void OnMouseEnter() => SetRingVisible(true);
+    private void OnMouseExit()  => SetRingVisible(false);
+    
 
     public void Tick(float dt)
     {

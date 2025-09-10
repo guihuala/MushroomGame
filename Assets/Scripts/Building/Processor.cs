@@ -111,7 +111,10 @@ public class Processor : Building, ITickable, IItemPort, IOrientable, IProductio
     public void Tick(float dt)
     {
         TryPullInputItems();
-        UpdateProduction(dt);
+        
+        float mult = PowerManager.Instance.GetSpeedMultiplier(cell, grid);
+        UpdateProduction(dt * mult);
+        
         TryPushOutputItems();
     }
 

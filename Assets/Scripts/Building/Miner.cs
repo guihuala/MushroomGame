@@ -79,7 +79,9 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     {
         if (_source == null) return;
 
-        _t += dt;
+        float mult = PowerManager.Instance.GetSpeedMultiplier(cell, grid);
+        _t += dt * mult; 
+        
         TryProduceItem();
         TryFlushBuffer();
     }

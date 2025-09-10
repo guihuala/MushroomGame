@@ -54,7 +54,17 @@ public class PowerManager : Singleton<PowerManager>
     {
         totalPower += powerAmount;
         if (totalPower < 0f) totalPower = 0f;
-        // Debug.Log("Total power: " + totalPower);
+    }
+    
+    public bool TryConsumePower(float amount)
+    {
+        if (amount <= 0f) return true;
+        if (totalPower >= amount)
+        {
+            totalPower -= amount;
+            return true;
+        }
+        return false;
     }
 
     public float GetPower() => totalPower;
@@ -62,7 +72,7 @@ public class PowerManager : Singleton<PowerManager>
 
     #endregion
 
-    #region 覆盖/连通计算（新增）
+    #region 覆盖/连通计算
 
     private struct Node
     {

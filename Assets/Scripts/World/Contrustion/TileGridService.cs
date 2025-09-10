@@ -129,24 +129,10 @@ public class TileGridService : MonoBehaviour
         return CheckBuildabilityWithBuilding(cell, building);
     }
     
-    public bool AreCellsFree(Vector2Int startCell, Vector2Int size, Building building)
-    {
-        for (int x = startCell.x; x < startCell.x + size.x; x++)
-        {
-            for (int y = startCell.y; y < startCell.y + size.y; y++)
-            {
-                Vector2Int c = new Vector2Int(x, y);
-                if (!CanBuildAt(c, building) || _buildings.ContainsKey(c))
-                    return false;
-            }
-        }
-        return true;
-    }
-    
     private bool CheckBuildabilityWithBuilding(Vector2Int cell, Building building)
     {
         Vector3 worldPos = CellToWorld(cell);
-        if (CheckObstacles(cell, worldPos)) return false;
+        if (!(building is PowerConveyer) && CheckObstacles(cell, worldPos)) return false;
         if (_buildings.ContainsKey(cell)) return false;
 
         // 图层探测

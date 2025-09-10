@@ -29,6 +29,26 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     public bool CanProvide => _items.Count > 0 && _items[0].pos >= 0.95f;
     public bool CanReceive => _items.Count < maxItems;
     
+    // === 菌丝直线（全体传送带共享的渲染配置） ===
+    [Header("Path Line (Mycelium) - Global for all conveyors")]
+    [SerializeField] private bool pathLineEnabled = true;
+    [SerializeField] private float pathLineWidth = 0.04f;
+    [SerializeField] private Color pathLineColor = new Color(0.90f, 1.00f, 0.90f, 0.90f);
+    [SerializeField] private Material pathLineMaterial; // 为空则用 Sprites/Default
+
+    // 静态共享
+    private static bool s_pathInit = false;
+    private static bool s_enabled = true;
+    private static float s_width = 0.04f;
+    private static Color s_color = new Color(0.90f, 1.00f, 0.90f, 0.90f);
+    private static Material s_material;
+    private static Transform s_lineRoot;
+    private static readonly List<LineRenderer> s_lines = new();
+    private static readonly HashSet<Conveyer> s_all = new();
+    private static bool s_dirty = false;
+    private static float s_lastBuildTime = -999f;
+    private const float REBUILD_DEBOUNCE = 0.02f; // 20ms 合并抖动，避免频繁拆装抖动
+    
     public Vector3 GetWorldPosition()
     {
         return grid != null ? grid.CellToWorld(cell) : transform.position;
@@ -36,10 +56,10 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
 
     #region IBeltNode
 
-    public Vector2Int Cell   => cell;
-    public Vector2Int InDir  => inDir;
+    public Vector2Int Cell => cell;
+    public Vector2Int InDir => inDir;
     public Vector2Int OutDir => outDir;
-    
+
     public virtual void StepMove(float dt)
     {
         UpdateItemPositions(dt);
@@ -59,23 +79,75 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     {
         base.OnPlaced(g, c);
         grid.RegisterPort(cell, this);
- 
+
         MsgCenter.RegisterMsg(MsgConst.NEIGHBOR_CHANGED, OnNeighborChangedMsg);
         MsgCenter.SendMsg(MsgConst.CONVEYOR_PLACED, this);
         AutoTile();
         BeltScheduler.Instance.RebuildAllPaths();
+        MarkPathDirty();
     }
 
     public override void OnRemoved()
     {
         MsgCenter.SendMsg(MsgConst.CONVEYOR_REMOVED, this);
         MsgCenter.UnregisterMsg(MsgConst.NEIGHBOR_CHANGED, OnNeighborChangedMsg);
-        
+
         grid.UnregisterPort(cell, this);
         BeltScheduler.Instance.RebuildAllPaths();
         _connectedOutputPort = null;
+        MarkPathDirty();
         base.OnRemoved();
     }
+    
+    protected virtual void Awake()
+    {
+        // 注册全局集合
+        s_all.Add(this);
+        EnsurePathSystemInitialized();
+    }
+
+    protected virtual void OnDestroy()
+    {
+        s_all.Remove(this);
+        MarkPathDirty();
+    }
+    
+    protected virtual void LateUpdate()
+    {
+        if (!s_dirty) return;
+        if (Time.unscaledTime - s_lastBuildTime < REBUILD_DEBOUNCE) return;
+        s_lastBuildTime = Time.unscaledTime;
+        RebuildAllPathLines();
+    }
+    
+    private void EnsurePathSystemInitialized()
+    {
+        if (s_pathInit) return;
+        s_pathInit = true;
+
+        // 把“本实例”的 inspector 配置同步到全局（以后以静态为准）
+        s_enabled = pathLineEnabled;
+        s_width = pathLineWidth;
+        s_color = pathLineColor;
+        s_material = pathLineMaterial != null ? pathLineMaterial : new Material(Shader.Find("Sprites/Default"))
+        {
+            name = "[Shared] MyceliumPathLine",
+            hideFlags = HideFlags.DontSave
+        };
+
+        var root = GameObject.Find("[Conveyor Path Lines]");
+        if (root == null)
+        {
+            var go = new GameObject("[Conveyor Path Lines]");
+            s_lineRoot = go.transform;
+        }
+        else s_lineRoot = root.transform;
+
+        MarkPathDirty();
+    }
+
+    private static void MarkPathDirty() => s_dirty = true;
+
 
     #endregion
 
@@ -145,11 +217,11 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     #endregion
 
     #region Tick逻辑
-    
+
     private void UpdateItemPositions(float dt)
     {
         float moveDistance = dt * beltSpeed;
-        
+
         var nextPort = grid.GetPortAt(cell + outDir);
 
         bool hasValidOutput = false;
@@ -212,6 +284,7 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
                 head.payload.worldPos = GetWorldPosition();
                 _items[0] = head;
             }
+
             return;
         }
 
@@ -226,6 +299,7 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
                 item.payload.worldPos = GetWorldPosition();
                 _items[0] = item;
             }
+
             return;
         }
 
@@ -254,7 +328,7 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     }
 
     #endregion
-    
+
     public bool TryAcceptFromNeighbour(Conveyer from)
     {
         if (!HasSpaceForIncoming()) return false;
@@ -312,6 +386,175 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
             }
         }
     }
-    
+
+    #endregion
+
+    #region 视觉效果
+
+    // —— 直线渲染：把所有 Conveyer 按 4 向邻接合并成线段 —— //
+    private static void RebuildAllPathLines()
+    {
+        s_dirty = false;
+        ClearAllPathLines();
+        if (!s_enabled || s_all.Count == 0) return;
+
+        // 1) 构建邻接（只考虑 4 向直邻，并且必须都处于已放置状态）
+        var neighbors = new Dictionary<Conveyer, List<Conveyer>>(s_all.Count);
+        foreach (var c in s_all)
+        {
+            if (c == null || c.grid == null) continue;
+            var list = GetNeighbors4(c);
+            if (list.Count > 0) neighbors[c] = list;
+        }
+
+        // 2) 找端点（度==1）优先生成路径；剩余（度==2的环）作为闭环处理
+        var visited = new HashSet<Conveyer>();
+        foreach (var kv in neighbors)
+        {
+            var node = kv.Key;
+            if (visited.Contains(node)) continue;
+            int deg = kv.Value.Count;
+            if (deg == 1)
+            {
+                BuildLineFromEndpoint(node, neighbors, visited);
+            }
+        }
+
+        // 闭环处理：未访问的、有邻居的，随便挑一点绕一圈
+        foreach (var kv in neighbors)
+        {
+            var node = kv.Key;
+            if (visited.Contains(node)) continue;
+            BuildLoopLine(node, neighbors, visited);
+        }
+    }
+
+// 收集 4 向直邻的 Conveyer（只连接同类基类/子类的传送带）
+    private static List<Conveyer> GetNeighbors4(Conveyer c)
+    {
+        var result = new List<Conveyer>(4);
+        var dirs = new[] { Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left };
+        foreach (var d in dirs)
+        {
+            var nb = c.grid?.GetBuildingAt(c.cell + d) as Conveyer;
+            if (nb != null) result.Add(nb);
+        }
+
+        return result;
+    }
+
+// 从端点出发，沿链到另一个端/或中止，生成一根折线
+    private static void BuildLineFromEndpoint(Conveyer start, Dictionary<Conveyer, List<Conveyer>> nbr,
+        HashSet<Conveyer> visited)
+    {
+        var points = new List<Vector3>(16);
+        Conveyer prev = null;
+        var cur = start;
+
+        while (cur != null && !visited.Contains(cur))
+        {
+            visited.Add(cur);
+            points.Add(cur.GetWorldPosition());
+
+            // 走向下一个未访问的邻居（不回头）
+            Conveyer next = null;
+            if (nbr.TryGetValue(cur, out var list))
+            {
+                foreach (var n in list)
+                {
+                    if (n == prev) continue;
+                    next = n;
+                    break;
+                }
+            }
+
+            prev = cur;
+            cur = next;
+        }
+
+        if (points.Count >= 2)
+            CreatePathLine(points, start);
+    }
+
+// 闭环：从任一点出发，沿着未访问的链一圈
+    private static void BuildLoopLine(Conveyer start, Dictionary<Conveyer, List<Conveyer>> nbr,
+        HashSet<Conveyer> visited)
+    {
+        var points = new List<Vector3>(16);
+        Conveyer prev = null;
+        var cur = start;
+
+        while (cur != null && !visited.Contains(cur))
+        {
+            visited.Add(cur);
+            points.Add(cur.GetWorldPosition());
+
+            // 选择任一未访问的邻居继续
+            Conveyer next = null;
+            if (nbr.TryGetValue(cur, out var list))
+            {
+                foreach (var n in list)
+                {
+                    if (n == prev)
+                    {
+                        continue;
+                    }
+
+                    if (!visited.Contains(n))
+                    {
+                        next = n;
+                        break;
+                    }
+                }
+
+                // 如果都访问过，闭环：把首点再加一遍，方便 LineRenderer 闭合视觉（非 loop）
+                if (next == null && list.Count == 2 && points.Count >= 2)
+                {
+                    points.Add(points[0]);
+                }
+            }
+
+            prev = cur;
+            cur = next;
+        }
+
+        if (points.Count >= 2)
+            CreatePathLine(points, start);
+    }
+
+// 创建一根 LineRenderer，放到共享容器下
+    private static void CreatePathLine(List<Vector3> points, Conveyer sample)
+    {
+        var go = new GameObject("[Conveyor Path]");
+        go.transform.SetParent(s_lineRoot, false);
+        var lr = go.AddComponent<LineRenderer>();
+
+        lr.useWorldSpace = true;
+        lr.loop = false;
+        lr.positionCount = points.Count;
+        lr.SetPositions(points.ToArray());
+        lr.widthMultiplier = s_width;
+        lr.material = s_material;
+        lr.startColor = lr.endColor = s_color;
+
+        // 与带同层绘制，并提高一个 order，避免被遮住
+        var sr = sample.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            lr.sortingLayerID = sr.sortingLayerID;
+            lr.sortingOrder = sr.sortingOrder + 1;
+        }
+
+        s_lines.Add(lr);
+    }
+
+    private static void ClearAllPathLines()
+    {
+        for (int i = 0; i < s_lines.Count; i++)
+            if (s_lines[i] != null)
+                Object.Destroy(s_lines[i].gameObject);
+        s_lines.Clear();
+    }
+
     #endregion
 }

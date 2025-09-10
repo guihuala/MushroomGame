@@ -6,7 +6,7 @@ public class GameManager : Singleton<GameManager>
     {
         Playing, // 游戏进行中
         Paused, // 游戏暂停
-        GameOver // 游戏结束
+        GameCleared 
     }
 
     [Header("管理器预制件")]
@@ -25,7 +25,6 @@ public class GameManager : Singleton<GameManager>
     {
         if (managersInstance != null)
         {
-            DebugManager.LogWarning("Managers already instantiated!");
             return;
         }
         
@@ -33,28 +32,8 @@ public class GameManager : Singleton<GameManager>
         {
             managersInstance = Instantiate(managersPrefab);
             managersInstance.name = "Managers";
-            DontDestroyOnLoad(managersInstance);
-            
-            DebugManager.Log("Managers prefab instantiated");
         }
-        else
-        {
-            // 如果没有分配预制件，尝试从Resources加载
-            managersPrefab = Resources.Load<GameObject>("Prefabs/Managers");
-            if (managersPrefab != null)
-            {
-                managersInstance = Instantiate(managersPrefab);
-                managersInstance.name = "Managers";
-                DontDestroyOnLoad(managersInstance);
-                DebugManager.Log("Managers prefab loaded from Resources and instantiated");
-            }
-            else
-            {
-                DebugManager.LogError("Managers prefab not found in Resources!");
-                return;
-            }
-        }
-
+        
         // 初始化所有管理器
         InitializeAllManagers();
     }
@@ -69,8 +48,6 @@ public class GameManager : Singleton<GameManager>
         {
             manager.Initialize();
         }
-
-        DebugManager.Log($"All {managers.Length} managers initialized successfully");
     }
 
     public void SetGameState(GameState newState)
@@ -95,22 +72,20 @@ public class GameManager : Singleton<GameManager>
                 Time.timeScale = 0;
                 UIManager.Instance.OpenPanel("PausePanel");
                 break;
-
-            case GameState.GameOver:
+            
+            case GameState.GameCleared:
                 Time.timeScale = 0;
-                UIManager.Instance.OpenPanel("GameOverPanel");
+                UIManager.Instance.OpenPanel("GameClearPanel");
                 break;
         }
     }
-
-    // 销毁管理器实例（用于重新开始游戏等场景）
+    
     public void DestroyManagers()
     {
         if (managersInstance != null)
         {
             Destroy(managersInstance);
             managersInstance = null;
-            DebugManager.Log("Managers destroyed");
         }
     }
 
@@ -143,7 +118,7 @@ public class GameManager : Singleton<GameManager>
     // 游戏结束
     public void EndGame()
     {
-        SetGameState(GameState.GameOver);
+        SetGameState(GameState.GameCleared);
     }
 
     // 返回主菜单

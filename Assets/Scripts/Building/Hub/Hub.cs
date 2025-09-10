@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class HubStage
 {
     public string stageName;
@@ -11,7 +11,7 @@ public class HubStage
     public GameObject[] stageObjectsToEnable;
 }
 
-[System.Serializable]
+[Serializable]
 public class ItemRequirement
 {
     public ItemDef item;
@@ -138,17 +138,13 @@ public class Hub : MonoBehaviour
 
     private void CompleteCurrentStage()
     {
-        // 消耗所需物品
         var currentStage = stages[currentStageIndex];
         foreach (var requirement in currentStage.requirements)
         {
             InventoryManager.Instance.RemoveItem(requirement.item, requirement.requiredAmount);
         }
-        
-        // 发送阶段完成消息
         MsgCenter.SendMsg(MsgConst.HUB_STAGE_COMPLETED, currentStageIndex);
-        
-        // 移动到下一阶段或完成所有阶段
+
         if (currentStageIndex < stages.Count - 1)
         {
             currentStageIndex++;
@@ -159,6 +155,8 @@ public class Hub : MonoBehaviour
             isFinalStageComplete = true;
             MsgCenter.SendMsgAct(MsgConst.HUB_ALL_STAGES_COMPLETE);
             DebugManager.Log("All hub stages completed!", this);
+            
+            GameManager.Instance.SetGameState(GameManager.GameState.GameCleared);
         }
     }
 
@@ -190,8 +188,7 @@ public class Hub : MonoBehaviour
             }
         }
     }
-
-    // 查询当前物品数量（从InventoryManager获取）
+    
     public int GetItemCount(ItemDef item)
     {
         return InventoryManager.Instance.GetItemCount(item);

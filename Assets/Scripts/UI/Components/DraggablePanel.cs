@@ -140,41 +140,4 @@ public class DraggablePanel : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             _panelRect.anchoredPosition = localPoint;
         }
     }
-
-    // 公共方法用于外部控制
-    public void StartDrag()
-    {
-        _isDragging = true;
-        _dragStartPosition = Input.mousePosition;
-        _panelStartPosition = _panelRect.anchoredPosition;
-    }
-
-    public void StopDrag()
-    {
-        _isDragging = false;
-        if (clampToScreen)
-        {
-            ClampToScreen();
-        }
-    }
-
-    // 设置拖拽手柄（运行时）
-    public void SetDragHandle(RectTransform handle)
-    {
-        dragHandle = handle;
-        if (handle != null)
-        {
-            AddDragEventsToHandle(handle);
-        }
-    }
-
-    // 启用/禁用拖拽
-    public void SetDraggable(bool draggable)
-    {
-        if (dragHandle != null)
-        {
-            dragHandle.gameObject.SetActive(draggable);
-        }
-        enabled = draggable;
-    }
 }

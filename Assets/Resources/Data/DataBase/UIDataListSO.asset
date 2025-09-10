@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: UIDataListSO
   m_EditorClassIdentifier: 
   uiDataList:
+  - uiName: GameClearPanel
+    uiPath: Panel/GameClearPanel
   - uiName: PausePanel
     uiPath: Panel/PausePanel
   - uiName: SettingPanel

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
+  m_Name: PowerRelay
+  m_EditorClassIdentifier: 
+  buildingName: PowerRelay
+  description: 
+  icon: {fileID: -809657034, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  prefab: {fileID: 5599806444419695884, guid: 3605cd789acc245149c254332e491e89, type: 3}
+  category: 0

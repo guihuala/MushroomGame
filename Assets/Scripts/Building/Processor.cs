@@ -20,10 +20,6 @@ public class Processor : Building, ITickable, IItemPort, IOrientable
     private readonly Dictionary<ItemDef, int> _inputBuffer = new();
     private readonly Dictionary<ItemDef, int> _outputBuffer = new();
     
-    // 连接的端口
-    private IItemPort _inputPort;
-    private IItemPort _outputPort;
-    
     public bool CanProvide => GetTotalOutputCount() > 0;
     public bool CanReceive => HasSpaceInInputBuffer();
     
@@ -39,7 +35,6 @@ public class Processor : Building, ITickable, IItemPort, IOrientable
         base.OnPlaced(g, c);
         grid.RegisterPort(cell, this);
         TickManager.Instance.Register(this);
-        FindConnections();
     }
 
     public override void OnRemoved()
@@ -312,18 +307,7 @@ public class Processor : Building, ITickable, IItemPort, IOrientable
     {
         return GetTotalInputCount() < inputBufferSize;
     }
-
-    private void FindConnections()
-    {
-        // 查找输入连接
-        var inputCell = cell + inDir;
-        _inputPort = grid.GetPortAt(inputCell);
-        
-        // 查找输出连接
-        var outputCell = cell + outDir;
-        _outputPort = grid.GetPortAt(outputCell);
-    }
-
+    
     #endregion
 
     #region 方向设置

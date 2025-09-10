@@ -117,16 +117,10 @@ public class BuildingSelectionUI : MonoBehaviour
             var buttonGO = Instantiate(buildingButtonPrefab, buildingButtonsContainer);
             var button = buttonGO.GetComponent<Button>();
             var iconImage = buttonGO.transform.GetChild(0).GetComponent<Image>();
-            var nameText = buttonGO.GetComponentInChildren<Text>();
             
             if (iconImage != null && buildingData.icon != null)
             {
                 iconImage.sprite = buildingData.icon;
-            }
-            
-            if (nameText != null)
-            {
-                nameText.text = buildingData.buildingName;
             }
             
             BuildingData data = buildingData;

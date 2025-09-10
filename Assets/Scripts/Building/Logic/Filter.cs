@@ -5,10 +5,10 @@ public class Filter : Building, IItemPort, IOrientable, ITickable
 {
     [Header("Direction")]
     public Vector2Int outDir = Vector2Int.right;   // 输出朝向
-    public Vector2Int inDir  = Vector2Int.left;    // 输入朝向（= -outDir）
+    public Vector2Int inDir  = Vector2Int.left;    // 输入朝向
 
     [Header("Whitelist")]
-    public List<ItemDef> allowedItems = new List<ItemDef>();  // Inspector 配置
+    public List<ItemDef> allowedItems = new List<ItemDef>();
 
     [Tooltip("白名单为空时是否允许所有物品通过")]
     public bool allowAllWhenEmpty = false;
@@ -123,17 +123,5 @@ public class Filter : Building, IItemPort, IOrientable, ITickable
             return true;
         }
         return false;
-    }
-
-    // ==== 调试可视化（选中时画输入/输出箭头） ====
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        var inC = (grid != null) ? grid.CellToWorld(cell + inDir) : transform.position + new Vector3(inDir.x, inDir.y, 0);
-        Gizmos.DrawWireCube(inC, Vector3.one * 0.6f);
-
-        Gizmos.color = Color.yellow;
-        var outC = (grid != null) ? grid.CellToWorld(cell + outDir) : transform.position + new Vector3(outDir.x, outDir.y, 0);
-        Gizmos.DrawWireCube(outC, Vector3.one * 0.6f);
     }
 }

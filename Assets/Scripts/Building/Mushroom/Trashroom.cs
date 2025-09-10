@@ -1,11 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;  // 引入 DOTween 命名空间
 
-/// <summary>
-/// 垃圾桶蘑菇：接收任何物品，先累计输入物品，按速率消耗物品并转化为目标产物，
-/// 处理过程中每次生产时会播放动画（压扁恢复效果）。
-/// </summary>
+
 public class Trashroom : Building, IItemPort, ITickable
 {
     [Header("Direction")]
@@ -14,7 +10,7 @@ public class Trashroom : Building, IItemPort, ITickable
 
     [Header("Conversion Rate")]
     public ItemDef outputItem;         // 目标产物
-    public float processRate = 1f;     // 每秒处理的物品数量（即每秒转化多少物品为产物）
+    public float processRate = 1f;     // 每秒处理的物品数量
     public int inputPerBatch  = 1;     // 每批消耗多少输入物品
     public int outputPerBatch = 1;     // 每批生成多少目标产物
 
@@ -33,9 +29,9 @@ public class Trashroom : Building, IItemPort, ITickable
     public override void OnPlaced(TileGridService g, Vector2Int c)
     {
         base.OnPlaced(g, c);
-        g.RegisterPort(cell, this);   // 注册端口
+        g.RegisterPort(cell, this);
         UpdateVisual();
-        TickManager.Instance?.Register(this); // 注册 Tick
+        TickManager.Instance?.Register(this);
 
         // 获取动画组件
         _mushroomAnimator = GetComponent<MushroomAnimator>();
@@ -43,12 +39,11 @@ public class Trashroom : Building, IItemPort, ITickable
 
     public override void OnRemoved()
     {
-        TickManager.Instance?.Unregister(this);  // 注销 Tick
-        grid.UnregisterPort(cell, this);         // 注销端口
+        TickManager.Instance?.Unregister(this);
+        grid.UnregisterPort(cell, this);
         base.OnRemoved();
     }
-
-    // ==== 接收物品：累积物品到内部缓冲区 ====
+    
     public bool TryReceive(in ItemPayload payloadIn)
     {
         if (payloadIn.item == null || payloadIn.amount <= 0) return false;
@@ -77,8 +72,7 @@ public class Trashroom : Building, IItemPort, ITickable
             dict[item] = amount;
         }
     }
-
-    // ==== 每Tick按速率处理物品并转化为目标产物 ====
+    
     public void Tick(float dt)
     {
         if (grid == null || outputItem == null) return;
@@ -86,7 +80,7 @@ public class Trashroom : Building, IItemPort, ITickable
         // 累计产物生成预算
         _processBudget += Mathf.Max(0f, processRate) * dt;
 
-        int quota = Mathf.FloorToInt(_processBudget); // 计算可生成的“批数”
+        int quota = Mathf.FloorToInt(_processBudget); 
 
         if (quota <= 0) return;
 
@@ -136,8 +130,7 @@ public class Trashroom : Building, IItemPort, ITickable
     {
         if (outputItem == null || amount <= 0) return;
 
-        _mushroomAnimator.PlaySquashAndStretch();  // 每次生产时调用动画
-        DebugManager.Log("[Trashroom] Produced output");
+        _mushroomAnimator.PlaySquashAndStretch();
         InventoryManager.Instance.AddItem(outputItem, amount);
     }
     

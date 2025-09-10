@@ -309,7 +309,6 @@ public class TileGridService : MonoBehaviour
     private void NotifyBuildingRemoved(Vector2Int cell)
     {
         MsgCenter.SendMsg(MsgConst.BUILDING_REMOVED, cell);
-        DebugManager.Log($"Building removed from {cell}", this);
     }
     
     #endregion

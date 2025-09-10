@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 3558734175396689791}
   - component: {fileID: 7164011442835654480}
   - component: {fileID: 5262894562915171561}
-  m_Layer: 0
+  - component: {fileID: 8144987566561692502}
+  m_Layer: 7
   m_Name: Processor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,3 +109,19 @@ MonoBehaviour:
   isProducing: 0
   inputBufferSize: 10
   outputBufferSize: 10
+--- !u!114 &8144987566561692502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7063021566156355855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c574fa11a8a1d4a7089ec8687ba9963c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panel: {fileID: 0}
+  panelPrefab: {fileID: 435346386346568698, guid: c5c519068240d42c9be5d8fb5ece1dab, type: 3}
+  panelCanvasOverride: {fileID: 0}
+  hoverDelay: 0.15

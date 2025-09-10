@@ -1,48 +1,85 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class HubClickHandler : MonoBehaviour, IPointerClickHandler
+public class HubClickHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
 {
-    private Hub _hub;
+    [Header("Hover UI")]
+    [SerializeField] private TaskPanel taskPanel;
+    [SerializeField] private float hoverDelay = 0.1f;
     
+    private Hub _hub;
+    private bool _isPointerInside;
+    private float _hoverTimer;
+
     private void Start()
     {
         _hub = GetComponent<Hub>();
-        if (_hub == null)
-        {
-            return;
-        }
-        
-        // 确保有碰撞器用于点击检测
         EnsureCollider();
     }
-    
-    public void OnPointerClick(PointerEventData eventData)
+
+    private void Update()
     {
-        if (eventData.button == PointerEventData.InputButton.Left && _hub != null)
+        if (_hub == null || taskPanel == null) return;
+
+        if (_isPointerInside)
         {
-            MsgCenter.SendMsg(MsgConst.HUB_CLICKED, _hub);
+            _hoverTimer += Time.unscaledDeltaTime;
+            
+            if (_hoverTimer >= hoverDelay)
+            {
+                Vector2 mouse = Input.mousePosition;
+
+                if (!taskPanel.gameObject.activeSelf)
+                {
+                    taskPanel.Initialize(_hub);
+                    taskPanel.ShowAtScreenPosition(mouse);
+                }
+                else
+                {
+                    taskPanel.FollowMouse(mouse);
+                }
+            }
+        }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        _isPointerInside = true;
+        _hoverTimer = 0f;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _isPointerInside = false;
+        _hoverTimer = 0f;
+
+        if (taskPanel != null)
+        {
+            taskPanel.ClosePanel();
         }
     }
     
-    // 确保有碰撞器用于点击检测
+    public void OnPointerMove(PointerEventData eventData)
+    {
+        if (_isPointerInside && taskPanel != null && taskPanel.gameObject.activeSelf)
+        {
+            taskPanel.FollowMouse(eventData.position);
+        }
+    }
+
+    // 确保有碰撞器用于指针事件检测
     private void EnsureCollider()
     {
         var existingCollider = GetComponent<Collider2D>();
         if (existingCollider == null)
         {
             var collider = gameObject.AddComponent<BoxCollider2D>();
-            
+
             var spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null && spriteRenderer.sprite != null)
-            {
                 collider.size = spriteRenderer.sprite.bounds.size;
-            }
             else
-            {
-                // 默认大小
-                collider.size = new Vector2(1f, 1f);
-            }
+                collider.size = new Vector2(2f, 2f);
         }
     }
 }

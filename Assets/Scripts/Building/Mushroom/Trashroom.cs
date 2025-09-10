@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Trashroom : Building, IItemPort, ITickable
+public class Trashroom : Building, IItemPort, ITickable, IProductionInfoProvider
 {
     [Header("Direction")]
     public Vector2Int outDir = Vector2Int.right; // 输出方向
@@ -145,4 +145,29 @@ public class Trashroom : Building, IItemPort, ITickable
     {
         transform.right = new Vector3(outDir.x, outDir.y, 0f);
     }
+
+    #region toolkit
+
+    public ProductionInfo GetProductionInfo()
+    {
+        var info = new ProductionInfo {
+            displayName = gameObject.name,
+            recipe      = null,
+            isProducing = CountTotal(_inputs) > 0,
+            progress01  = 0f,
+            extraText   = $"速率：{processRate}/s，转化：{inputPerBatch} → {outputPerBatch} x {(outputItem ? outputItem.itemId : "（无）")}"
+        };
+
+        // 列出当前累计的输入（无固定种类）
+        foreach (var kv in _inputs)
+        {
+            info.inputs.Add(new IOEntry {
+                item = kv.Key, have = kv.Value, cap = -1, want = inputPerBatch
+            });
+        }
+        // 垃圾房产物直接进仓库，不做输出缓存列表
+        return info;
+    }
+
+    #endregion
 }

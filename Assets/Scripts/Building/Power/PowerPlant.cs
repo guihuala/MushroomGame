@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PowerPlant : Building, ITickable, IItemPort
+public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvider
 {
     private Vector2Int inDir = Vector2Int.down;
     
@@ -74,4 +74,29 @@ public class PowerPlant : Building, ITickable, IItemPort
     }
 
     public bool TryProvide(ref ItemPayload payload) => false;
+
+    #region tooltip
+    
+    public ProductionInfo GetProductionInfo()
+    {
+        var info = new ProductionInfo {
+            displayName = gameObject.name,
+            recipe      = null,
+            isProducing = cachedResources >= resourceConsumed,
+            progress01  = 0f,
+            extraText   = $"发电：+{powerGenerated}/每{productionInterval:F1}s；消耗：{resourceConsumed} x {(resourceType ? resourceType.itemId : "资源")}"
+        };
+        
+        info.inputs.Add(new IOEntry {
+            item = resourceType, have = cachedResources, cap = -1, want = resourceConsumed
+        });
+        
+        info.outputs.Add(new IOEntry {
+            item = null, have = 0, cap = -1, want = 0, resourceKey = "Electricity"
+        });
+
+        return info;
+    }
+
+    #endregion
 }

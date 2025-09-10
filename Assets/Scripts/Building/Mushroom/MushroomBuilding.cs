@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MushroomBuilding : MultiGridBuilding, ITickable
+public class MushroomBuilding : MultiGridBuilding, ITickable ,IProductionInfoProvider
 {
     [Header("Recipe")]
     public RecipeDef recipe;
@@ -307,6 +307,43 @@ public class MushroomBuilding : MultiGridBuilding, ITickable
     }
 
     private bool HasSpaceInInputBuffer() => GetTotal(_inputs) < inputCap;
+
+    #endregion
+
+    #region toolkit
+
+    public ProductionInfo GetProductionInfo()
+    {
+        var info = new ProductionInfo {
+            displayName = gameObject.name,
+            recipe      = recipe,
+            isProducing = isProducing,
+            progress01  = (recipe != null && recipe.productionTime > 0f)
+                ? Mathf.Clamp01(productionProgress / recipe.productionTime)
+                : 0f
+        };
+
+        if (recipe != null)
+        {
+            foreach (var input in recipe.inputItems)
+            {
+                int have = 0;
+                if (input.item != null) _inputs.TryGetValue(input.item, out have);
+                info.inputs.Add(new IOEntry {
+                    item = input.item, have = have, cap = inputCap, want = input.amount
+                });
+            }
+            foreach (var output in recipe.outputItems)
+            {
+                int have = 0;
+                if (output.item != null) _outputs.TryGetValue(output.item, out have);
+                info.outputs.Add(new IOEntry {
+                    item = output.item, have = have, cap = outputCap, want = output.amount
+                });
+            }
+        }
+        return info;
+    }
 
     #endregion
 }

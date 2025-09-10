@@ -2,17 +2,87 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TaskPanel : MonoBehaviour
+public class TaskPanel : MonoBehaviour, IHoverPanel
 {
     [Header("UI References")]
     [SerializeField] private Text taskStageText;
     [SerializeField] private Transform taskContent;
     [SerializeField] private GameObject taskItemPrefab;
-    [SerializeField] private Button closeButton;
-
+    
     private Hub _hub;
     private Dictionary<ItemDef, TaskPanelItem> _taskItems = new Dictionary<ItemDef, TaskPanelItem>();
     private DraggablePanel _draggablePanel;
+    
+    // === 悬浮定位相关 ===
+    [SerializeField] private Vector2 hoverOffset = new Vector2(18f, -18f); // 面板相对鼠标的偏移
+    [SerializeField] private bool clampToCanvas = true;                    // 贴边防出界
+
+    private Canvas _rootCanvas;
+    private RectTransform _rt;
+
+    private void OnEnable()
+    {
+        CacheRTAndCanvas();
+    }
+
+    private void CacheRTAndCanvas()
+    {
+        if (_rt == null) _rt = GetComponent<RectTransform>();
+        if (_rootCanvas == null) _rootCanvas = GetComponentInParent<Canvas>();
+    }
+    
+    // ==== IHoverPanel 实现 ====
+    public void ShowAtScreenPosition(Vector2 screenPos)
+    {
+        Initialize(FindObjectOfType<Hub>()); 
+        ShowPanel();
+        Reposition(screenPos);
+    }
+
+    public void FollowMouse(Vector2 screenPos)
+    {
+        if (!gameObject.activeSelf) return;
+        Reposition(screenPos);
+    }
+    
+    public void SetContext(object context)
+    {
+        if (context is Hub hub) Initialize(hub);
+    }
+
+    private void Reposition(Vector2 screenPos)
+    {
+        CacheRTAndCanvas();
+        if (_rt == null) return;
+
+        // 鼠标偏移
+        Vector2 sp = screenPos + hoverOffset;
+
+        if (_rootCanvas != null && _rootCanvas.renderMode != RenderMode.WorldSpace)
+        {
+            RectTransform canvasRT = _rootCanvas.transform as RectTransform;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, sp, _rootCanvas.worldCamera, out var localPos);
+            _rt.anchoredPosition = localPos;
+
+            if (clampToCanvas)
+            {
+                // 贴边约束：让面板保持在画布矩形内
+                Vector2 min = canvasRT.rect.min + _rt.rect.size * _rt.pivot;
+                Vector2 max = canvasRT.rect.max - _rt.rect.size * (Vector2.one - _rt.pivot);
+                Vector2 clamped = new Vector2(
+                    Mathf.Clamp(_rt.anchoredPosition.x, min.x, max.x),
+                    Mathf.Clamp(_rt.anchoredPosition.y, min.y, max.y)
+                );
+                _rt.anchoredPosition = clamped;
+            }
+        }
+        else
+        {
+            // World Space 或找不到 Canvas：退化为直接用屏幕坐标
+            _rt.position = sp;
+        }
+    }
+
 
     private void Awake()
     {
@@ -26,7 +96,6 @@ public class TaskPanel : MonoBehaviour
     public void Initialize(Hub hub)
     {
         _hub = hub;
-        closeButton.onClick.AddListener(ClosePanel);
         
         ClosePanel();
     }

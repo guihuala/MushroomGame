@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Processor : Building, ITickable, IItemPort, IOrientable
+public class Processor : Building, ITickable, IItemPort, IOrientable, IProductionInfoProvider
 {
     [Header("加工器设置")]
     public RecipeDef recipe;  // 生产配方
@@ -317,6 +317,43 @@ public class Processor : Building, ITickable, IItemPort, IOrientable
         outDir = dir;
         inDir = -dir;
         transform.right = new Vector3(dir.x, dir.y, 0f);
+    }
+
+    #endregion
+
+    #region toolkit
+
+    public ProductionInfo GetProductionInfo()
+    {
+        var info = new ProductionInfo {
+            displayName = gameObject.name,
+            recipe      = recipe,
+            isProducing = isProducing,
+            progress01  = (recipe != null && recipe.productionTime > 0f)
+                ? Mathf.Clamp01(productionProgress / recipe.productionTime)
+                : 0f
+        };
+
+        if (recipe != null)
+        {
+            foreach (var input in recipe.inputItems)
+            {
+                int have = 0;
+                if (input.item != null) _inputBuffer.TryGetValue(input.item, out have);
+                info.inputs.Add(new IOEntry {
+                    item = input.item, have = have, cap = inputBufferSize, want = input.amount
+                });
+            }
+            foreach (var output in recipe.outputItems)
+            {
+                int have = 0;
+                if (output.item != null) _outputBuffer.TryGetValue(output.item, out have);
+                info.outputs.Add(new IOEntry {
+                    item = output.item, have = have, cap = outputBufferSize, want = output.amount
+                });
+            }
+        }
+        return info;
     }
 
     #endregion

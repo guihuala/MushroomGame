@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2597241317459517797}
   - component: {fileID: 4303202747509856788}
   - component: {fileID: 554979471478016057}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Crosser
   m_TagString: Untagged
   m_Icon: {fileID: 0}

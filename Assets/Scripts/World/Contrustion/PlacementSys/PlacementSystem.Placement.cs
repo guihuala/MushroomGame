@@ -5,22 +5,44 @@ public partial class PlacementSystem
     #region 放置/擦除
     private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
     {
-        // 1) 统一可行性：按“建筑类型 + 占地矩形”判断
-        if (_currentPrefab == null || !grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab))
+        // 1) 必须有 Data 和 Prefab
+        if (_currentData == null || _currentData.prefab == null)
+        {
+            _dragLastCell = cell;
+            return;
+        }
+        _currentPrefab = _currentData.prefab; // 确保一致
+
+        // 2) 建造区域可行性
+        if (!grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab))
         {
             _dragLastCell = cell;
             return;
         }
 
-        // 2) 实例化并设置朝向
+        // 3) 检查/扣除建造费用——只看 Data
+        if (!_currentData.HasEnoughResources())
+        {
+            Debug.Log("资源不足，无法建造");
+            _dragLastCell = cell;
+            return;
+        }
+        if (!_currentData.DeductConstructionCost())
+        {
+            Debug.Log("扣除资源失败");
+            _dragLastCell = cell;
+            return;
+        }
+
+        // 4) 实例化并朝向
         var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
         if (building is IOrientable orientable) orientable.SetDirection(dirForThis);
 
-        // 3) 占格 & 回调
+        // 5) 占格 & 回调
         grid.OccupyCells(cell, building.size, building);
         building.OnPlaced(grid, cell);
 
-        // 4) 拖动时让上一件顺着方向
+        // 6) 拖线时让上一件顺向
         if (adjustPrev && _dragLastBuilding is IOrientable prevOrient)
         {
             var delta = NormalizeToCardinal(cell - _dragLastCell);
@@ -30,32 +52,7 @@ public partial class PlacementSystem
         _dragLastCell = cell;
         _dragLastBuilding = building;
     }
-    
-    private void EraseOne(Vector2Int cell)
-    {
-        var building = grid.GetBuildingAt(cell);
-        if (building != null && !_pendingEraseBuildings.Contains(building))
-        {
-            MarkBuildingForErase(building);
-        }
-        _dragLastCell = cell;
-    }
 
-    private void EraseArea(Vector2Int start, Vector2Int end)
-    {
-        Vector2Int min = Vector2Int.Min(start, end);
-        Vector2Int max = Vector2Int.Max(start, end);
-
-        for (int x = min.x; x <= max.x; x++)
-        {
-            for (int y = min.y; y <= max.y; y++)
-            {
-                Vector2Int cell = new Vector2Int(x, y);
-                EraseOne(cell);
-            }
-        }
-    }
-    
     // 仅沿水平或垂直（锁定轴）步进放置
     private void StepAndPlaceAlongLockedAxis(Vector2Int last, Vector2Int target)
     {

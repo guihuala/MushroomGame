@@ -28,6 +28,7 @@ public class BuildingSelectionUI : MonoBehaviour
     public Text buildingNameText;              // 建筑名称文本
     public Text buildingDescriptionText;       // 建筑描述文本
     public Image buildingIconImage;            // 建筑图标图片
+    public ConstructionCostPanel costPanel;  // 拖入材料信息面板
  
     private Dictionary<BuildingCategory, List<BuildingData>> buildingsByCategory;
     private BuildingCategory currentCategory = BuildingCategory.Production;
@@ -162,19 +163,18 @@ public class BuildingSelectionUI : MonoBehaviour
     private void OnBuildingSelected(BuildingData buildingData)
     {
         currentSelectedBuilding = buildingData;
-
-        // 设置放置系统
+        
         if (placementSystem != null && buildingData.prefab != null)
         {
-            placementSystem.SetCurrentBuilding(buildingData.prefab);
+            placementSystem.SetCurrentBuildingData(buildingData);
 
-            // 如果不在建造模式，进入建造模式
             if (!placementSystem.IsInBuildMode)
             {
                 placementSystem.EnterBuildMode();
-                placementSystem.SetCurrentBuilding(buildingData.prefab);
+                placementSystem.SetCurrentBuildingData(buildingData);
             }
         }
+
         
         ShowBuildingDetails(buildingData);
     }
@@ -236,6 +236,9 @@ public class BuildingSelectionUI : MonoBehaviour
         buildingNameText.text = buildingData.buildingName;
         buildingDescriptionText.text = buildingData.description;
         buildingIconImage.sprite = buildingData.icon;
+        
+        if (costPanel != null)
+            costPanel.SetData(buildingData);
     }
     
     private void CloseBuildingDetails()

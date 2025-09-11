@@ -33,6 +33,8 @@ public partial class PlacementSystem : MonoBehaviour
     [SerializeField] private Texture2D cursorDefault;   // 默认光标
     [SerializeField] private Texture2D cursorErase;     // 拆除光标（如小锤子/橡皮）
     [SerializeField] private Vector2 cursorHotspot = new Vector2(8, 8); // 热点（像素坐标）
+    
+    private BuildingData _currentData;
 
     // 预览与当前选择
     private GenericPreview _currentPreview;
@@ -126,39 +128,67 @@ public partial class PlacementSystem : MonoBehaviour
         SelectedIndex = Mathf.Clamp(idx, 1, buildingList.allBuildings.Count);
         if (SelectedIndex <= buildingList.allBuildings.Count)
         {
-            SetCurrentBuilding(buildingList.allBuildings[SelectedIndex - 1].prefab);
+            SetCurrentBuildingData(buildingList.allBuildings[SelectedIndex - 1]);
         }
     }
     #endregion
 
     #region 选择与外部接口
-    public void SetCurrentBuilding(Building buildingPrefab)
+    public void SetCurrentBuildingData(BuildingData data)
     {
-        _currentPrefab = buildingPrefab;
+        _currentData = data;
+        _currentPrefab = (data != null) ? data.prefab : null;
+
         ClearPreview();
         _isDragging = false;
         _dragLastBuilding = null;
         _mode = BrushMode.Place;
-        
+
         if (_currentPreview == null)
         {
-            CreatePreview(Vector3.zero); // 使用默认位置进行实例化
+            CreatePreview(Vector3.zero);
         }
 
-        // 检查建筑是否可旋转
-        var orientableBuilding = buildingPrefab as IOrientable;
-        if (orientableBuilding == null)
-        {
-            // 禁用旋转预览
-            _currentPreview.SetRotationEnabled(false);
-        }
-        else
-        {
-            // 启用旋转预览
+        // 根据 prefab 是否实现 IOrientable 控制预览是否可旋转
+        if (_currentPrefab is IOrientable)
             _currentPreview.SetRotationEnabled(true);
-        }
+        else
+            _currentPreview.SetRotationEnabled(false);
     }
- 
+
+    // 兼容旧接口：若外部还调用此方法，则尝试通过 buildingList 找到对应 Data
+    public void SetCurrentBuilding(Building buildingPrefab)
+    {
+        _currentPrefab = buildingPrefab;
+
+        // 尝试反查 Data
+        _currentData = null;
+        if (buildingList != null && buildingList.allBuildings != null)
+        {
+            foreach (var bd in buildingList.allBuildings)
+            {
+                if (bd != null && bd.prefab != null && bd.prefab.GetType() == buildingPrefab.GetType())
+                {
+                    _currentData = bd;
+                    break;
+                }
+            }
+        }
+
+        // 与 Data 入口保持一致的后续处理
+        ClearPreview();
+        _isDragging = false;
+        _dragLastBuilding = null;
+        _mode = BrushMode.Place;
+
+        if (_currentPreview == null)
+            CreatePreview(Vector3.zero);
+
+        if (_currentPrefab is IOrientable)
+            _currentPreview.SetRotationEnabled(true);
+        else
+            _currentPreview.SetRotationEnabled(false);
+    }
     public void SelectIndex(int idx) => SelectIndexInternal(idx);
 
     #endregion

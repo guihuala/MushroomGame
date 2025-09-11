@@ -50,13 +50,6 @@ public partial class PlacementSystem
         }
     }
 
-    private void SetPreviewIcon()
-    {
-        if (_currentPreview == null || _currentPrefab == null) return;
-        var data = GetBuildingDataForCurrentPrefab();
-        if (data != null && data.icon != null) _currentPreview.SetIcon(data.icon);
-    }
-
     private BuildingData GetBuildingDataForCurrentPrefab()
     {
         if (buildingList == null || _currentPrefab == null) return null;
@@ -66,6 +59,19 @@ public partial class PlacementSystem
                 return bd;
         }
         return null;
+    }
+
+    private void SetPreviewIcon()
+    {
+        if (_currentPreview == null) return;
+        if (_currentData != null && _currentData.icon != null)
+            _currentPreview.SetIcon(_currentData.icon);
+    }
+    
+    private bool EvaluatePlacementOK(Vector2Int cell)
+    {
+        if (_currentPrefab == null) return false;
+        return grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab);
     }
 
     private void SmoothMovePreview(Vector3 targetPosition)
@@ -91,13 +97,7 @@ public partial class PlacementSystem
         var renderers = _currentPreview.GetComponentsInChildren<SpriteRenderer>(true);
         foreach (var r in renderers) r.color = c;
     }
-
-    private bool EvaluatePlacementOK(Vector2Int cell)
-    {
-        if (_currentPrefab == null) return false;
-        return grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab);
-    }
-
+    
     private void RotatePreview()
     {
         Vector2Int[] rotationCycle = { Vector2Int.right, Vector2Int.down, Vector2Int.left, Vector2Int.up };

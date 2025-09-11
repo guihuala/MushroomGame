@@ -59,6 +59,8 @@ public static class AutoTileSystem
             me.inDir = newIn;          // 只改自己，不触邻居
             me.ApplyDirAndRebuild();
         }
+        
+        Debug.Log($"Conveyor at {me.cell}: Output direction {me.outDir}, Input direction {me.inDir}");
     }
 }
 

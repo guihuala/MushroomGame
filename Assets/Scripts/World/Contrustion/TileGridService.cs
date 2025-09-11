@@ -22,94 +22,32 @@ public class TileGridService : MonoBehaviour
     // 缓存已检查的格子建造权限
     private readonly Dictionary<Vector2Int, bool> _buildableCache = new();
     
-
     #region 坐标转换和检查
-
-    /// <summary>
-    /// 世界坐标转换为网格坐标
-    /// </summary>
+    
     public Vector2Int WorldToCell(Vector3 world) =>
         new(Mathf.RoundToInt(world.x / cellSize), Mathf.RoundToInt(world.y / cellSize));
-
-    /// <summary>
-    /// 网格坐标转换为世界坐标
-    /// </summary>
+    
     public Vector3 CellToWorld(Vector2Int cell) =>
         new(cell.x * cellSize, cell.y * cellSize, 0);
-
-    /// <summary>
-    /// 检查指定网格是否空闲（没有建筑且可以建造）
-    /// </summary>
-    public bool IsFree(Vector2Int cell)
-    {
-        // 首先检查是否可以建造
-        if (!CanBuildAt(cell))
-        {
-            return false;
-        }
-
-        // 然后检查是否有建筑
-        return !_buildings.ContainsKey(cell);
-    }
-
-    /// <summary>
-    /// 检查指定位置是否可以建造
-    /// </summary>
-    public bool CanBuildAt(Vector2Int cell)
-    {
-        // 使用缓存提高性能
-        if (_buildableCache.TryGetValue(cell, out bool cachedResult))
-        {
-            return cachedResult;
-        }
-
-        bool canBuild = CheckBuildability(cell);
-        _buildableCache[cell] = canBuild;
-        return canBuild;
-    }    
 
     #endregion
     
     #region 检查权限
-
-    private bool CheckBuildability(Vector2Int cell)
+    
+    public bool AreCellsFree(Vector2Int startCell, Vector2Int size, Building building)
     {
-        Vector3 worldPos = CellToWorld(cell);
-
-        // 1. 检查是否有地面
-        bool hasGround = CheckGroundTile(cell, worldPos);
-        if (!hasGround)
+        for (int x = startCell.x; x < startCell.x + size.x; x++)
         {
-            return false;
+            for (int y = startCell.y; y < startCell.y + size.y; y++)
+            {
+                Vector2Int cell = new Vector2Int(x, y);
+                if (!CanBuildAt(cell, building) || _buildings.ContainsKey(cell))
+                    return false;
+            }
         }
-        
-        // 2. 检查是否有障碍物
-        bool hasObstacle = CheckObstacles(cell, worldPos);
-        if (hasObstacle)
-        {
-            return false;
-        }
-
-        // 3. 检查是否有其他建筑
-        if (_buildings.ContainsKey(cell))
-        {
-            return false;
-        }
-
         return true;
     }
-    
-    private bool CheckGroundTile(Vector2Int cell, Vector3 worldPos)
-    {
-        if (groundTilemap != null)
-        {
-            Vector3Int tilemapCell = groundTilemap.WorldToCell(worldPos);
-            return groundTilemap.HasTile(tilemapCell);
-        }
 
-        return false;
-    }
-    
     private bool CheckObstacles(Vector2Int cell, Vector3 worldPos)
     {
         if (obstacleTilemap != null)
@@ -175,60 +113,16 @@ public class TileGridService : MonoBehaviour
         }
     }
     
-    #endregion
-    
     public Building GetBuildingAt(Vector2Int cell)
     {
         _buildings.TryGetValue(cell, out var building);
         return building;
-    }
-
-    #region 放置格子操作与邻居有关操作
-
-    public void RotateBuilding(Building building, float angle)
-    {
-        // 获取建筑的所有占用格子
-        Vector2Int[] occupiedCells = building.GetOccupiedCells();
-        
-        // 占用旋转后的格子
-        foreach (var cell in occupiedCells)
-        {
-            _buildings.Remove(cell);
-            _buildableCache.Remove(cell);
-        }
-
-        building.RotateBuilding(angle);
-
-        Vector2Int[] rotatedCells = building.GetOccupiedCells();
-        foreach (var cell in rotatedCells)
-        {
-            _buildings[cell] = building;
-            _buildableCache[cell] = false;
-        }
-
-        // 重新计算邻居
-        foreach (var cell in rotatedCells)
-        {
-            NotifyNeighborsOfChange(cell);
-        }
-    }
+    }    
     
-    public bool AreCellsFree(Vector2Int startCell, Vector2Int size)
-    {
-        for (int x = startCell.x; x < startCell.x + size.x; x++)
-        {
-            for (int y = startCell.y; y < startCell.y + size.y; y++)
-            {
-                Vector2Int cell = new Vector2Int(x, y);
-                if (!CanBuildAt(cell) || _buildings.ContainsKey(cell))  // 不能放置
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
+    #endregion
+    
+    #region 放置格子操作与邻居有关操作
+    
     public void OccupyCells(Vector2Int startCell, Vector2Int size, Building building)
     {
         for (int x = startCell.x; x < startCell.x + size.x; x++)
@@ -303,7 +197,6 @@ public class TileGridService : MonoBehaviour
 
     public void RegisterPort(Vector2Int cell, IItemPort port)
     {
-        // 允许在已占用的建筑格上注册端口。端口是格子的"功能"，并不额外占地
         _ports[cell] = port;
     }
 

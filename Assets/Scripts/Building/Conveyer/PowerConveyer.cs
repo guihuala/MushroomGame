@@ -21,22 +21,20 @@ public class PowerConveyer : Conveyer
 
         if (covered)
         {
-            // 估算本帧需要的电量（按“在带上的物品数×时间×单价”）
             int movingCount = Items.Count;
             float need = movingCount * powerPerSecondPerItem * dt;
 
             if (movingCount == 0 || PowerManager.Instance.TryConsumePower(need))
             {
-                // 有电且电够 → 用通电速度
                 useSpeed = poweredSpeed;
+                MarkPathActivated(this, 1f);
             }
             else
             {
-                // 电不够 → 退回断电速度
                 useSpeed = powerlessSpeed;
             }
         }
-
+        
         float prev = beltSpeed;
         beltSpeed = useSpeed;
         base.StepMove(dt);

@@ -110,6 +110,10 @@ MonoBehaviour:
   pathLineWidth: 0.2
   pathLineColor: {r: 1, g: 0.96816087, b: 0.4481132, a: 0.9}
   pathLineMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  cornerVertices: 6
+  capVertices: 2
+  highlightColor: {r: 1, g: 0.905031, b: 0.495283, a: 1}
+  highlightFadePerSec: 2.5
   powerPerSecondPerItem: 0.2
   poweredSpeed: 2
   powerlessSpeed: 0

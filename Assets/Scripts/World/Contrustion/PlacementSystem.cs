@@ -48,8 +48,7 @@ public class PlacementSystem : MonoBehaviour
     private bool _isRightErasing;
     private bool _eraseAsBox;
     private Vector2Int _eraseAnchorCell;
-
-
+    
     private enum BrushMode { Place, Erase }
     private BrushMode _mode = BrushMode.Place;
 
@@ -214,11 +213,9 @@ public class PlacementSystem : MonoBehaviour
     private bool EvaluatePlacementOK(Vector2Int cell)
     {
         if (_currentPrefab == null) return false;
-        
-        return grid.AreCellsFree(cell, _currentPrefab.size);
+        return grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab);
     }
 
-    
     private void RotatePreview()
     {
         Vector2Int[] rotationCycle = { Vector2Int.right, Vector2Int.down, Vector2Int.left, Vector2Int.up };
@@ -340,8 +337,8 @@ public class PlacementSystem : MonoBehaviour
     #region 放置/擦除
     private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
     {
-        // 1) 统一可行性：整块+上下文
-        if (!EvaluatePlacementOK(cell))
+        // 1) 统一可行性：按“建筑类型 + 占地矩形”判断
+        if (_currentPrefab == null || !grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab))
         {
             _dragLastCell = cell;
             return;
@@ -351,13 +348,11 @@ public class PlacementSystem : MonoBehaviour
         var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
         if (building is IOrientable orientable) orientable.SetDirection(dirForThis);
 
-        // 3) TileGridService 已提供 OccupyCells，按 size 矩形逐格占用
+        // 3) 占格 & 回调
         grid.OccupyCells(cell, building.size, building);
-
-        // 4) 建筑回调（注册端口/自定义逻辑等）
         building.OnPlaced(grid, cell);
 
-        // 5) 连续拖动时，让上一件按拖动方向自动调整朝向
+        // 4) 拖动时让上一件顺着方向
         if (adjustPrev && _dragLastBuilding is IOrientable prevOrient)
         {
             var delta = NormalizeToCardinal(cell - _dragLastCell);
@@ -465,7 +460,6 @@ public class PlacementSystem : MonoBehaviour
         else
             Cursor.SetCursor(cursorDefault, cursorHotspot, CursorMode.Auto);
     }
-
-
+    
     #endregion
 }

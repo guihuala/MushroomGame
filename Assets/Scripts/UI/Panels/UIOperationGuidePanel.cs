@@ -95,16 +95,4 @@ public class UIOperationGuidePanel : BasePanel
     {
         UIManager.Instance.ClosePanel(panelName);
     }
-
-    // 设置面板内容（可选，用于动态更新）
-    public void SetGuideContent(string[] titles, string[] contents)
-    {
-        if (titles != null && contents != null && titles.Length == contents.Length)
-        {
-            pageTitles = titles;
-            pageContents = contents;
-            currentPage = 0;
-            UpdateContent();
-        }
-    }
 }

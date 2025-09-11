@@ -4,15 +4,10 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
-
-    [Header("通用输入设置")]
-    public KeyCode eraseToggleKey = KeyCode.X;
-    public KeyCode holdToErasePrimary = KeyCode.LeftAlt;
-    public KeyCode holdToEraseSecondary = KeyCode.RightAlt;
-    public KeyCode exitBuildKey = KeyCode.Escape;
     
     [Header("建造操作输入")]
     public KeyCode rotateKey = KeyCode.R;
+    public KeyCode cancelEraseKey = KeyCode.X;
     
     [Header("相机控制输入")]
     public string horizontalAxis = "Horizontal";
@@ -104,22 +99,9 @@ public class InputManager : MonoBehaviour
         return Input.mousePosition;
     }
 
-    // ===== 特定功能输入检查 =====
-    public bool IsEraseTogglePressed()
+    public bool IsCancelErasePressed()
     {
-        return GetKeyDown(eraseToggleKey);
-    }
-
-    public bool IsHoldEraseActive()
-    {
-        bool primary = holdToErasePrimary != KeyCode.None && GetKey(holdToErasePrimary);
-        bool secondary = holdToEraseSecondary != KeyCode.None && GetKey(holdToEraseSecondary);
-        return primary || secondary;
-    }
-
-    public bool IsExitBuildPressed()
-    {
-        return GetKeyDown(exitBuildKey);
+        return GetKeyDown(cancelEraseKey);
     }
 
     public bool IsRotatePressed()

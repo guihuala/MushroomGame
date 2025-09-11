@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3208456576425184749}
   - component: {fileID: 2409439051069485589}
-  - component: {fileID: 226436848684729348}
+  - component: {fileID: 8460108924053623367}
   m_Layer: 7
   m_Name: Conveyer
   m_TagString: Untagged
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &226436848684729348
+--- !u!114 &8460108924053623367
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,7 +94,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8571690192028879993}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7110e6d0ccf642b7b421d8309c370b1, type: 3}
+  m_Script: {fileID: 11500000, guid: aadcd82f714d54dd3a6b3f61c82b38dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buildZone: 0
@@ -109,4 +109,8 @@ MonoBehaviour:
   pathLineEnabled: 1
   pathLineWidth: 0.1
   pathLineColor: {r: 0.9, g: 1, b: 0.9, a: 0.9}
-  pathLineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  pathLineMaterial: {fileID: 0}
+  cornerVertices: 6
+  capVertices: 2
+  highlightColor: {r: 1, g: 1, b: 1, a: 1}
+  highlightFadePerSec: 2.5

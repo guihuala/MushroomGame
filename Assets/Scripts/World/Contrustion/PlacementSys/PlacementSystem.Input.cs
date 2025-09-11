@@ -65,7 +65,7 @@ public partial class PlacementSystem
             _lineAxis = LineAxis.Free;
         }
     }
-
+    
     private void HandleDefaultModeInput(Vector2Int cell)
     {
         // 取消拆除检查
@@ -81,19 +81,18 @@ public partial class PlacementSystem
             _isRightErasing = true;
             _eraseAsBox = false;
             _eraseAnchorCell = cell;
-            ClearPendingErase(); // 清除之前的待拆除列表
+            ClearPendingErase(); // 这会发送隐藏提示事件
 
             SetEraseCursor(true);
             return;
         }
 
-        // 右键按住：标记待拆除建筑
+        // 右键按住：标记待拆除建筑（会自动发送显示提示事件）
         if (_isRightErasing && _input.IsRightMouseHeld() && !_input.IsPointerOverUI())
         {
             if (!_eraseAsBox && cell != _eraseAnchorCell)
                 _eraseAsBox = true;
 
-            // 标记单个或多个建筑
             if (_eraseAsBox)
             {
                 MarkAreaForErase(_eraseAnchorCell, cell);
@@ -102,7 +101,6 @@ public partial class PlacementSystem
             {
                 MarkBuildingForErase(cell);
             }
-
             return;
         }
 
@@ -111,16 +109,15 @@ public partial class PlacementSystem
         {
             if (_isEraseCancelled)
             {
-                // 已经取消，不做任何操作
-                ClearPendingErase();
+                ClearPendingErase(); // 这会发送隐藏提示事件
             }
             else if (_eraseAsBox)
             {
-                ConfirmErase(); // 确认拆除区域
+                ConfirmErase(); // 这会发送确认事件和隐藏提示事件
             }
             else
             {
-                ConfirmErase(); // 确认拆除单个
+                ConfirmErase(); // 这会发送确认事件和隐藏提示事件
             }
 
             _isRightErasing = false;
@@ -129,7 +126,6 @@ public partial class PlacementSystem
         }
     }
 
-// 标记区域内的建筑
     private void MarkAreaForErase(Vector2Int start, Vector2Int end)
     {
         Vector2Int min = Vector2Int.Min(start, end);
@@ -144,8 +140,7 @@ public partial class PlacementSystem
             }
         }
     }
-
-// 标记单个格子的建筑
+    
     private void MarkBuildingForErase(Vector2Int cell)
     {
         var building = grid.GetBuildingAt(cell);

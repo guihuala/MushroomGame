@@ -22,6 +22,11 @@ public class MsgConst
     // ========== UI 相关消息 (4000-4999) ==========
     public const int UI_TASK_PANEL_UPDATE = 4001;
     public const int UI_HUD_INVENTORY_UPDATE = 4002;
+    public const int ERASE_CANCEL_SHOW_HINT = 4003;    // 显示拆除取消提示
+    public const int ERASE_CANCEL_HIDE_HINT = 4004;    // 隐藏拆除取消提示
+    public const int ERASE_CANCELLED = 4005;           // 拆除已取消
+    public const int ERASE_CONFIRMED = 4006;           // 拆除已确认
+    
     
     // ========== 科技树消息 (5000-5999) ==========
     public const int BUILDING_UNLOCKED = 5001;

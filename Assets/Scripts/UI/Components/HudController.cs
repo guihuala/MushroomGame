@@ -25,6 +25,11 @@ public class HudController : MonoBehaviour
     public float slideSpeed = 10f;  // 控制收缩和展开的速度
     public float hiddenX = -600f;   // 收缩后的 X 坐标
     public float shownX = 0f;       // 展开后的 X 坐标
+    
+    [Header("拆除提示UI")]
+    [SerializeField] private GameObject eraseCancelHintUI;
+    [SerializeField] private Text eraseCancelText;
+    [SerializeField] private float hintShowDuration = 2f;
 
     private bool isInventoryOpen = true;  // 标记面板是否展开
     
@@ -50,6 +55,10 @@ public class HudController : MonoBehaviour
         MsgCenter.RegisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
         MsgCenter.RegisterMsgAct(MsgConst.INVENTORY_CHANGED, HandleInventoryChanged);
         MsgCenter.RegisterMsg(MsgConst.HUB_STAGE_COMPLETED, HandleStageCompleted);
+        MsgCenter.RegisterMsg(MsgConst.ERASE_CANCEL_SHOW_HINT, ShowEraseCancelHint);
+        MsgCenter.RegisterMsg(MsgConst.ERASE_CANCEL_HIDE_HINT, HideEraseCancelHint);
+        MsgCenter.RegisterMsg(MsgConst.ERASE_CANCELLED, OnEraseCancelled);
+        MsgCenter.RegisterMsg(MsgConst.ERASE_CONFIRMED, OnEraseConfirmed);
 
         InitializeInventory();
         
@@ -69,6 +78,10 @@ public class HudController : MonoBehaviour
         MsgCenter.UnregisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
         MsgCenter.UnregisterMsgAct(MsgConst.INVENTORY_CHANGED, HandleInventoryChanged);
         MsgCenter.UnregisterMsg(MsgConst.HUB_STAGE_COMPLETED, HandleStageCompleted);
+        MsgCenter.UnregisterMsg(MsgConst.ERASE_CANCEL_SHOW_HINT, ShowEraseCancelHint);
+        MsgCenter.UnregisterMsg(MsgConst.ERASE_CANCEL_HIDE_HINT, HideEraseCancelHint);
+        MsgCenter.UnregisterMsg(MsgConst.ERASE_CANCELLED, OnEraseCancelled);
+        MsgCenter.UnregisterMsg(MsgConst.ERASE_CONFIRMED, OnEraseConfirmed);
     }
 
     #endregion
@@ -255,6 +268,36 @@ public class HudController : MonoBehaviour
         {
             taskPanel?.ShowPanel();
         }
+    }
+    
+    // 显示拆除取消提示
+    private void ShowEraseCancelHint(params object[] args)
+    {
+        if (eraseCancelHintUI == null) return;
+
+        eraseCancelHintUI.SetActive(true);
+
+        // 如果有倒计时参数，显示倒计时
+        eraseCancelText.text = "Press X to cancel the removal";
+    }
+    
+    private void HideEraseCancelHint(params object[] args)
+    {
+        if (eraseCancelHintUI != null)
+        {
+            eraseCancelHintUI.SetActive(false);
+        }
+        StopAllCoroutines();
+    }
+    
+    private void OnEraseCancelled(params object[] args)
+    {
+        // 可以在这里播放取消音效或显示取消提示
+    }
+    
+    private void OnEraseConfirmed(params object[] args)
+    {
+        // 可以在这里播放确认音效
     }
 
     #endregion

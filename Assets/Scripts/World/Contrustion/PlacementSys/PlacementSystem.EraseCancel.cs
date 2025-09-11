@@ -1,3 +1,4 @@
+// PlacementSystem.EraseCancel.cs 修改为使用事件中心
 using UnityEngine;
 
 public partial class PlacementSystem
@@ -22,6 +23,12 @@ public partial class PlacementSystem
         }
         
         _originalBuildingColors.Add(originalColors);
+        
+        // 第一次标记建筑时发送显示提示事件
+        if (_pendingEraseBuildings.Count == 1)
+        {
+            MsgCenter.SendMsg(MsgConst.ERASE_CANCEL_SHOW_HINT, eraseConfirmDuration);
+        }
     }
 
     // 取消拆除
@@ -50,6 +57,9 @@ public partial class PlacementSystem
             colorIndex++;
         }
 
+        // 发送取消事件
+        MsgCenter.SendMsg(MsgConst.ERASE_CANCELLED);
+        
         ClearPendingErase();
     }
 
@@ -64,12 +74,18 @@ public partial class PlacementSystem
             }
         }
         
+        // 发送确认事件
+        MsgCenter.SendMsg(MsgConst.ERASE_CONFIRMED);
+        
         ClearPendingErase();
     }
 
     // 清空待拆除列表
     private void ClearPendingErase()
     {
+        // 发送隐藏提示事件
+        MsgCenter.SendMsg(MsgConst.ERASE_CANCEL_HIDE_HINT);
+        
         _pendingEraseBuildings.Clear();
         _originalBuildingColors.Clear();
         _isEraseCancelled = false;

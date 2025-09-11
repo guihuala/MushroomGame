@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,7 @@ public class HudController : MonoBehaviour
     [Header("UI组件")]
     [SerializeField] private Button pauseButton;
     [SerializeField] private Button techTreeButton;
+    [SerializeField] private Button guideButton;
     [SerializeField] private Hub hub;
 
     [SerializeField] private Transform inventoryPanel;
@@ -38,6 +40,7 @@ public class HudController : MonoBehaviour
         toggleInventoryButton.onClick.AddListener(ToggleInventoryPanel);
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
         techTreeButton.onClick.AddListener(OnTechTreeButtonClicked);
+        guideButton.onClick.AddListener(OnGuideButtonClicked);
     }
 
     private void Start()
@@ -80,6 +83,11 @@ public class HudController : MonoBehaviour
     private void OnTechTreeButtonClicked()
     {
         UIManager.Instance.OpenPanel("TechTreePanel");
+    }
+
+    private void OnGuideButtonClicked()
+    {
+        UIManager.Instance.OpenPanel("GuidePanel");
     }
 
     #endregion

@@ -47180,11 +47180,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c95833f895fe4a3283c42c22913074b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eraseToggleKey: 120
-  holdToErasePrimary: 308
-  holdToEraseSecondary: 307
-  exitBuildKey: 27
   rotateKey: 114
+  cancelEraseKey: 120
   horizontalAxis: Horizontal
   verticalAxis: Vertical
   zoomAxis: Mouse ScrollWheel
@@ -47687,6 +47684,155 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3798297443958373381, guid: 70a904db6acfd4006bb33b78075af274, type: 3}
   m_PrefabInstance: {fileID: 1045017442}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1051524757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1051524758}
+  - component: {fileID: 1051524762}
+  - component: {fileID: 1051524761}
+  - component: {fileID: 1051524760}
+  - component: {fileID: 1051524759}
+  m_Layer: 5
+  m_Name: GuideBtn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1051524758
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051524757}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8297428947101742967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -249.5, y: -50}
+  m_SizeDelta: {x: 80, y: 80}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1051524759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051524757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13020ddac3e3e4644bdefd4e1da5ae54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationType: 0
+  enableClickAnimation: 1
+  animationDuration: 0.2
+  easeType: 27
+  hoverScale: 1.1
+  clickScale: 0.95
+  hoverMoveOffset: {x: 0, y: 10}
+  clickMoveOffset: {x: 0, y: -5}
+  hoverRotation: 5
+  clickRotation: -3
+  hoverColor: {r: 1.2, g: 1.2, b: 1.2, a: 1}
+  clickColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
+  enableShake: 1
+  shakeStrength: 10
+  shakeDuration: 0.5
+  shakeVibrato: 10
+--- !u!114 &1051524760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051524757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1051524761}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1051524761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051524757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 213c212dbf5704f7f862dd141ce55dcd, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1051524762
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051524757}
+  m_CullTransparentMesh: 1
 --- !u!1 &1064990887
 GameObject:
   m_ObjectHideFlags: 0
@@ -49166,6 +49312,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   previewValidColor: {r: 0, g: 1, b: 0, a: 0.5}
   previewInvalidColor: {r: 1, g: 0, b: 0, a: 0.5}
+  pendingEraseColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  eraseConfirmDuration: 2
   previewMoveDuration: 0.1
   moveEase: 6
   mainCam: {fileID: 1234201018}
@@ -50047,36 +50195,6 @@ Tilemap:
   m_GameObject: {fileID: 1626169349}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: -11, y: -67, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 9
-      m_TileSpriteIndex: 9
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
-  - first: {x: -11, y: -66, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 9
-      m_TileSpriteIndex: 9
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
-  - first: {x: -11, y: -65, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 9
-      m_TileSpriteIndex: 9
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: -27, y: -64, z: 0}
     second:
       serializedVersion: 2
@@ -54257,8 +54375,8 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 3
-    m_Data: {fileID: 11400000, guid: 919f40c2480c64c2cb503ec594bcb417, type: 2}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 14
     m_Data: {fileID: 11400000, guid: 1a166b6715bca4e91a2c1d5211c91ce0, type: 2}
   - m_RefCount: 17
@@ -54286,8 +54404,8 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 3
-    m_Data: {fileID: 135312274, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 14
     m_Data: {fileID: -2050542221, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   - m_RefCount: 17
@@ -54297,7 +54415,7 @@ Tilemap:
   - m_RefCount: 344
     m_Data: {fileID: -523371132, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 419
+  - m_RefCount: 416
     m_Data:
       e00: 1
       e01: 0
@@ -54316,7 +54434,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 419
+  - m_RefCount: 416
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray:
   - m_RefCount: 344
@@ -55200,6 +55318,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseButton: {fileID: 6474616253066024439}
   techTreeButton: {fileID: 1463296058}
+  guideButton: {fileID: 1051524760}
   hub: {fileID: 1179134435}
   inventoryPanel: {fileID: 4619617541852331569}
   inventoryContainer: {fileID: 1243995859}
@@ -55243,6 +55362,7 @@ RectTransform:
   m_Children:
   - {fileID: 7881610667438657122}
   - {fileID: 1463296056}
+  - {fileID: 1051524758}
   - {fileID: 72201588}
   m_Father: {fileID: 50944646137843116}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

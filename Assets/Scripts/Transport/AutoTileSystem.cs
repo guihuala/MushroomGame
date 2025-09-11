@@ -3,70 +3,63 @@ using UnityEngine;
 
 public static class AutoTileSystem
 {
-    // 新签名：带 force，用于同帧级联
+    /// <summary>
+    /// 仅重建 “me 自身” 的 in/out；不再修改邻居，避免并行带相互抢方向。
+    /// 规则：
+    /// 1) 先确定 out：直行优先，其次右转、左转；必须 DownAccepts；
+    /// 2) 再确定 in：优先来自反向直邻，其次左右邻；必须 UpFeeds；
+    /// </summary>
     public static void RewireAround(TileGridService g, Conveyer me, bool force = false)
     {
-        // 1) 遍历四邻，若是传送带且与我出向正交，则尝试“只改邻居一侧”
-        foreach (var dv in new[] { Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left })
+        if (g == null || me == null) return;
+
+        // -------- 1) 选择输出（我喂谁）--------
+        Vector2Int forward = me.outDir; // 你已有的当前出向
+        Vector2Int right   = new Vector2Int(forward.y, -forward.x);
+        Vector2Int left    = new Vector2Int(-forward.y, forward.x);
+
+        Vector2Int ChooseOut(Vector2Int dir)
         {
-            Vector2Int neighborCell = me.cell + dv;
-            if (!(g.GetPortAt(neighborCell) is Conveyer nb)) continue; // 只处理传送带邻居
-
-            // 只要求几何上正交；不再强制邻居已“锚定”（放宽）
-            bool ortho = IsPerp(me.outDir, dv) || IsPerp(me.inDir, dv);
-            if (!ortho) continue;
-
-            var dBA = dv;      // nb -> me 的方向
-            var dAB = -dBA;    // me -> nb 的方向
-
-            bool alreadyIn  = (me.inDir  == dBA) && (nb.outDir == dAB); // 我吃邻居
-            bool alreadyOut = (me.outDir == dBA) && (nb.inDir  == dAB); // 我喂邻居
-            if (alreadyIn || alreadyOut) continue;
-
-            // 只改邻居“一侧”，保持你原有策略
-            if (me.inDir == dBA && nb.outDir != dAB)
-            {
-                nb.outDir = dAB;
-                nb.ApplyDirAndRebuild();
-                // 关键：同帧让邻居再跑一次 AutoTile，确保链式稳定
-                nb.AutoTile();
-            }
-            else if (me.outDir == dBA && nb.inDir != dAB)
-            {
-                nb.inDir = dAB;
-                nb.ApplyDirAndRebuild();
-                nb.AutoTile();
-            }
+            var down = g.GetPortAt(me.cell + dir) as IItemPort;
+            return (down != null && TransportCompat.DownAccepts(dir, down)) ? dir : Vector2Int.zero;
         }
 
-        // 2) 自己：先按“直行→右转→左转”的优先级连下游（你已有）
-        me.FindBestOutputConnection(); // 若成功会更新朝向与可视
+        Vector2Int newOut =
+            ChooseOut(forward) != Vector2Int.zero ? forward :
+            ChooseOut(right)   != Vector2Int.zero ? right   :
+            ChooseOut(left)    != Vector2Int.zero ? left    :
+            Vector2Int.zero;
 
-        // 3) 失败回退：如果仍然没有可用输出，尝试把 outDir 指向正交邻格上“存在传送带”的方向，再重建
-        bool hasValid =
-            g.GetPortAt(me.cell + me.Direction) != null &&
-            TransportCompat.DownAccepts(me.Direction, g.GetPortAt(me.cell + me.Direction));
-
-        if (!hasValid)
+        if (newOut != Vector2Int.zero && newOut != me.outDir)
         {
-            // 正交方向优先：先右转、再左转（与你现有 FindBestOutputConnection 的顺序一致）
-            Vector2Int RotCW(Vector2Int v)  => new Vector2Int(v.y, -v.x);
-            Vector2Int RotCCW(Vector2Int v) => new Vector2Int(-v.y, v.x);
+            me.SetDirection(newOut);   // 改出向（你已有）
+            me.ApplyDirAndRebuild();   // 重建可视（你已有）
+        }
 
-            foreach (var dir in new[] { RotCW(me.outDir), RotCCW(me.outDir) })
-            {
-                var p = g.GetPortAt(me.cell + dir);
-                if (p is Conveyer) // 看到是带子，就先把几何对齐，再交给 ApplyDir 校正端口
-                {
-                    me.SetDirection(dir);
-                    me.ApplyDirAndRebuild();
-                    break;
-                }
-            }
+        // -------- 2) 选择输入（谁喂我）--------
+        // 期望有人从我 cell - outDir 的方向来喂（直线优先），否则尝试左右邻
+        Vector2Int back = -me.outDir;
+        Vector2Int ibRight = new Vector2Int(back.y, -back.x);
+        Vector2Int ibLeft  = new Vector2Int(-back.y, back.x);
+
+        Vector2Int ChooseIn(Vector2Int dirFromNeighborToMe)
+        {
+            var up = g.GetPortAt(me.cell + dirFromNeighborToMe) as IItemPort;
+            return (up != null && TransportCompat.UpFeeds(dirFromNeighborToMe, up)) ? dirFromNeighborToMe : Vector2Int.zero;
+        }
+
+        Vector2Int newIn =
+            ChooseIn(back)    != Vector2Int.zero ? back    :
+            ChooseIn(ibRight) != Vector2Int.zero ? ibRight :
+            ChooseIn(ibLeft)  != Vector2Int.zero ? ibLeft  :
+            Vector2Int.zero;
+
+        if (newIn != Vector2Int.zero && newIn != me.inDir)
+        {
+            me.inDir = newIn;          // 只改自己，不触邻居
+            me.ApplyDirAndRebuild();
         }
     }
-
-    private static bool IsPerp(Vector2Int a, Vector2Int b) => a.x * b.x + a.y * b.y == 0;
 }
 
 public static class TransportCompat

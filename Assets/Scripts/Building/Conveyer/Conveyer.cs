@@ -403,7 +403,7 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
         foreach (var c in s_all)
         {
             if (c == null || c.grid == null) continue;
-            var list = GetNeighbors4(c);
+            var list = GetFlowNeighbors(c);
             if (list.Count > 0) neighbors[c] = list;
         }
 
@@ -428,22 +428,35 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
             BuildLoopLine(node, neighbors, visited);
         }
     }
-
-// 收集 4 向直邻的 Conveyer（只连接同类基类/子类的传送带）
-    private static List<Conveyer> GetNeighbors4(Conveyer c)
+    // a 与 b 是否在“同一条物流链”上相连（只认 Out→In / In←Out 的配对）
+    private static bool IsFlowConnected(Conveyer a, Conveyer b)
     {
-        var result = new List<Conveyer>(4);
+        // 仅允许 4 向直邻
+        Vector2Int d = b.cell - a.cell;
+        if (Mathf.Abs(d.x) + Mathf.Abs(d.y) != 1) return false;
+
+        // a 的输出喂 b 的输入，或 a 的输入来自 b 的输出
+        bool forward  = (a.outDir == d) && (b.inDir == -d);
+        bool backward = (a.inDir  == d) && (b.outDir == -d);
+        return forward || backward;
+    }
+
+    // 只返回“物流上连通”的邻居（不再是“物理相邻就算”）
+    private static List<Conveyer> GetFlowNeighbors(Conveyer c)
+    {
+        var result = new List<Conveyer>(2);
         var dirs = new[] { Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left };
         foreach (var d in dirs)
         {
             var nb = c.grid?.GetBuildingAt(c.cell + d) as Conveyer;
-            if (nb != null) result.Add(nb);
+            if (nb != null && IsFlowConnected(c, nb))
+                result.Add(nb);
         }
-
         return result;
     }
 
-// 从端点出发，沿链到另一个端/或中止，生成一根折线
+
+    // 从端点出发，沿链到另一个端/或中止，生成一根折线
     private static void BuildLineFromEndpoint(Conveyer start, Dictionary<Conveyer, List<Conveyer>> nbr,
         HashSet<Conveyer> visited)
     {
@@ -476,7 +489,7 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
             CreatePathLine(points, start);
     }
 
-// 闭环：从任一点出发，沿着未访问的链一圈
+    // 闭环：从任一点出发，沿着未访问的链一圈
     private static void BuildLoopLine(Conveyer start, Dictionary<Conveyer, List<Conveyer>> nbr,
         HashSet<Conveyer> visited)
     {
@@ -522,13 +535,40 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
             CreatePathLine(points, start);
     }
 
-// 创建一根 LineRenderer，放到共享容器下
+    private static void SimplifyColinear(List<Vector3> pts)
+    {
+        if (pts.Count < 3) return;
+        var outPts = new List<Vector3>(pts.Count);
+        outPts.Add(pts[0]);
+
+        for (int i = 1; i < pts.Count - 1; i++)
+        {
+            var a = outPts[outPts.Count - 1];
+            var b = pts[i];
+            var c = pts[i + 1];
+            var ab = (b - a); ab.z = 0;
+            var bc = (c - b); bc.z = 0;
+
+            // 共线（方向相同或相反）则跳过中点
+            if (Vector3.Cross(ab.normalized, bc.normalized).sqrMagnitude < 1e-6f)
+                continue;
+
+            outPts.Add(b);
+        }
+        outPts.Add(pts[pts.Count - 1]);
+
+        pts.Clear();
+        pts.AddRange(outPts);
+    }
+
     private static void CreatePathLine(List<Vector3> points, Conveyer sample)
     {
+        SimplifyColinear(points);
+        if (points.Count < 2) return;
+
         var go = new GameObject("[Conveyor Path]");
         go.transform.SetParent(s_lineRoot, false);
         var lr = go.AddComponent<LineRenderer>();
-
         lr.useWorldSpace = true;
         lr.loop = false;
         lr.positionCount = points.Count;
@@ -537,14 +577,12 @@ public class Conveyer : Building, IItemPort, IOrientable, IBeltNode
         lr.material = s_material;
         lr.startColor = lr.endColor = s_color;
 
-        // 与带同层绘制，并提高一个 order，避免被遮住
         var sr = sample.GetComponent<SpriteRenderer>();
         if (sr != null)
         {
             lr.sortingLayerID = sr.sortingLayerID;
-            lr.sortingOrder = sr.sortingOrder + 1;
+            lr.sortingOrder   = sr.sortingOrder + 1;
         }
-
         s_lines.Add(lr);
     }
 

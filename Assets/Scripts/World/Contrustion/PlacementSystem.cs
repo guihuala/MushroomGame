@@ -241,7 +241,6 @@ public class PlacementSystem : MonoBehaviour
     
     private void HandleBuildModeInput(Vector2Int cell, Vector3 worldPos)
     {
-        // 旋转
         if (_input.IsRotatePressed()) RotatePreview();
 
         // 右键退出建造模式
@@ -308,7 +307,7 @@ public class PlacementSystem : MonoBehaviour
             _eraseAsBox = false;
             _eraseAnchorCell = cell;
 
-            SetEraseCursor(true);   // ← 显示“拆除”鼠标
+            SetEraseCursor(true);
             return;
         }
 
@@ -404,18 +403,6 @@ public class PlacementSystem : MonoBehaviour
                 Vector2Int cell = new Vector2Int(x, y);
                 EraseOne(cell);  // 按区域清除
             }
-        }
-    }
-    
-    private void StepAndPlaceAlongPath(Vector2Int last, Vector2Int target)
-    {
-        var cur = last;
-        while (cur != target)
-        {
-            Vector2Int move = StepToward(cur, target);
-            var next = cur + move;
-            PlaceOne(next, grid.CellToWorld(next), move, adjustPrev: true);
-            cur = next;
         }
     }
 

@@ -17,11 +17,12 @@ public class GenericPreview : MonoBehaviour
 
     public void SetRotationEnabled(bool enabled)
     {
-        if (_spriteRenderer == null) return; 
+        if (_spriteRenderer == null) return;
         _isRotationEnabled = enabled;
+        transform.DORotate(new Vector3(0, 0, 0), 0.3f)
+            .SetEase(Ease.OutBack);
     }
-
-
+    
     public void SetDirection(Vector2Int direction)
     {
         if (!_isRotationEnabled) return;
@@ -43,8 +44,7 @@ public class GenericPreview : MonoBehaviour
         if (direction == Vector2Int.down)  return 270f;
         return 0f;
     }
-
-
+    
     private void ApplyPreviewColor(Color color)
     {
         if (_spriteRenderer != null)

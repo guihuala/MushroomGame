@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PowerConveyer : Conveyer
@@ -39,7 +37,6 @@ public class PowerConveyer : Conveyer
             }
         }
 
-        // 暂存并替换父类使用的 beltSpeed，跑一帧，然后还原
         float prev = beltSpeed;
         beltSpeed = useSpeed;
         base.StepMove(dt);

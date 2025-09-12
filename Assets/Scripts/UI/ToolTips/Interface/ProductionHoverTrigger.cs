@@ -6,8 +6,7 @@ public class ProductionHoverTrigger : MonoBehaviour, IPointerEnterHandler, IPoin
 {
     private IProductionInfoProvider _provider;
     private bool _inside;
-    private float _t;
-    
+
     private void Awake()
     {
         _provider = GetComponent<IProductionInfoProvider>();
@@ -19,14 +18,12 @@ public class ProductionHoverTrigger : MonoBehaviour, IPointerEnterHandler, IPoin
     public void OnPointerEnter(PointerEventData eventData)
     {
         _inside = true;
-        _t = 0f;
         BuildingSelectionUI.Instance.ShowProductionTooltip(_provider);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         _inside = false;
-        _t = 0f;
         BuildingSelectionUI.Instance.CloseAllTooltips();
     }
 

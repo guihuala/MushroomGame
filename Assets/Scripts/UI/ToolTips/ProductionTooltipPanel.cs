@@ -6,7 +6,6 @@ public class ProductionTooltipPanel : MonoBehaviour
 {
     [Header("UI Refs")]
     [SerializeField] private Text title;
-    [SerializeField] private Image progressFill;
     [SerializeField] private Transform inputsRoot;           // 输入图标的容器
     [SerializeField] private Transform outputsRoot;          // 输出图标的容器
     [SerializeField] private GameObject iconEntryPrefab;     // 上文的图标条目预制体
@@ -45,11 +44,8 @@ public class ProductionTooltipPanel : MonoBehaviour
 
     private void RefreshNow(ProductionInfo info)
     {
-        if (title) title.text = info.displayName;
-
-        if (progressFill)
-            progressFill.fillAmount = Mathf.Clamp01(info.progress01);
-
+        if (title) title.text = info.displayName.Replace("(Clone)", "").Trim();
+        
         BuildIconRow(inputsRoot, info.inputs, isInput: true);
         BuildIconRow(outputsRoot, info.outputs, isInput: false);
 

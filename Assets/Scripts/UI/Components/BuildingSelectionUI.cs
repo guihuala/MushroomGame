@@ -32,6 +32,7 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     
     [Header("工具栏")]
     public ProductionTooltipPanel productionTooltipPanel; 
+    public MinerTooltipPanel minerTooltipPanel;
     
     private Dictionary<BuildingCategory, List<BuildingData>> buildingsByCategory;
     private BuildingCategory currentCategory = BuildingCategory.Production;
@@ -267,6 +268,10 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             
             if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
                 productionTooltipPanel.ClosePanel();
+            
+            if (minerTooltipPanel != null && minerTooltipPanel.gameObject.activeSelf)
+                minerTooltipPanel.ClosePanel();
+            
         }
     
         // 显示生产信息面板
@@ -282,5 +287,17 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             }
         }
 
-    #endregion
+        // 显示矿机信息面板
+        public void ShowMinerTooltip(Miner miner)
+        {
+            CloseAllTooltips();
+
+            if (minerTooltipPanel != null)
+            {
+                minerTooltipPanel.SetMiner(miner);
+                minerTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
+            }
+        }
+
+        #endregion
 }

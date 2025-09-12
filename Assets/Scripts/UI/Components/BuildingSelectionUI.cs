@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BuildingSelectionUI : MonoBehaviour
+public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
 {
     [Header("引用")]
     public PlacementSystem placementSystem;
@@ -29,7 +29,10 @@ public class BuildingSelectionUI : MonoBehaviour
     public Text buildingDescriptionText;       // 建筑描述文本
     public Image buildingIconImage;            // 建筑图标图片
     public ConstructionCostPanel costPanel;  // 拖入材料信息面板
- 
+    
+    [Header("工具栏")]
+    public ProductionTooltipPanel productionTooltipPanel; 
+    
     private Dictionary<BuildingCategory, List<BuildingData>> buildingsByCategory;
     private BuildingCategory currentCategory = BuildingCategory.Production;
     private BuildingData currentSelectedBuilding;
@@ -174,7 +177,6 @@ public class BuildingSelectionUI : MonoBehaviour
                 placementSystem.SetCurrentBuildingData(buildingData);
             }
         }
-
         
         ShowBuildingDetails(buildingData);
     }
@@ -198,9 +200,6 @@ public class BuildingSelectionUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 更新分类页签视觉效果
-    /// </summary>
     private void UpdateCategoryTabsVisual()
     {
         for (int i = 0; i < categoryTabButtons.Count; i++)
@@ -230,22 +229,58 @@ public class BuildingSelectionUI : MonoBehaviour
         }
     }
 
-    private void ShowBuildingDetails(BuildingData buildingData)
-    {
-        buildingDetailsPanel.SetActive(true); // 显示详情栏
-        buildingNameText.text = buildingData.buildingName;
-        buildingDescriptionText.text = buildingData.description;
-        buildingIconImage.sprite = buildingData.icon;
-        
-        if (costPanel != null)
-            costPanel.SetData(buildingData);
-    }
-    
-    private void CloseBuildingDetails()
-    {
-        if (buildingDetailsPanel != null)
+    #region BuildingDetail
+
+        private void ShowBuildingDetails(BuildingData buildingData)
         {
-            buildingDetailsPanel.SetActive(false);
+            buildingDetailsPanel.SetActive(true);
+            buildingNameText.text = buildingData.buildingName;
+            buildingDescriptionText.text = buildingData.description;
+            buildingIconImage.sprite = buildingData.icon;
+    
+            // 显示建筑信息时关闭生产信息面板
+            if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
+            {
+                productionTooltipPanel.ClosePanel();
+            }
+    
+            // 显示建筑的材料信息面板
+            if (costPanel != null)
+                costPanel.SetData(buildingData);
         }
-    }
+        
+        private void CloseBuildingDetails()
+        {
+            if (buildingDetailsPanel != null)
+            {
+                buildingDetailsPanel.SetActive(false);
+            }
+        }
+
+    #endregion
+
+    #region Tootips
+
+        public void CloseAllTooltips()
+        {
+            CloseBuildingDetails();
+            
+            if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
+                productionTooltipPanel.ClosePanel();
+        }
+    
+        // 显示生产信息面板
+        public void ShowProductionTooltip(IProductionInfoProvider provider)
+        {
+            // 关闭所有面板
+            CloseAllTooltips();
+    
+            if (productionTooltipPanel != null)
+            {
+                productionTooltipPanel.SetContext(provider);
+                productionTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
+            }
+        }
+
+    #endregion
 }

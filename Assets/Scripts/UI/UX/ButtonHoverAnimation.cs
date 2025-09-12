@@ -157,6 +157,8 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
                 PlayCombinedClickAnimation();
                 break;
         }
+        
+        AudioManager.Instance.PlaySfx("select");
     }
 
     public void OnPointerUp(PointerEventData eventData)

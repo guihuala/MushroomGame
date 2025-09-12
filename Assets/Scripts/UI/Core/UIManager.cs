@@ -6,12 +6,16 @@ public class UIManager : SingletonPersistent<UIManager>
 {
     // <面板名称, 面板预制体路径>
     private Dictionary<string, string> _panelPathDict;
+
     // 缓存的面板预制体 <面板名称, 面板预制体>
     private Dictionary<string, GameObject> _uiPrefabDict;
+
     // 当前已打开的面板实例 <面板名称, 面板实例>
     private Dictionary<string, BasePanel> _panelDict;
+
     // UI 面板的根节点
     private Transform _uiRoot;
+
     public Transform UIRoot
     {
         get
@@ -20,6 +24,7 @@ public class UIManager : SingletonPersistent<UIManager>
             {
                 _uiRoot = GameObject.Find("Canvas").transform;
             }
+
             return _uiRoot;
         }
     }
@@ -116,13 +121,12 @@ public class UIManager : SingletonPersistent<UIManager>
         // 检查面板是否已经打开，未打开则无法关闭
         if (!_panelDict.TryGetValue(name, out panel))
         {
-            Debug.LogWarning($"面板 {name} 当前未打开，无法关闭");
             return false;
         }
-        
+
         _panelDict.Remove(name);
         panel.ClosePanel();
-        
+
         return true;
     }
 }

@@ -13,19 +13,7 @@ MonoBehaviour:
   m_Name: AudioDataListSO
   m_EditorClassIdentifier: 
   audioDataList:
-  - audioName: glass_005
-    audioPath: Audio/Sfx/glass_005
-  - audioName: glass_006
-    audioPath: Audio/Sfx/glass_006
-  - audioName: maximize_001
-    audioPath: Audio/Sfx/maximize_001
-  - audioName: maximize_002
-    audioPath: Audio/Sfx/maximize_002
-  - audioName: minimize_008
-    audioPath: Audio/Sfx/minimize_008
-  - audioName: minimize_009
-    audioPath: Audio/Sfx/minimize_009
-  - audioName: scroll_005
-    audioPath: Audio/Sfx/scroll_005
-  - audioName: select_005
-    audioPath: Audio/Sfx/select_005
+  - audioName: scroll
+    audioPath: Audio/Sfx/scroll
+  - audioName: select
+    audioPath: Audio/Sfx/select

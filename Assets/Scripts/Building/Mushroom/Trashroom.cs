@@ -150,22 +150,15 @@ public class Trashroom : Building, IItemPort, ITickable, IProductionInfoProvider
 
     public ProductionInfo GetProductionInfo()
     {
-        var info = new ProductionInfo {
-            displayName = gameObject.name,
-            recipe      = null,
-            isProducing = CountTotal(_inputs) > 0,
-            progress01  = 0f,
-            extraText   = $"速率：{processRate}/s，转化：{inputPerBatch} → {outputPerBatch} x {(outputItem ? outputItem.itemId : "（无）")}"
-        };
-
-        // 列出当前累计的输入（无固定种类）
-        foreach (var kv in _inputs)
+        var info = new ProductionInfo
         {
-            info.inputs.Add(new IOEntry {
-                item = kv.Key, have = kv.Value, cap = -1, want = inputPerBatch
-            });
-        }
-        // 垃圾房产物直接进仓库，不做输出缓存列表
+            displayName = gameObject.name,
+            recipe = null,
+            isProducing = CountTotal(_inputs) > 0,
+            progress01 = 0f,
+            extraText = $"Rate: {processRate}/s, conversion: everything → {outputPerBatch} x {outputItem}"
+        };
+        
         return info;
     }
 

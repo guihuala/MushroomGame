@@ -33,8 +33,6 @@ public class HudController : MonoBehaviour
 
     private bool isInventoryOpen = true;  // 标记面板是否展开
     
-    public MushroomSelectionPanel mushroomSelectionPanel;
-
     private Dictionary<ItemDef, InventoryHudItem> _hudItems = new Dictionary<ItemDef, InventoryHudItem>();
     private bool _isInitialized = false;
 
@@ -50,7 +48,6 @@ public class HudController : MonoBehaviour
 
     private void Start()
     {
-        MsgCenter.RegisterMsg(MsgConst.SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
         MsgCenter.RegisterMsg(MsgConst.HUB_CLICKED, OnHubClicked);
         MsgCenter.RegisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
         MsgCenter.RegisterMsgAct(MsgConst.INVENTORY_CHANGED, HandleInventoryChanged);
@@ -73,7 +70,6 @@ public class HudController : MonoBehaviour
 
     private void OnDestroy()
     {
-        MsgCenter.UnregisterMsg(MsgConst.SHOW_MUSHROOM_PANEL, ShowMushroomSelectionPanel);
         MsgCenter.UnregisterMsg(MsgConst.HUB_CLICKED, OnHubClicked);
         MsgCenter.UnregisterMsg(MsgConst.INVENTORY_ITEM_ADDED, HandleItemAdded);
         MsgCenter.UnregisterMsgAct(MsgConst.INVENTORY_CHANGED, HandleInventoryChanged);
@@ -248,13 +244,6 @@ public class HudController : MonoBehaviour
             InitializeInventory();
             taskPanel?.UpdateTaskPanelProgress();
         }
-    }
-
-    private void ShowMushroomSelectionPanel(params object[] args)
-    {
-        Vector2Int targetCell = (Vector2Int)args[0];
-        List<BuildingData> mushrooms = GetUnlockedMushrooms();
-        mushroomSelectionPanel.ShowMushroomPanel(mushrooms, targetCell);
     }
 
     private List<BuildingData> GetUnlockedMushrooms()

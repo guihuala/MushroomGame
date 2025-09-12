@@ -99,10 +99,6 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
             PowerManager.Instance.AddPower(powerGenerated);
             Debug.Log("PowerGenerator generated " + powerGenerated + " power.");
         }
-        else
-        {
-            Debug.LogWarning("Not enough cached resources to generate power.");
-        }
     }
     
     public bool TryReceive(in ItemPayload payload)
@@ -129,7 +125,7 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
             recipe      = null,
             isProducing = cachedResources >= resourceConsumed,
             progress01  = 0f,
-            extraText   = $"发电：+{powerGenerated}/每{productionInterval:F1}s；消耗：{resourceConsumed} x {(resourceType ? resourceType.itemId : "资源")}"
+            extraText   = $"Power generation: +{powerGenerated}/each{productionInterval:F1}s; Consumption: {resourceConsumed} x {(resourceType ? resourceType.itemId : "resource")}"
         };
         
         info.inputs.Add(new IOEntry {

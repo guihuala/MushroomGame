@@ -9,7 +9,6 @@ public class TechNode
     public List<ItemStack> unlockCost;
     public List<TechNode> prerequisites;
     public bool isUnlocked;
-    public bool isInitialUnlock;
 
     public TechNode(BuildingData building, List<ItemStack> cost, bool initialUnlock = false)
     {
@@ -17,7 +16,6 @@ public class TechNode
         unlockCost = cost ?? new List<ItemStack>();
         prerequisites = new List<TechNode>();
         isUnlocked = initialUnlock;
-        isInitialUnlock = initialUnlock;
     }
 
     public bool CanUnlock()
@@ -82,6 +80,10 @@ public class TechTreeManager : Singleton<TechTreeManager>, IManager
     
     private Dictionary<BuildingData, TechNode> techTree = new Dictionary<BuildingData, TechNode>();
     private HashSet<BuildingData> unlockedBuildings = new HashSet<BuildingData>();
+    
+    private Dictionary<BuildingData, int> _overrideLevels = new Dictionary<BuildingData, int>();
+    private Dictionary<BuildingData, int> _depthCache = new Dictionary<BuildingData, int>();
+
 
     public TechTreeConfig Config => techTreeConfig;
 
@@ -129,6 +131,19 @@ public class TechTreeManager : Singleton<TechTreeManager>, IManager
                 }
             }
         }
+    }
+    
+    public int GetNodeLevel(BuildingData building)
+    {
+        if (_overrideLevels.TryGetValue(building, out var ov) && ov >= 0)
+            return ov;
+        return GetNodeDepth(building);
+    }
+    
+    public int GetOrderInLevel(BuildingData building)
+    {
+        var cfg = techTreeConfig.nodes.FirstOrDefault(n => n.building == building);
+        return cfg != null ? cfg.orderInLevel : 0;
     }
 
     private void UnlockInitialBuildings()

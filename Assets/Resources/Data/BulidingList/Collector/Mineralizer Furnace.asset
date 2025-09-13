@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
+  m_Name: Mineralizer Furnace
+  m_EditorClassIdentifier: 
+  buildingName: Mineralizer Furnace
+  description: 
+  icon: {fileID: 2014472946, guid: 10223e4b298384d478a88692d0963313, type: 3}
+  prefab: {fileID: 5262894562915171561, guid: 56c57d6dd34b54cd3a022f26c8d151d1, type: 3}
+  category: 0
+  constructionCost: []

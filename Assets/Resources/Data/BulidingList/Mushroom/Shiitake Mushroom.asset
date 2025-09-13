@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
-  m_Name: PowerConveyer
+  m_Name: Shiitake Mushroom
   m_EditorClassIdentifier: 
-  buildingName: PowerConveyer
+  buildingName: Mushroom
   description: 
-  icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  prefab: {fileID: 1980940513668515614, guid: b01417ca57a084e46b371994ba08886c, type: 3}
-  category: 1
+  icon: {fileID: 1440057940, guid: 10223e4b298384d478a88692d0963313, type: 3}
+  prefab: {fileID: 0}
+  category: 0
+  constructionCost: []

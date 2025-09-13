@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e003bda3e62914f91b3068428068b917, type: 3}
-  m_Name: test
+  m_Name: TechTree
   m_EditorClassIdentifier: 
   nodes:
   - building: {fileID: 11400000, guid: 1769c3bdf986b4979a7699b4b8197795, type: 2}

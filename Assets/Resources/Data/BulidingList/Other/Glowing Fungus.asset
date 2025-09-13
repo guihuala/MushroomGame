@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
-  m_Name: Filter
+  m_Name: Glowing Fungus
   m_EditorClassIdentifier: 
-  buildingName: Filter
+  buildingName: Lantern mushroom
   description: 
-  icon: {fileID: -262195863, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 8859230656384483213, guid: 54d836db7f67a44a296320f247be7da8, type: 3}
-  category: 1
+  icon: {fileID: -1033529171, guid: 10223e4b298384d478a88692d0963313, type: 3}
+  prefab: {fileID: 3302959437552956217, guid: 61334cb3468564f11af2367782dce51b, type: 3}
+  category: 0
   constructionCost: []

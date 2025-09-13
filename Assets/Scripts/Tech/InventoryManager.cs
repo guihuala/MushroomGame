@@ -164,10 +164,4 @@ public class InventoryManager : Singleton<InventoryManager>,IManager
         
         return false;
     }
-
-    // 尝试取出 ItemStack
-    public bool TryTakeItemStack(ItemStack requiredStack, out ItemStack takenStack)
-    {
-        return TryTakeItems(requiredStack.item, requiredStack.amount, out takenStack);
-    }
 }

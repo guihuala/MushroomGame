@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
+  m_Name: Mycelium Node
+  m_EditorClassIdentifier: 
+  buildingName: Mycelium Node
+  description: 
+  icon: {fileID: 997775275, guid: 10223e4b298384d478a88692d0963313, type: 3}
+  prefab: {fileID: 554979471478016057, guid: 4d435a456844345b4864a48ee2a408d2, type: 3}
+  category: 1
+  constructionCost: []

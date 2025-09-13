@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
-  m_Name: Crosser
+  m_Name: Mycelium
   m_EditorClassIdentifier: 
-  buildingName: Crosser
+  buildingName: conveyer
   description: 
-  icon: {fileID: 997775275, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 554979471478016057, guid: 4d435a456844345b4864a48ee2a408d2, type: 3}
+  icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  prefab: {fileID: 8460108924053623367, guid: 9e3e5ed9d50084e2ea1691531522d3ca, type: 3}
   category: 1
-  constructionCost: []

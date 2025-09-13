@@ -13,7 +13,13 @@ MonoBehaviour:
   m_Name: AudioDataListSO
   m_EditorClassIdentifier: 
   audioDataList:
-  - audioName: scroll
-    audioPath: Audio/Sfx/scroll
+  - audioName: LightClick
+    audioPath: Audio/Sfx/LightClick
+  - audioName: Place
+    audioPath: Audio/Sfx/Place
+  - audioName: Remove
+    audioPath: Audio/Sfx/Remove
+  - audioName: Unlock
+    audioPath: Audio/Sfx/Unlock
   - audioName: select
     audioPath: Audio/Sfx/select

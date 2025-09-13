@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
-  m_Name: Processor
+  m_Name: Worldshroom
   m_EditorClassIdentifier: 
-  buildingName: processor
+  buildingName: 
   description: 
-  icon: {fileID: 2014472946, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 5262894562915171561, guid: 56c57d6dd34b54cd3a022f26c8d151d1, type: 3}
+  icon: {fileID: 0}
+  prefab: {fileID: 0}
   category: 0
   constructionCost: []

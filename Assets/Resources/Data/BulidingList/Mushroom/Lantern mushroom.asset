@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
-  m_Name: Mushroom
+  m_Name: Lantern mushroom
   m_EditorClassIdentifier: 
-  buildingName: Mushroom
-  description: Im mushroom babe
-  icon: {fileID: -609106249, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
-  prefab: {fileID: 3351338112139567625, guid: de0bf82b4d4564086abd58c9a5ad0d5f, type: 3}
-  category: 2
+  buildingName: 
+  description: 
+  icon: {fileID: 0}
+  prefab: {fileID: 0}
+  category: 0
+  constructionCost: []

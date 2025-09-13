@@ -71,6 +71,7 @@ public partial class PlacementSystem
             if (building != null)
             {
                 building.OnRemoved();
+                AudioManager.Instance.PlaySfx("Remove");
             }
         }
         

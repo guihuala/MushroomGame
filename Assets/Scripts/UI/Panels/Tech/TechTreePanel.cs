@@ -44,8 +44,8 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
         zoomOutButton.onClick.AddListener(ZoomOut);
         resetZoomButton.onClick.AddListener(ResetZoom);
     }
-    
-    
+
+
     void OnDestroy()
     {
         closeButton.onClick.RemoveAllListeners();
@@ -66,41 +66,55 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
     private void InitializeTechTree()
     {
         ClearTechTree();
-        
+
         var techTree = TechTreeManager.Instance.GetTechTreeStructure();
         var unlockedBuildings = TechTreeManager.Instance.GetUnlockedBuildings();
 
-        // 按层级组织节点
+        // 1) 分层：优先使用 overrideLevel
         Dictionary<int, List<BuildingData>> levels = new Dictionary<int, List<BuildingData>>();
         foreach (var kvp in techTree)
         {
-            int level = CalculateNodeLevel(kvp.Value, techTree);
-            if (!levels.ContainsKey(level))
-                levels[level] = new List<BuildingData>();
-            levels[level].Add(kvp.Key);
+            var building = kvp.Key;
+            int level = TechTreeManager.Instance.GetNodeLevel(building); // <-- 新方法
+            if (!levels.ContainsKey(level)) levels[level] = new List<BuildingData>();
+            levels[level].Add(building);
         }
 
-        // 创建节点UI
+        // 2) 同层稳定排序：orderInLevel -> buildingName
+        foreach (var kv in levels)
+        {
+            kv.Value.Sort((a, b) =>
+            {
+                int oa = TechTreeManager.Instance.GetOrderInLevel(a);
+                int ob = TechTreeManager.Instance.GetOrderInLevel(b);
+                int cmp = oa.CompareTo(ob);
+                if (cmp != 0) return cmp;
+                // 兜底：按名字
+                string na = techTree[a].building.buildingName;
+                string nb = techTree[b].building.buildingName;
+                return string.Compare(na, nb, System.StringComparison.Ordinal);
+            });
+        }
+
+        // 3) 逐层摆放
         foreach (var level in levels)
         {
             int nodeCount = level.Value.Count;
             float totalWidth = (nodeCount - 1) * nodeSpacing;
-            float startX = -totalWidth / 2;
+            float startX = -totalWidth / 2f;
 
             for (int i = 0; i < nodeCount; i++)
             {
-                BuildingData building = level.Value[i];
-                TechNode node = techTree[building];
+                var building = level.Value[i];
+                var node = techTree[building];
 
-                // 创建节点
-                GameObject nodeObj = Instantiate(techNodePrefab, techTreeContainer);
-                TechNodeUI nodeUI = nodeObj.GetComponent<TechNodeUI>();
-                
+                var nodeObj = Instantiate(techNodePrefab, techTreeContainer);
+                var nodeUI = nodeObj.GetComponent<TechNodeUI>();
+
                 float xPos = startX + i * nodeSpacing;
                 float yPos = -level.Key * levelSpacing;
                 nodeObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(xPos, yPos);
 
-                // 初始化节点UI
                 bool isUnlocked = unlockedBuildings.Contains(building);
                 bool canUnlock = node.CanUnlock();
                 nodeUI.Initialize(node, isUnlocked, canUnlock);
@@ -110,10 +124,8 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
             }
         }
 
-        // 创建连接线
+        // 4) 连线 & 视图复位
         CreateConnectionLines(techTree);
-
-        // 重置视图
         ResetView();
     }
 
@@ -204,6 +216,7 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
                 // 更新UI
                 if (nodeUIs.ContainsKey(node.building))
                 {
+                    AudioManager.Instance.PlaySfx("Unlock");
                     nodeUIs[node.building].SetUnlocked(true);
                 }
             }

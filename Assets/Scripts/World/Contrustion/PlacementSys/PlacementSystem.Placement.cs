@@ -48,6 +48,8 @@ public partial class PlacementSystem
             var delta = NormalizeToCardinal(cell - _dragLastCell);
             if (delta != Vector2Int.zero) prevOrient.SetDirection(delta);
         }
+        
+        AudioManager.Instance.PlaySfx("Place");
 
         _dragLastCell = cell;
         _dragLastBuilding = building;

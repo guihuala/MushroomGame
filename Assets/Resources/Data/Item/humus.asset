@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId: humus
   displayName: humus
-  icon: {fileID: 21300000, guid: 990336bccb7ed4f52b9aa97bc9a26af7, type: 3}
+  icon: {fileID: -442067958, guid: 54beee953cbaa49448b8792eb4d73b0e, type: 3}
   stackLimit: 100

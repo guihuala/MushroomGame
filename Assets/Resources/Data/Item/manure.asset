@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId: manure
   displayName: It doesn't smell good, but it is indeed a favorite of mushrooms.
-  icon: {fileID: 21300000, guid: 239883dd88c7e410eb283babf62f8aab, type: 3}
+  icon: {fileID: 2031853930, guid: 54beee953cbaa49448b8792eb4d73b0e, type: 3}
   stackLimit: 100

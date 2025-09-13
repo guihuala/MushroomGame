@@ -359,10 +359,10 @@ RectTransform:
   - {fileID: 5267681964964216770}
   m_Father: {fileID: 7232990976757837626}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -1000, y: -400}
+  m_SizeDelta: {x: 920, y: 680}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &687863659424204440
 CanvasRenderer:
@@ -641,6 +641,8 @@ GameObject:
   - component: {fileID: 7433390656916628404}
   - component: {fileID: 5751043904297468233}
   - component: {fileID: 5328588100391226540}
+  - component: {fileID: 5289695279007391932}
+  - component: {fileID: 2911683980878838197}
   m_Layer: 5
   m_Name: PausePanel
   m_TagString: Untagged
@@ -666,7 +668,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 1000, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7433390656916628404
 CanvasRenderer:
@@ -711,6 +713,52 @@ MonoBehaviour:
   sfxVolumeSlider: {fileID: 4039562779955259894}
   resumeButton: {fileID: 2747631534496218495}
   mainmenuButton: {fileID: 7766011560581475682}
+--- !u!114 &5289695279007391932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5161442730790814456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 123407ce53d924300804ae8298651cd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dragFromAnywhere: 1
+  dragHandle: {fileID: 3938325179974271926}
+  clampToScreen: 1
+  dragSensitivity: 1
+--- !u!114 &2911683980878838197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5161442730790814456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.34509805}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5208088081852086161
 GameObject:
   m_ObjectHideFlags: 0

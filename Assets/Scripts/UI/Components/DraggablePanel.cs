@@ -20,12 +20,10 @@ public class DraggablePanel : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private void Awake()
     {
         _panelRect = GetComponent<RectTransform>();
-        _canvas = GetComponentInParent<Canvas>();
-        
-        // 如果没有指定拖拽手柄，并且允许任意位置拖拽，则整个面板可拖拽
+        _canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+
         if (dragHandle == null && dragFromAnywhere)
         {
-            // 确保面板有Image或Graphic组件才能接收事件
             var graphic = GetComponent<Graphic>();
             if (graphic == null)
             {
@@ -76,7 +74,6 @@ public class DraggablePanel : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         _dragStartPosition = eventData.position;
         _panelStartPosition = _panelRect.anchoredPosition;
         
-        // 提升面板层级（可选）
         _panelRect.SetAsLastSibling();
     }
 
@@ -104,7 +101,6 @@ public class DraggablePanel : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private bool IsValidDrag(PointerEventData eventData)
     {
-        // 只响应左键点击（或触摸）
         return eventData.button == PointerEventData.InputButton.Left;
     }
 
@@ -116,26 +112,23 @@ public class DraggablePanel : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         _panelRect.GetWorldCorners(panelCorners);
 
         Rect canvasRect = _canvas.pixelRect;
-        Vector2 minPanelCorner = _canvas.worldCamera.WorldToScreenPoint(panelCorners[0]);
-        Vector2 maxPanelCorner = _canvas.worldCamera.WorldToScreenPoint(panelCorners[2]);
+        
+        Vector2 minPanelCorner = panelCorners[0];
+        Vector2 maxPanelCorner = panelCorners[2];
 
         Vector2 panelSize = maxPanelCorner - minPanelCorner;
-        Vector2 currentPosition = _panelRect.anchoredPosition;
-
-        // 计算边界限制
+        
         float minX = 0;
         float maxX = canvasRect.width - panelSize.x;
         float minY = 0;
         float maxY = canvasRect.height - panelSize.y;
-
-        // 转换为Canvas空间的位置
-        Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(_canvas.worldCamera, _panelRect.position);
+        
+        Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(null, _panelRect.position); 
         screenPosition.x = Mathf.Clamp(screenPosition.x, minX, maxX);
         screenPosition.y = Mathf.Clamp(screenPosition.y, minY, maxY);
-
-        // 转换回anchoredPosition
+        
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _panelRect.parent as RectTransform, screenPosition, _canvas.worldCamera, out Vector2 localPoint))
+                _panelRect.parent as RectTransform, screenPosition, null, out Vector2 localPoint))
         {
             _panelRect.anchoredPosition = localPoint;
         }

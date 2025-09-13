@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
+public class InputManager : Singleton<InputManager>
 {
-    public static InputManager Instance { get; private set; }
-    
     [Header("建造操作输入")]
     public KeyCode rotateKey = KeyCode.R;
     public KeyCode cancelEraseKey = KeyCode.X;
@@ -23,19 +21,7 @@ public class InputManager : MonoBehaviour
     private Dictionary<KeyCode, bool> _keyDownCache = new Dictionary<KeyCode, bool>();
     private Dictionary<KeyCode, bool> _keyUpCache = new Dictionary<KeyCode, bool>();
     private Dictionary<KeyCode, bool> _keyHeldCache = new Dictionary<KeyCode, bool>();
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
-
+    
     private void Update()
     {
         // 清空缓存

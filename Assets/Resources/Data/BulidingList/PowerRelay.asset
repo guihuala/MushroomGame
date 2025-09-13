@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingName: PowerRelay
   description: 
-  icon: {fileID: -809657034, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  icon: {fileID: -1293167690, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 5599806444419695884, guid: 3605cd789acc245149c254332e491e89, type: 3}
   category: 0
+  constructionCost: []

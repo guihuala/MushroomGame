@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: 21300000, guid: 25460fb93056d485bb4db30e25bffcd4, type: 3}
+  m_Sprite: {fileID: 2014472946, guid: 10223e4b298384d478a88692d0963313, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -103,8 +103,8 @@ MonoBehaviour:
   cell: {x: 0, y: 0}
   size: {x: 1, y: 1}
   recipe: {fileID: 11400000, guid: 71f9e342d59d94010b807f556c244095, type: 2}
-  inDir: {x: -1, y: 0}
-  outDir: {x: 1, y: 0}
+  inDir: {x: 0, y: -1}
+  outDir: {x: 0, y: 1}
   productionProgress: 0
   isProducing: 0
   inputBufferSize: 10
@@ -121,7 +121,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c574fa11a8a1d4a7089ec8687ba9963c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panel: {fileID: 0}
-  panelPrefab: {fileID: 435346386346568698, guid: c5c519068240d42c9be5d8fb5ece1dab, type: 3}
-  panelCanvasOverride: {fileID: 0}
-  hoverDelay: 0.15

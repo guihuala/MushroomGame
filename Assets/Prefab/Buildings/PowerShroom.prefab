@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 12
-  m_Sprite: {fileID: -224304618, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  m_Sprite: {fileID: 2000793908, guid: 10223e4b298384d478a88692d0963313, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -105,6 +105,10 @@ MonoBehaviour:
   powerGenerated: 10
   resourceConsumed: 5
   resourceType: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+  coverageRange: 5
+  showRingOnHover: 1
+  ringColor: {r: 1, g: 0.85, b: 0.2, a: 0.5}
+  ringSegments: 64
 --- !u!114 &4321983722051725106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,7 +121,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c574fa11a8a1d4a7089ec8687ba9963c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panel: {fileID: 0}
-  panelPrefab: {fileID: 435346386346568698, guid: c5c519068240d42c9be5d8fb5ece1dab, type: 3}
-  panelCanvasOverride: {fileID: 0}
-  hoverDelay: 0.15

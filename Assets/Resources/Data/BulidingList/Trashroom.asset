@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingName: Trashroom
   description: 
-  icon: {fileID: -1962746484, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  icon: {fileID: 1726949328, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 7477967300382333871, guid: 4315fc7608b8640a59732e001f6c7507, type: 3}
   category: 2
+  constructionCost: []

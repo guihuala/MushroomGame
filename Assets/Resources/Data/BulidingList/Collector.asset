@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Collector
   description: The Collector allows you to collect manure and wood shavings from
     the soil.
-  icon: {fileID: 21300000, guid: ae5143af020f548a7b516f50dd7937cd, type: 3}
+  icon: {fileID: -1738815070, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 4677449544429423496, guid: 6008c1be3b662426f829a1056c283fd1, type: 3}
   category: 0
   constructionCost:

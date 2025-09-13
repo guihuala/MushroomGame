@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingName: Crosser
   description: 
-  icon: {fileID: 21300000, guid: 4462fb6c9afb64216b81775cef60863e, type: 3}
+  icon: {fileID: 997775275, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 554979471478016057, guid: 4d435a456844345b4864a48ee2a408d2, type: 3}
   category: 1
+  constructionCost: []

@@ -336,6 +336,7 @@ GameObject:
   - component: {fileID: 687863659424204440}
   - component: {fileID: 1919292017155021690}
   - component: {fileID: 7015021488773534677}
+  - component: {fileID: 932857124026559351}
   m_Layer: 5
   m_Name: BG
   m_TagString: Untagged
@@ -428,6 +429,22 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &932857124026559351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2283499800821108110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 123407ce53d924300804ae8298651cd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dragFromAnywhere: 1
+  dragHandle: {fileID: 0}
+  clampToScreen: 1
+  dragSensitivity: 1
 --- !u!1 &2843239397182476099
 GameObject:
   m_ObjectHideFlags: 0
@@ -641,7 +658,6 @@ GameObject:
   - component: {fileID: 7433390656916628404}
   - component: {fileID: 5751043904297468233}
   - component: {fileID: 5328588100391226540}
-  - component: {fileID: 5289695279007391932}
   - component: {fileID: 2911683980878838197}
   m_Layer: 5
   m_Name: PausePanel
@@ -713,22 +729,6 @@ MonoBehaviour:
   sfxVolumeSlider: {fileID: 4039562779955259894}
   resumeButton: {fileID: 2747631534496218495}
   mainmenuButton: {fileID: 7766011560581475682}
---- !u!114 &5289695279007391932
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5161442730790814456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 123407ce53d924300804ae8298651cd6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dragFromAnywhere: 1
-  dragHandle: {fileID: 3938325179974271926}
-  clampToScreen: 1
-  dragSensitivity: 1
 --- !u!114 &2911683980878838197
 MonoBehaviour:
   m_ObjectHideFlags: 0

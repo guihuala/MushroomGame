@@ -698,24 +698,24 @@ MonoBehaviour:
   techTreeContainer: {fileID: 8777716856992001815}
   techNodePrefab: {fileID: 3911683583327173519, guid: 78af6991a28d84a96909ae64ff2e7b77, type: 3}
   connectionLinePrefab: {fileID: 1540626117995983694, guid: bee3e589197214b079a5d0bd0f25d339, type: 3}
-  nodeSpacing: 300
-  levelSpacing: 300
+  nodeSpacing: 200
+  levelSpacing: 150
   minZoom: 0.5
   maxZoom: 2
-  zoomSpeed: 0.2
-  wheelZoomSpeed: 0.12
+  zoomSpeed: 0.3
+  wheelZoomSpeed: 0.3
   zoomTweenTime: 0.12
   enableInertia: 1
   inertiaDamping: 10
   enableRubberBand: 1
   rubberStrength: 0.15
-  boundsPadding: 1000
+  boundsPadding: 500
   closeButton: {fileID: 5170840983670113584}
-  scrollRect: {fileID: 0}
   zoomControls: {fileID: 7151823618088620350}
   zoomInButton: {fileID: 4282713482266537846}
   zoomOutButton: {fileID: 2929916696869640355}
   resetZoomButton: {fileID: 8983250276173462312}
+  connectionLineRoot: {fileID: 0}
 --- !u!1 &4486938970040220566
 GameObject:
   m_ObjectHideFlags: 0
@@ -1281,10 +1281,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 5955526576819837665}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00005758833}
-  m_SizeDelta: {x: 0, y: 300}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &7028679072264372409
 GameObject:
@@ -1323,8 +1323,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -200}
-  m_SizeDelta: {x: 200, y: 600}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5294818927670061020
 CanvasRenderer:
@@ -1347,7 +1347,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8396226, g: 0.8396226, b: 0.8396226, a: 1}
+  m_Color: {r: 0.5754717, g: 0.5754717, b: 0.5754717, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

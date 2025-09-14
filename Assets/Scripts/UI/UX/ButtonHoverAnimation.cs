@@ -119,7 +119,7 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         if (enableShake)
         {
             transform.DOShakePosition(shakeDuration, shakeStrength, shakeVibrato, 90, false, true)
-                     .SetEase(Ease.OutQuad);
+                     .SetEase(Ease.OutQuad).SetUpdate(true);
         }
     }
 
@@ -171,20 +171,20 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     private void PlayScaleAnimation(float targetScale)
     {
         transform.DOScale(originalScale * targetScale, animationDuration)
-                 .SetEase(easeType);
+                 .SetEase(easeType).SetUpdate(true);
     }
 
     private void PlayMoveAnimation(Vector2 offset)
     {
         Vector3 targetPosition = originalPosition + (Vector3)offset;
         transform.DOLocalMove(targetPosition, animationDuration)
-                 .SetEase(easeType);
+                 .SetEase(easeType).SetUpdate(true);
     }
 
     private void PlayRotationAnimation(float angle)
     {
         transform.DORotate(new Vector3(0, 0, angle), animationDuration)
-                 .SetEase(easeType);
+                 .SetEase(easeType).SetUpdate(true);
     }
 
     private void PlayColorAnimation(Color targetColor)
@@ -192,7 +192,7 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         if (buttonImage != null)
         {
             buttonImage.DOColor(targetColor, animationDuration)
-                       .SetEase(easeType);
+                       .SetEase(easeType).SetUpdate(true);
         }
     }
 
@@ -200,16 +200,16 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         hoverSequence = DOTween.Sequence();
         
-        hoverSequence.Join(transform.DOScale(originalScale * hoverScale, animationDuration));
-        hoverSequence.Join(transform.DOLocalMove(originalPosition + (Vector3)hoverMoveOffset, animationDuration));
-        hoverSequence.Join(transform.DORotate(new Vector3(0, 0, hoverRotation), animationDuration));
+        hoverSequence.Join(transform.DOScale(originalScale * hoverScale, animationDuration).SetUpdate(true));
+        hoverSequence.Join(transform.DOLocalMove(originalPosition + (Vector3)hoverMoveOffset, animationDuration).SetUpdate(true));
+        hoverSequence.Join(transform.DORotate(new Vector3(0, 0, hoverRotation), animationDuration).SetUpdate(true));
         
         if (buttonImage != null)
         {
-            hoverSequence.Join(buttonImage.DOColor(hoverColor, animationDuration));
+            hoverSequence.Join(buttonImage.DOColor(hoverColor, animationDuration).SetUpdate(true));
         }
         
-        hoverSequence.SetEase(easeType);
+        hoverSequence.SetEase(easeType).SetUpdate(true);
     }
 
     private void PlayCombinedClickAnimation()
@@ -225,24 +225,24 @@ public class ButtonHoverAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
             clickSequence.Join(buttonImage.DOColor(clickColor, animationDuration));
         }
         
-        clickSequence.SetEase(easeType);
+        clickSequence.SetEase(easeType).SetUpdate(true);
     }
 
     private void PlayResetAnimation()
     {
         transform.DOScale(originalScale, animationDuration)
-                 .SetEase(easeType);
+                 .SetEase(easeType).SetUpdate(true);
         
         transform.DOLocalMove(originalPosition, animationDuration)
-                 .SetEase(easeType);
+                 .SetEase(easeType).SetUpdate(true);
         
         transform.DORotate(originalRotation.eulerAngles, animationDuration)
-                 .SetEase(easeType);
+                 .SetEase(easeType).SetUpdate(true);
         
         if (buttonImage != null)
         {
             buttonImage.DOColor(originalColor, animationDuration)
-                       .SetEase(easeType);
+                       .SetEase(easeType).SetUpdate(true);
         }
     }
     #endregion

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// 科技树面板（增强版交互：惯性拖拽、软边界、围绕鼠标缩放）
+/// 科技树面板
 /// </summary>
 public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler
 {
@@ -33,7 +33,6 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
 
     [Header("UI组件")]
     [SerializeField] private Button closeButton;
-    [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private CanvasGroup zoomControls;
     [SerializeField] private Button zoomInButton;
     [SerializeField] private Button zoomOutButton;
@@ -81,8 +80,7 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
         }
         (connectionLineRoot as RectTransform)?.SetSiblingIndex(0);
     }
-
-
+    
     void OnDestroy()
     {
         closeButton.onClick.RemoveAllListeners();
@@ -95,6 +93,8 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
     {
         base.OpenPanel(name);
         InitializeTechTree();
+        
+        GameManager.Instance.PauseGame();
     }
 
     /// <summary>初始化科技树</summary>
@@ -130,12 +130,15 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
             });
         }
 
+        float totalWidth = 0f;
+        float totalHeight = 0f;
+
         // 3) 逐层摆放
         foreach (var level in levels.OrderBy(kv => kv.Key))
         {
             int nodeCount = level.Value.Count;
-            float totalWidth = (nodeCount - 1) * nodeSpacing;
-            float startX = -totalWidth / 2f;
+            float startX = -((nodeCount - 1) * nodeSpacing) / 2f;
+            float levelHeight = level.Key * levelSpacing;
 
             for (int i = 0; i < nodeCount; i++)
             {
@@ -145,8 +148,21 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
                 var nodeObj = Object.Instantiate(techNodePrefab, techTreeContainer);
                 var nodeUI = nodeObj.GetComponent<TechNodeUI>();
 
-                float xPos = startX + i * nodeSpacing;
-                float yPos = level.Key * levelSpacing; // <- 原来是 -level.Key，改成正向向上
+                float parentXPos = 0f;
+                float parentYPos = 0f;
+
+                if (node.HasParent())
+                {
+                    var parentNode = node.Parent();
+                    var parentNodeUI = nodeUIs[parentNode.building];
+                    var parentRect = parentNodeUI.GetComponent<RectTransform>();
+                    parentXPos = parentRect.anchoredPosition.x;
+                    parentYPos = parentRect.anchoredPosition.y;
+                }
+
+                float xPos = parentXPos + startX + i * nodeSpacing;
+                float yPos = parentYPos + levelHeight;
+
                 nodeObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(xPos, yPos);
 
                 bool isUnlocked = unlockedBuildings.Contains(building);
@@ -155,6 +171,9 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
                 nodeUI.OnNodeClick += OnNodeClick;
 
                 nodeUIs[building] = nodeUI;
+                
+                totalWidth = Mathf.Max(totalWidth, Mathf.Abs(xPos) + nodeSpacing);
+                totalHeight = Mathf.Max(totalHeight, Mathf.Abs(yPos) + levelSpacing);
             }
         }
 
@@ -182,7 +201,7 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
     private void CreateConnectionLine(TechNodeUI fromNode, TechNodeUI toNode)
     {
         Transform parent = connectionLineRoot != null ? connectionLineRoot : techTreeContainer;
-        GameObject lineObj = Object.Instantiate(connectionLinePrefab, parent);
+        GameObject lineObj = Instantiate(connectionLinePrefab, parent);
         ConnectionLine line = lineObj.GetComponent<ConnectionLine>();
         line.Initialize(fromNode.GetComponent<RectTransform>(), toNode.GetComponent<RectTransform>());
         connectionLines.Add(lineObj);
@@ -225,8 +244,6 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
         }
     }
 
-    // ========= 视图控制 =========
-
     /// <summary>立即复位</summary>
     private void ResetViewImmediate()
     {
@@ -237,8 +254,6 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
         (connectionLineRoot as RectTransform)?.SetSiblingIndex(0);
     }
 
-
-    /// <summary>动画复位</summary>
     private void ResetZoomAnimated()
     {
         KillTweens();
@@ -253,7 +268,7 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
     private void ZoomButtonStep(float step)
     {
         // 按钮缩放以视口中心为基准
-        var centerScreen = (Vector2)RectTransformUtility.WorldToScreenPoint(null, _viewport.position);
+        var centerScreen = RectTransformUtility.WorldToScreenPoint(null, _viewport.position);
         ZoomAroundScreenPoint(centerScreen, step, zoomTweenTime);
     }
 
@@ -264,10 +279,10 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
 
         Vector2 mouseScreen = eventData.position;
         float delta = eventData.scrollDelta.y * wheelZoomSpeed;
+        
         ZoomAroundScreenPoint(mouseScreen, delta, zoomTweenTime);
     }
 
-    /// <summary>围绕屏幕坐标点缩放（保持该点下内容不飘）</summary>
     private void ZoomAroundScreenPoint(Vector2 screenPoint, float delta, float tweenTime)
     {
         KillTweens();
@@ -276,22 +291,19 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
         float newScale = Mathf.Clamp(oldScale + delta, minZoom, maxZoom);
         if (Mathf.Approximately(oldScale, newScale)) return;
 
-        // 转换鼠标到“视口局部坐标”
+        // 转换鼠标到视口的局部坐标
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(_viewport, screenPoint, null, out var viewPt))
             viewPt = Vector2.zero;
 
-        // 鼠标所指“内容局部点” c = (viewPt - pos) / s
+        // 计算目标位置
         Vector2 contentPos = techTreeContainer.anchoredPosition;
         Vector2 contentLocalPoint = (viewPt - contentPos) / oldScale;
-
-        // 目标位置 p' = viewPt - c * s'
         Vector2 targetPos = viewPt - contentLocalPoint * newScale;
+        
+        _zoomTween = techTreeContainer.DOScale(newScale, tweenTime).SetEase(Ease.OutQuad).SetUpdate(true);
+        _panTween  = techTreeContainer.DOAnchorPos(targetPos, tweenTime).SetEase(Ease.OutQuad).SetUpdate(true);
 
-        // DOTween 平滑缩放 + 平移
-        _zoomTween = techTreeContainer.DOScale(newScale, tweenTime).SetEase(Ease.OutQuad);
-        _panTween  = techTreeContainer.DOAnchorPos(targetPos, tweenTime).SetEase(Ease.OutQuad);
-
-        // 缩放时清空惯性
+        // 重置速度
         _velocity = Vector2.zero;
     }
 
@@ -352,24 +364,22 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
             _velocity = Vector2.Lerp(_velocity, Vector2.zero, damp);
         }
     }
-
-    /// <summary>对内容坐标应用“软边界”限制（超出时按比例收紧）</summary>
+    
     private Vector2 ApplyRubberBand(Vector2 targetPos)
     {
         if (!enableRubberBand || _viewport == null) return targetPos;
 
-        // 估算内容边界（以视口中心为参考，pivot=0.5,0.5 时适用）
+        // 估算内容边界
         float scale = techTreeContainer.localScale.x;
         Vector2 contentSize = techTreeContainer.rect.size * scale;
         Vector2 viewSize = _viewport.rect.size;
 
-        // 允许的移动范围（让内容中心在[-halfDiff, +halfDiff]附近游走）
+        // 允许的移动范围
         Vector2 halfDiff = new Vector2(
             Mathf.Max(0f, (contentSize.x - viewSize.x) * 0.5f),
             Mathf.Max(0f, (contentSize.y - viewSize.y) * 0.5f)
         );
-
-        // 实际我们允许再多出一点“橡皮筋”范围
+        
         Vector2 min = -halfDiff - Vector2.one * boundsPadding;
         Vector2 max = halfDiff + Vector2.one * boundsPadding;
 
@@ -387,7 +397,7 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
         if (v < min)
         {
             float d = min - v;
-            return min - d * (1f - rubberStrength); // 越界越多，拉回越多
+            return min - d * (1f - rubberStrength);
         }
         if (v > max)
         {
@@ -406,6 +416,7 @@ public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDra
 
     private void OnCloseClick()
     {
+        GameManager.Instance.ResumeGame();
         UIManager.Instance.ClosePanel(panelName);
     }
 }

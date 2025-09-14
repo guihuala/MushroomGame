@@ -27,11 +27,6 @@ public class PausePanel : BasePanel
     }
 
     #region 音量设置
-
-    private void ChangeMainVolume(float value)
-    {
-        AudioManager.Instance.ChangeMainVolume(value);
-    }
     
     private void ChangeBgmVolume(float value)
     {

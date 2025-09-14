@@ -22,13 +22,13 @@ public class TechNode
     {
         if (isUnlocked) return false;
         
-        // 检查前置条件
+        // Check prerequisites
         foreach (var prereq in prerequisites)
         {
             if (!prereq.isUnlocked) return false;
         }
         
-        // 检查资源
+        // Check resources
         foreach (var cost in unlockCost)
         {
             if (cost.item == null || !InventoryManager.Instance.HasEnoughItemStack(cost))
@@ -56,14 +56,14 @@ public class TechNode
         if (isUnlocked) return "已解锁";
         if (CanUnlock()) return "可解锁";
         
-        // 检查缺少的前置
+        // Check missing prerequisites
         foreach (var prereq in prerequisites)
         {
             if (!prereq.isUnlocked)
                 return $"需要 {prereq.building.buildingName}";
         }
         
-        // 检查缺少的资源
+        // Check missing resources
         foreach (var cost in unlockCost)
         {
             if (!InventoryManager.Instance.HasEnoughItemStack(cost))
@@ -72,7 +72,18 @@ public class TechNode
         
         return "未知状态";
     }
+    
+    public bool HasParent()
+    {
+        return prerequisites.Count > 0;
+    }
+    
+    public TechNode Parent()
+    {
+        return prerequisites.FirstOrDefault();
+    }
 }
+
 
 public class TechTreeManager : Singleton<TechTreeManager>, IManager
 {

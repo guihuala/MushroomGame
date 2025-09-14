@@ -18,7 +18,22 @@ public class GameManager : Singleton<GameManager>
     // 游戏开始时初始化状态
     void Start()
     {
+        CheckFirstTimePlay(); // 检查是否第一次游玩
         StartGame();
+    }
+
+    private void CheckFirstTimePlay()
+    {
+        // 检查是否是第一次游玩
+        if (PlayerPrefs.GetInt("FirstTimePlay", 0) == 0) // 0表示第一次游玩
+        {
+            // 显示新手指引面板
+            UIManager.Instance.OpenPanel("GuidePanel");
+
+            // 设置已游玩标记，避免下次显示
+            PlayerPrefs.SetInt("FirstTimePlay", 1);
+            PlayerPrefs.Save(); // 保存更改
+        }
     }
 
     private void InstantiateAndInitializeManagers()
@@ -70,7 +85,6 @@ public class GameManager : Singleton<GameManager>
 
             case GameState.Paused:
                 Time.timeScale = 0;
-                UIManager.Instance.OpenPanel("PausePanel");
                 break;
             
             case GameState.GameCleared:
@@ -125,7 +139,7 @@ public class GameManager : Singleton<GameManager>
     public void ReturnToMainMenu()
     {
         SetGameState(GameState.Playing);
-        // 销毁管理器，因为主菜单可能不需要它们
+        // 销毁管理器
         DestroyManagers();
         SceneLoader.Instance.LoadScene(GameScene.MainMenu);
     }
@@ -135,7 +149,7 @@ public class GameManager : Singleton<GameManager>
     {
         DestroyManagers();
         SetGameState(GameState.Playing);
-        // 这里可以添加其他重置逻辑
+        
     }
 
     #endregion

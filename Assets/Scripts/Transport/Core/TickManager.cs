@@ -12,8 +12,6 @@ public class TickManager : Singleton<TickManager>,IManager
     // 初始化方法
     public void Initialize()
     {
-        DebugManager.Log("TickManager initialized");
-        
         _accumulatedTime = 0f;
         _tickables.Clear();
     }

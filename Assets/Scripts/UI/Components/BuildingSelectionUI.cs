@@ -1,7 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.EventSystems;
 
 public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
 {
@@ -23,12 +25,19 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     public Color normalButtonColor = new Color(1, 1, 1, 0.35f);
     public Color selectedButtonColor = Color.white;
     
+    [Header("动效设置")]
+    public float tabTransitionDuration = 0.3f;
+    public float buttonScaleDuration = 0.2f;
+    public float detailsFadeDuration = 0.3f;
+    public float buttonHoverScale = 1.1f;
+    public float buttonSelectScale = 1.15f;
+    
     [Header("建筑详情栏")]
-    public GameObject buildingDetailsPanel;    // 建筑详情面板
-    public Text buildingNameText;              // 建筑名称文本
-    public Text buildingDescriptionText;       // 建筑描述文本
-    public Image buildingIconImage;            // 建筑图标图片
-    public ConstructionCostPanel costPanel;  // 拖入材料信息面板
+    public GameObject buildingDetailsPanel;
+    public Text buildingNameText;
+    public Text buildingDescriptionText;
+    public Image buildingIconImage;
+    public ConstructionCostPanel costPanel;
     
     [Header("工具栏")]
     public ProductionTooltipPanel productionTooltipPanel; 
@@ -40,6 +49,7 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     
     private List<Button> categoryTabButtons = new List<Button>();
     private List<Button> buildingButtons = new List<Button>();
+    private Dictionary<Button, Vector3> originalButtonScales = new Dictionary<Button, Vector3>();
     
     void Start()
     {
@@ -96,10 +106,11 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             {
                 tabImage.sprite = tabIcon;
             }
-
+            
             BuildingCategory cat = category;
             tabButton.onClick.AddListener(() => SelectCategory(cat));
-
+            
+            tabButton.GetComponent<Image>().DOColor(normalTabColor, 0.5f).SetUpdate(true);
             categoryTabButtons.Add(tabButton);
         }
     }
@@ -116,6 +127,7 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             Destroy(child.gameObject);
         }
         buildingButtons.Clear();
+        originalButtonScales.Clear();
         
         foreach (var buildingData in buildingsByCategory.Values.SelectMany(x => x))
         {
@@ -128,13 +140,34 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
                 iconImage.sprite = buildingData.icon;
             }
             
+            // 保存原始尺寸
+            originalButtonScales[button] = button.transform.localScale;
+            
+            AddClickEffect(button, buttonScaleDuration);
+            
             BuildingData data = buildingData;
             button.onClick.AddListener(() => OnBuildingSelected(data));
             
             buildingButtons.Add(button);
-
-            buttonGO.SetActive(false);
+            
+            // 初始隐藏并添加渐显效果
+            buttonGO.GetComponent<CanvasGroup>().alpha = 0;
+            buttonGO.GetComponent<CanvasGroup>().DOFade(1f, 0.3f).SetUpdate(true);
         }
+    }
+    
+    /// <summary>
+    /// 为按钮添加点击效果
+    /// </summary>
+    private void AddClickEffect(Button button, float duration)
+    {
+        button.onClick.AddListener(() => {
+            // 点击时放大效果
+            button.transform.DOScale(originalButtonScales[button] * buttonSelectScale, duration / 2)
+                .OnComplete(() => {
+                    button.transform.DOScale(originalButtonScales[button], duration / 2);
+                });
+        });
     }
     
     /// <summary>
@@ -144,20 +177,39 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     {
         currentCategory = category;
         
-        UpdateCategoryTabsVisual();
+        // 添加页签切换动画
+        UpdateCategoryTabsVisualWithAnimation();
 
-        ShowBuildingsInCategory(category);
+        ShowBuildingsInCategoryWithAnimation(category);
     }
     
     /// <summary>
-    /// 显示指定分类的建筑
+    /// 显示指定分类的建筑（带动画）
     /// </summary>
-    private void ShowBuildingsInCategory(BuildingCategory category)
+    private void ShowBuildingsInCategoryWithAnimation(BuildingCategory category)
     {
+        Sequence sequence = DOTween.Sequence();
+        
         for (int i = 0; i < buildingButtons.Count; i++)
         {
             var buildingData = buildingsByCategory.Values.SelectMany(x => x).ElementAt(i);
-            buildingButtons[i].gameObject.SetActive(buildingData.category == category);
+            var button = buildingButtons[i];
+            var shouldShow = buildingData.category == category;
+            
+            if (button.gameObject.activeSelf != shouldShow)
+            {
+                if (shouldShow)
+                {
+                    button.gameObject.SetActive(true);
+                    button.transform.localScale = Vector3.zero;
+                    sequence.Insert(i * 0.05f,
+                        button.transform.DOScale(originalButtonScales[button], 0.02f).SetEase(Ease.OutBack));
+                }
+                else
+                {
+                    button.gameObject.SetActive(false);
+                }
+            }
         }
     }
     
@@ -179,7 +231,9 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             }
         }
         
-        ShowBuildingDetails(buildingData);
+        AudioManager.Instance.PlaySfx("LightClick");
+        
+        ShowBuildingDetailsWithAnimation(buildingData);
     }
     
     /// <summary>
@@ -201,16 +255,28 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         }
     }
     
-    private void UpdateCategoryTabsVisual()
+    /// <summary>
+    /// 更新页签视觉效果（带动画）
+    /// </summary>
+    private void UpdateCategoryTabsVisualWithAnimation()
     {
         for (int i = 0; i < categoryTabButtons.Count; i++)
         {
             var tabButton = categoryTabButtons[i];
             if (tabButton != null)
             {
-                var colors = tabButton.colors;
-                colors.normalColor = (i == (int)currentCategory) ? selectedTabColor : normalTabColor;
-                tabButton.colors = colors;
+                bool isSelected = i == (int)currentCategory;
+                Color targetColor = isSelected ? selectedTabColor : normalTabColor;
+                
+                // 使用动画过渡颜色
+                tabButton.GetComponent<Image>().DOColor(targetColor, tabTransitionDuration);
+                
+                // 添加缩放效果
+                if (isSelected)
+                {
+                    tabButton.transform.DOScale(1.1f, tabTransitionDuration / 2)
+                        .OnComplete(() => tabButton.transform.DOScale(1f, tabTransitionDuration / 2));
+                }
             }
         }
     }
@@ -232,72 +298,105 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
 
     #region BuildingDetail
 
-        private void ShowBuildingDetails(BuildingData buildingData)
-        {
-            buildingDetailsPanel.SetActive(true);
-            buildingNameText.text = buildingData.buildingName;
-            buildingDescriptionText.text = buildingData.description;
-            buildingIconImage.sprite = buildingData.icon;
-    
-            // 显示建筑信息时关闭生产信息面板
-            if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
-            {
-                productionTooltipPanel.ClosePanel();
-            }
-    
-            // 显示建筑的材料信息面板
-            if (costPanel != null)
-                costPanel.SetData(buildingData);
-        }
+    /// <summary>
+    /// 显示建筑详情（带动画）
+    /// </summary>
+    private void ShowBuildingDetailsWithAnimation(BuildingData buildingData)
+    {
+        buildingDetailsPanel.SetActive(true);
         
-        private void CloseBuildingDetails()
+        // 重置详情面板的透明度
+        CanvasGroup detailsCanvasGroup = buildingDetailsPanel.GetComponent<CanvasGroup>();
+        if (detailsCanvasGroup == null)
+            detailsCanvasGroup = buildingDetailsPanel.AddComponent<CanvasGroup>();
+            
+        detailsCanvasGroup.alpha = 0;
+        
+        buildingNameText.text = buildingData.buildingName;
+        buildingDescriptionText.text = buildingData.description;
+        buildingIconImage.sprite = buildingData.icon;
+        
+        // 图标放大动画
+        buildingIconImage.transform.localScale = Vector3.zero;
+        buildingIconImage.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+    
+        // 显示建筑信息时关闭生产信息面板
+        if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
         {
-            if (buildingDetailsPanel != null)
-            {
-                buildingDetailsPanel.SetActive(false);
-            }
+            productionTooltipPanel.ClosePanel();
         }
+    
+        // 显示建筑的材料信息面板
+        if (costPanel != null)
+            costPanel.SetData(buildingData);
+
+        // 使用 DOTween 添加建筑详情面板的淡入效果
+        detailsCanvasGroup.DOFade(1f, detailsFadeDuration);
+    }
+    
+    /// <summary>
+    /// 关闭建筑详情（带动画）
+    /// </summary>
+    private void CloseBuildingDetailsWithAnimation()
+    {
+        if (buildingDetailsPanel != null && buildingDetailsPanel.activeSelf)
+        {
+            CanvasGroup detailsCanvasGroup = buildingDetailsPanel.GetComponent<CanvasGroup>();
+            if (detailsCanvasGroup == null)
+                detailsCanvasGroup = buildingDetailsPanel.AddComponent<CanvasGroup>();
+                
+            detailsCanvasGroup.DOFade(0f, detailsFadeDuration / 2)
+                .OnComplete(() => buildingDetailsPanel.SetActive(false));
+        }
+    }
+        
+    private void CloseBuildingDetails()
+    {
+        if (buildingDetailsPanel != null)
+        {
+            buildingDetailsPanel.SetActive(false);
+        }
+    }
 
     #endregion
 
     #region Tootips
 
-        public void CloseAllTooltips()
-        {
-            CloseBuildingDetails();
-            
-            if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
-                productionTooltipPanel.ClosePanel();
-            
-            if (minerTooltipPanel != null && minerTooltipPanel.gameObject.activeSelf)
-                minerTooltipPanel.ClosePanel();
-            
-        }
-    
-        // 显示生产信息面板
-        public void ShowProductionTooltip(IProductionInfoProvider provider)
-        {
-            // 关闭所有面板
-            CloseAllTooltips();
-    
-            if (productionTooltipPanel != null)
-            {
-                productionTooltipPanel.SetContext(provider);
-                productionTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
-            }
-        }
+    public void CloseAllTooltips()
+    {
+        CloseBuildingDetailsWithAnimation();
+        
+        if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
+            productionTooltipPanel.ClosePanel();
+        
+        if (minerTooltipPanel != null && minerTooltipPanel.gameObject.activeSelf)
+            minerTooltipPanel.ClosePanel();
+    }
 
-        // 显示矿机信息面板
-        public void ShowMinerTooltip(Miner miner)
+    // 显示生产信息面板
+    public void ShowProductionTooltip(IProductionInfoProvider provider)
+    {
+        // 关闭所有面板
+        CloseAllTooltips();
+
+        if (productionTooltipPanel != null)
         {
-            CloseAllTooltips();
-
-            if (minerTooltipPanel != null)
-            {
-                minerTooltipPanel.SetMiner(miner);
-                minerTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
-            }
+            productionTooltipPanel.SetContext(provider);
+            productionTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
         }
+    }
 
-        #endregion
+    // 显示矿机信息面板
+    public void ShowMinerTooltip(Miner miner)
+    {
+        CloseAllTooltips();
+
+        if (minerTooltipPanel != null)
+        {
+            minerTooltipPanel.SetMiner(miner);
+            minerTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
+        }
+    }
+
+    #endregion
 }

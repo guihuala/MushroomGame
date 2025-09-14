@@ -165,7 +165,6 @@ public class TechTreeManager : Singleton<TechTreeManager>, IManager
             {
                 techTree[building].isUnlocked = true;
                 unlockedBuildings.Add(building);
-                DebugManager.Log($"初始建筑已解锁: {building.buildingName}");
             }
         }
     }

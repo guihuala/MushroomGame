@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3094050062924555185}
   - component: {fileID: 3250004947818674740}
   - component: {fileID: 3258881153883889164}
+  - component: {fileID: 1511435296062762574}
   m_Layer: 5
   m_Name: BuildingSlot
   m_TagString: Untagged
@@ -121,6 +122,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!225 &1511435296062762574
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3699604452802883570}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &8273041015192073583
 GameObject:
   m_ObjectHideFlags: 0

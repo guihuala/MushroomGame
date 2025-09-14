@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5865514882296865505}
   - component: {fileID: 1117768037358049595}
   - component: {fileID: 8859230656384483213}
+  - component: {fileID: 5750730059783695802}
   m_Layer: 7
   m_Name: Filter
   m_TagString: Untagged
@@ -103,9 +104,21 @@ MonoBehaviour:
   size: {x: 1, y: 1}
   outDir: {x: 1, y: 0}
   inDir: {x: -1, y: 0}
-  allowedItems:
-  - {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+  allowedItem: {fileID: 0}
   allowAllWhenEmpty: 0
   bufferCap: 16
   strictDirCheck: 1
   pushesPerSecond: 4
+--- !u!114 &5750730059783695802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909003087183154115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6182776e3c434d0a881667a5a20c9d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemSelectionPanelPrefab: {fileID: 6618367041641777076, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}

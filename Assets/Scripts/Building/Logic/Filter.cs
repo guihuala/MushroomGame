@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Filter : Building, IItemPort, IOrientable, ITickable
 {
@@ -8,7 +9,7 @@ public class Filter : Building, IItemPort, IOrientable, ITickable
     public Vector2Int inDir  = Vector2Int.left;    // 输入朝向
 
     [Header("Whitelist")]
-    public List<ItemDef> allowedItems = new List<ItemDef>();
+    public ItemDef allowedItem;
 
     [Tooltip("白名单为空时是否允许所有物品通过")]
     public bool allowAllWhenEmpty = false;
@@ -69,8 +70,8 @@ public class Filter : Building, IItemPort, IOrientable, ITickable
     private bool IsAllowed(ItemDef item)
     {
         if (item == null) return false;
-        if (allowedItems == null || allowedItems.Count == 0) return allowAllWhenEmpty;
-        return allowedItems.Contains(item);
+        if (allowedItem == null) return allowAllWhenEmpty;
+        return allowedItem == item;
     }
     
     public bool TryReceive(in ItemPayload payloadIn)

@@ -6,13 +6,7 @@ public class ConnectionLine : MonoBehaviour
 {
     private RectTransform from;
     private RectTransform to;
-    private Image lineImage;
-
-    private void Awake()
-    {
-        lineImage = GetComponent<Image>();
-    }
-
+    
     public void Initialize(RectTransform fromTransform, RectTransform toTransform)
     {
         from = fromTransform;

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
   m_Name: Ice Maker
   m_EditorClassIdentifier: 
-  buildingName: 
+  buildingName: Ice Maker
   description: 
-  icon: {fileID: 0}
+  icon: {fileID: -1980006255, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 0}
   category: 0
   constructionCost: []

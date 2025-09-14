@@ -21,6 +21,9 @@ public class TechNodeUI : MonoBehaviour, IPointerClickHandler
         
         SetUnlocked(isUnlocked);
         
+        if(node.unlockCost == null)
+            return;
+        
         // 设置成本文本
         string costString = "";
         foreach (var cost in node.unlockCost)

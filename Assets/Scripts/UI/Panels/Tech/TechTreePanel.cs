@@ -1,25 +1,35 @@
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// 科技树面板
+/// 科技树面板（增强版交互：惯性拖拽、软边界、围绕鼠标缩放）
 /// </summary>
-public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
+public class TechTreePanel : BasePanel, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler
 {
     [Header("科技树设置")]
-    [SerializeField] private RectTransform techTreeContainer; // 科技树容器
-    [SerializeField] private GameObject techNodePrefab; // 科技节点预制体
+    [SerializeField] private RectTransform techTreeContainer; // 科技树容器（内容）
+    [SerializeField] private GameObject techNodePrefab;       // 科技节点预制体
     [SerializeField] private GameObject connectionLinePrefab; // 连接线预制体
-    [SerializeField] private float nodeSpacing = 200f; // 节点间距
-    [SerializeField] private float levelSpacing = 150f; // 层级间距
+    [SerializeField] private float nodeSpacing = 200f;        // 节点间距
+    [SerializeField] private float levelSpacing = 150f;       // 层级间距
 
     [Header("缩放设置")]
     [SerializeField] private float minZoom = 0.5f;
     [SerializeField] private float maxZoom = 2f;
-    [SerializeField] private float zoomSpeed = 0.1f;
+    [SerializeField] private float zoomSpeed = 0.1f;          // 点击按钮缩放步长
+    [SerializeField] private float wheelZoomSpeed = 0.12f;    // 滚轮缩放强度
+    [SerializeField] private float zoomTweenTime = 0.12f;     // DOTween 缩放时长
+
+    [Header("拖拽/惯性/边界")]
+    [SerializeField] private bool enableInertia = true;
+    [SerializeField] private float inertiaDamping = 10f;      // 越大越快停
+    [SerializeField] private bool enableRubberBand = true;
+    [SerializeField] private float rubberStrength = 0.15f;    // 越大越“紧”
+    [SerializeField] private float boundsPadding = 120f;      // 内容边界以外允许的橡皮筋范围
 
     [Header("UI组件")]
     [SerializeField] private Button closeButton;
@@ -28,21 +38,48 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
     [SerializeField] private Button zoomInButton;
     [SerializeField] private Button zoomOutButton;
     [SerializeField] private Button resetZoomButton;
+    
+    [Header("连线层级")]
+    [SerializeField] private Transform connectionLineRoot;
 
     private Dictionary<BuildingData, TechNodeUI> nodeUIs = new Dictionary<BuildingData, TechNodeUI>();
     private List<GameObject> connectionLines = new List<GameObject>();
-    private Vector2 dragStartPosition;
-    private Vector2 containerStartPosition;
+
+    // === 交互状态 ===
+    private RectTransform _viewport;             // 容器父级视口（一般是 ScrollRect.viewport 或 techTreeContainer.parent）
+    private Vector2 _dragStartPosView;           // 开始拖拽时指针在视口局部坐标
+    private Vector2 _contentStartPos;            // 开始拖拽时内容 anchoredPosition
+    private Vector2 _velocity;                   // 惯性速度（view 空间）
+    private bool _isDragging;
+
+    // Tween 缓存
+    private Tweener _zoomTween;
+    private Tweener _panTween;
 
     protected override void Awake()
     {
         base.Awake();
-        
-        // 绑定按钮事件
+
         closeButton.onClick.AddListener(OnCloseClick);
-        zoomInButton.onClick.AddListener(ZoomIn);
-        zoomOutButton.onClick.AddListener(ZoomOut);
-        resetZoomButton.onClick.AddListener(ResetZoom);
+        zoomInButton.onClick.AddListener(ZoomInButton);
+        zoomOutButton.onClick.AddListener(ZoomOutButton);
+        resetZoomButton.onClick.AddListener(ResetZoomAnimated);
+
+        _viewport = techTreeContainer.parent as RectTransform;
+
+        // 自动创建一个 Connections 容器并放在最底层，这样连线永远在节点下方
+        if (connectionLineRoot == null)
+        {
+            var go = new GameObject("Connections", typeof(RectTransform));
+            var rt = go.GetComponent<RectTransform>();
+            rt.SetParent(techTreeContainer, false);
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = Vector2.zero;
+            connectionLineRoot = rt;
+        }
+        (connectionLineRoot as RectTransform)?.SetSiblingIndex(0);
     }
 
 
@@ -60,9 +97,7 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
         InitializeTechTree();
     }
 
-    /// <summary>
-    /// 初始化科技树
-    /// </summary>
+    /// <summary>初始化科技树</summary>
     private void InitializeTechTree()
     {
         ClearTechTree();
@@ -75,7 +110,7 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
         foreach (var kvp in techTree)
         {
             var building = kvp.Key;
-            int level = TechTreeManager.Instance.GetNodeLevel(building); // <-- 新方法
+            int level = TechTreeManager.Instance.GetNodeLevel(building);
             if (!levels.ContainsKey(level)) levels[level] = new List<BuildingData>();
             levels[level].Add(building);
         }
@@ -89,7 +124,6 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
                 int ob = TechTreeManager.Instance.GetOrderInLevel(b);
                 int cmp = oa.CompareTo(ob);
                 if (cmp != 0) return cmp;
-                // 兜底：按名字
                 string na = techTree[a].building.buildingName;
                 string nb = techTree[b].building.buildingName;
                 return string.Compare(na, nb, System.StringComparison.Ordinal);
@@ -97,7 +131,7 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
         }
 
         // 3) 逐层摆放
-        foreach (var level in levels)
+        foreach (var level in levels.OrderBy(kv => kv.Key))
         {
             int nodeCount = level.Value.Count;
             float totalWidth = (nodeCount - 1) * nodeSpacing;
@@ -108,11 +142,11 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
                 var building = level.Value[i];
                 var node = techTree[building];
 
-                var nodeObj = Instantiate(techNodePrefab, techTreeContainer);
+                var nodeObj = Object.Instantiate(techNodePrefab, techTreeContainer);
                 var nodeUI = nodeObj.GetComponent<TechNodeUI>();
 
                 float xPos = startX + i * nodeSpacing;
-                float yPos = -level.Key * levelSpacing;
+                float yPos = level.Key * levelSpacing; // <- 原来是 -level.Key，改成正向向上
                 nodeObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(xPos, yPos);
 
                 bool isUnlocked = unlockedBuildings.Contains(building);
@@ -126,30 +160,10 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
 
         // 4) 连线 & 视图复位
         CreateConnectionLines(techTree);
-        ResetView();
+        ResetViewImmediate();
     }
 
-    /// <summary>
-    /// 计算节点层级
-    /// </summary>
-    private int CalculateNodeLevel(TechNode node, Dictionary<BuildingData, TechNode> techTree)
-    {
-        if (node.prerequisites.Count == 0)
-            return 0;
-
-        int maxLevel = 0;
-        foreach (var prereq in node.prerequisites)
-        {
-            int prereqLevel = CalculateNodeLevel(prereq, techTree) + 1;
-            maxLevel = Mathf.Max(maxLevel, prereqLevel);
-        }
-
-        return maxLevel;
-    }
-
-    /// <summary>
-    /// 创建连接线
-    /// </summary>
+    /// <summary>创建连接线</summary>
     private void CreateConnectionLines(Dictionary<BuildingData, TechNode> techTree)
     {
         foreach (var kvp in techTree)
@@ -165,41 +179,26 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
         }
     }
 
-    /// <summary>
-    /// 创建单个连接线
-    /// </summary>
     private void CreateConnectionLine(TechNodeUI fromNode, TechNodeUI toNode)
     {
-        GameObject lineObj = Instantiate(connectionLinePrefab, techTreeContainer);
+        Transform parent = connectionLineRoot != null ? connectionLineRoot : techTreeContainer;
+        GameObject lineObj = Object.Instantiate(connectionLinePrefab, parent);
         ConnectionLine line = lineObj.GetComponent<ConnectionLine>();
-        
         line.Initialize(fromNode.GetComponent<RectTransform>(), toNode.GetComponent<RectTransform>());
         connectionLines.Add(lineObj);
     }
-
-    /// <summary>
-    /// 清空科技树
-    /// </summary>
+    
     private void ClearTechTree()
     {
         foreach (var node in nodeUIs.Values)
-        {
-            if (node != null)
-                Destroy(node.gameObject);
-        }
+            if (node != null) Object.Destroy(node.gameObject);
         nodeUIs.Clear();
 
         foreach (var line in connectionLines)
-        {
-            if (line != null)
-                Destroy(line);
-        }
+            if (line != null) Object.Destroy(line);
         connectionLines.Clear();
     }
 
-    /// <summary>
-    /// 节点点击事件
-    /// </summary>
     private void OnNodeClick(TechNode node)
     {
         if (node.isUnlocked)
@@ -213,7 +212,6 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
             bool success = TechTreeManager.Instance.UnlockBuilding(node.building);
             if (success)
             {
-                // 更新UI
                 if (nodeUIs.ContainsKey(node.building))
                 {
                     AudioManager.Instance.PlaySfx("Unlock");
@@ -226,43 +224,184 @@ public class TechTreePanel : BasePanel, IDragHandler, IScrollHandler
             DebugManager.Log($"无法解锁 {node.building.buildingName}，需要满足前置条件或资源不足");
         }
     }
-    
-    /// <summary>
-    /// 重置视图
-    /// </summary>
-    private void ResetView()
+
+    // ========= 视图控制 =========
+
+    /// <summary>立即复位</summary>
+    private void ResetViewImmediate()
     {
+        KillTweens();
         techTreeContainer.localScale = Vector3.one;
         techTreeContainer.anchoredPosition = Vector2.zero;
+        _velocity = Vector2.zero;
+        (connectionLineRoot as RectTransform)?.SetSiblingIndex(0);
     }
 
-    /// <summary>
-    /// 缩放视图
-    /// </summary>
-    private void Zoom(float delta)
+
+    /// <summary>动画复位</summary>
+    private void ResetZoomAnimated()
     {
-        float newScale = Mathf.Clamp(techTreeContainer.localScale.x + delta, minZoom, maxZoom);
-        techTreeContainer.localScale = Vector3.one * newScale;
+        KillTweens();
+        _zoomTween = techTreeContainer.DOScale(Vector3.one, 0.25f);
+        _panTween  = techTreeContainer.DOAnchorPos(Vector2.zero, 0.25f);
+        _velocity = Vector2.zero;
     }
 
-    private void ZoomIn() => Zoom(zoomSpeed);
-    private void ZoomOut() => Zoom(-zoomSpeed);
-    private void ResetZoom() => techTreeContainer.DOScale(Vector3.one, 0.3f);
+    private void ZoomInButton()  => ZoomButtonStep(+zoomSpeed);
+    private void ZoomOutButton() => ZoomButtonStep(-zoomSpeed);
 
-    /// <summary>
-    /// 拖动事件
-    /// </summary>
-    public void OnDrag(PointerEventData eventData)
+    private void ZoomButtonStep(float step)
     {
-        techTreeContainer.anchoredPosition += eventData.delta / techTreeContainer.localScale.x;
+        // 按钮缩放以视口中心为基准
+        var centerScreen = (Vector2)RectTransformUtility.WorldToScreenPoint(null, _viewport.position);
+        ZoomAroundScreenPoint(centerScreen, step, zoomTweenTime);
     }
 
-    /// <summary>
-    /// 滚轮缩放事件
-    /// </summary>
+    /// <summary>滚轮缩放（围绕鼠标）</summary>
     public void OnScroll(PointerEventData eventData)
     {
-        Zoom(eventData.scrollDelta.y * zoomSpeed * 0.1f);
+        if (Mathf.Approximately(eventData.scrollDelta.y, 0f)) return;
+
+        Vector2 mouseScreen = eventData.position;
+        float delta = eventData.scrollDelta.y * wheelZoomSpeed;
+        ZoomAroundScreenPoint(mouseScreen, delta, zoomTweenTime);
+    }
+
+    /// <summary>围绕屏幕坐标点缩放（保持该点下内容不飘）</summary>
+    private void ZoomAroundScreenPoint(Vector2 screenPoint, float delta, float tweenTime)
+    {
+        KillTweens();
+
+        float oldScale = techTreeContainer.localScale.x;
+        float newScale = Mathf.Clamp(oldScale + delta, minZoom, maxZoom);
+        if (Mathf.Approximately(oldScale, newScale)) return;
+
+        // 转换鼠标到“视口局部坐标”
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(_viewport, screenPoint, null, out var viewPt))
+            viewPt = Vector2.zero;
+
+        // 鼠标所指“内容局部点” c = (viewPt - pos) / s
+        Vector2 contentPos = techTreeContainer.anchoredPosition;
+        Vector2 contentLocalPoint = (viewPt - contentPos) / oldScale;
+
+        // 目标位置 p' = viewPt - c * s'
+        Vector2 targetPos = viewPt - contentLocalPoint * newScale;
+
+        // DOTween 平滑缩放 + 平移
+        _zoomTween = techTreeContainer.DOScale(newScale, tweenTime).SetEase(Ease.OutQuad);
+        _panTween  = techTreeContainer.DOAnchorPos(targetPos, tweenTime).SetEase(Ease.OutQuad);
+
+        // 缩放时清空惯性
+        _velocity = Vector2.zero;
+    }
+
+    /// <summary>开始拖拽</summary>
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        _isDragging = true;
+        _velocity = Vector2.zero;
+        KillTweens();
+
+        // 记录指针在视口的局部位置，以及当前内容位置
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(_viewport, eventData.position, null, out _dragStartPosView);
+        _contentStartPos = techTreeContainer.anchoredPosition;
+    }
+
+    /// <summary>拖拽中</summary>
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!_isDragging) return;
+
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(_viewport, eventData.position, null, out var viewPt))
+            return;
+
+        Vector2 deltaView = viewPt - _dragStartPosView;
+        // 拖拽位移按“当前缩放”衰减，保证手感稳定
+        Vector2 targetPos = _contentStartPos + deltaView;
+
+        // 软边界：越越界，位移越被压缩（橡皮筋）
+        targetPos = ApplyRubberBand(targetPos);
+
+        // 赋值并计算速度（供惯性使用）
+        Vector2 oldPos = techTreeContainer.anchoredPosition;
+        techTreeContainer.anchoredPosition = targetPos;
+        _velocity = (targetPos - oldPos) / Mathf.Max(Time.unscaledDeltaTime, 0.0001f);
+    }
+
+    /// <summary>结束拖拽</summary>
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        _isDragging = false;
+    }
+
+    private void Update()
+    {
+        // 惯性衰减
+        if (!_isDragging && enableInertia && _velocity.sqrMagnitude > 1f)
+        {
+            // 先按速度推进
+            Vector2 pos = techTreeContainer.anchoredPosition + _velocity * Time.unscaledDeltaTime;
+
+            // 软边界
+            pos = ApplyRubberBand(pos);
+
+            techTreeContainer.anchoredPosition = pos;
+
+            // 指数衰减
+            float damp = Mathf.Clamp01(inertiaDamping * Time.unscaledDeltaTime);
+            _velocity = Vector2.Lerp(_velocity, Vector2.zero, damp);
+        }
+    }
+
+    /// <summary>对内容坐标应用“软边界”限制（超出时按比例收紧）</summary>
+    private Vector2 ApplyRubberBand(Vector2 targetPos)
+    {
+        if (!enableRubberBand || _viewport == null) return targetPos;
+
+        // 估算内容边界（以视口中心为参考，pivot=0.5,0.5 时适用）
+        float scale = techTreeContainer.localScale.x;
+        Vector2 contentSize = techTreeContainer.rect.size * scale;
+        Vector2 viewSize = _viewport.rect.size;
+
+        // 允许的移动范围（让内容中心在[-halfDiff, +halfDiff]附近游走）
+        Vector2 halfDiff = new Vector2(
+            Mathf.Max(0f, (contentSize.x - viewSize.x) * 0.5f),
+            Mathf.Max(0f, (contentSize.y - viewSize.y) * 0.5f)
+        );
+
+        // 实际我们允许再多出一点“橡皮筋”范围
+        Vector2 min = -halfDiff - Vector2.one * boundsPadding;
+        Vector2 max = halfDiff + Vector2.one * boundsPadding;
+
+        Vector2 pos = targetPos;
+
+        // 对每个轴：若超出 min/max，则按距离做平滑压缩
+        pos.x = RubberClamp(pos.x, min.x, max.x);
+        pos.y = RubberClamp(pos.y, min.y, max.y);
+
+        return pos;
+    }
+
+    private float RubberClamp(float v, float min, float max)
+    {
+        if (v < min)
+        {
+            float d = min - v;
+            return min - d * (1f - rubberStrength); // 越界越多，拉回越多
+        }
+        if (v > max)
+        {
+            float d = v - max;
+            return max + d * (1f - rubberStrength);
+        }
+        return v;
+    }
+
+    private void KillTweens()
+    {
+        _zoomTween?.Kill(false);
+        _panTween?.Kill(false);
+        _zoomTween = _panTween = null;
     }
 
     private void OnCloseClick()

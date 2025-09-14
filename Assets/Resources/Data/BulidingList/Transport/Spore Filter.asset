@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
   m_Name: Spore Filter
   m_EditorClassIdentifier: 
-  buildingName: Filter
+  buildingName: Spore Filter
   description: 
   icon: {fileID: -262195863, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 8859230656384483213, guid: 54d836db7f67a44a296320f247be7da8, type: 3}

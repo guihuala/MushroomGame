@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 12
-  m_Sprite: {fileID: 1854740926, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  m_Sprite: {fileID: -1009944104, guid: ca8b19520c81541b0bdcceee5916d332, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -99,8 +99,70 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 0}
-  maxStorage: 999
-  stages: []
+  maxStorage: 99999
+  stages:
+  - stageName: stage1
+    stageSprite: {fileID: -1009944104, guid: ca8b19520c81541b0bdcceee5916d332, type: 3}
+    requirements:
+    - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: df6f9f1f6074e4af3aa7d9e371cf28bf, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
+      requiredAmount: 0
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: bb02b282ac85e44d98dcce66f5ae07db, type: 2}
+      requiredAmount: 0
+      currentAmount: 0
+    stageObjectsToEnable: []
+  - stageName: stage2
+    stageSprite: {fileID: -327004583, guid: ca8b19520c81541b0bdcceee5916d332, type: 3}
+    requirements:
+    - item: {fileID: 11400000, guid: 1b654b3c9413f4ce3a5d67470de5acdc, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: bb02b282ac85e44d98dcce66f5ae07db, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: 646ae81d0270941018e2d04f250ee975, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    stageObjectsToEnable: []
+  - stageName: stage3
+    stageSprite: {fileID: 1988029707, guid: ca8b19520c81541b0bdcceee5916d332, type: 3}
+    requirements:
+    - item: {fileID: 11400000, guid: be091b3bb326c492aadf708f497facca, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: 56179e0d855c2412da7c94818f7c6e08, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: 82cabfcb84e56499ab4252d6a40e1d3e, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: a457f78ca21894b2a97385cae3488cbc, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    stageObjectsToEnable: []
+  - stageName: stage4
+    stageSprite: {fileID: 1239406580, guid: ca8b19520c81541b0bdcceee5916d332, type: 3}
+    requirements:
+    - item: {fileID: 11400000, guid: bdb81a4af92314f2da1f5eff2e8475bb, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: fab9642e1f4994a04b6af0e9825a03c4, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    - item: {fileID: 11400000, guid: 295033a5ea89041898ef5ee2826930a5, type: 2}
+      requiredAmount: 1
+      currentAmount: 0
+    stageObjectsToEnable: []
+  - stageName: stage5
+    stageSprite: {fileID: -716424970, guid: ca8b19520c81541b0bdcceee5916d332, type: 3}
+    requirements: []
+    stageObjectsToEnable: []
   currentStageIndex: 0
   isFinalStageComplete: 0
   initialItems: []

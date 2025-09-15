@@ -26,6 +26,9 @@ public class Hub : MonoBehaviour
     private Vector2Int centerCell;
     private readonly List<HubPort> _ports = new();
 
+    // NEW: 记录SpriteRenderer的初始本地位置，避免偏移累计
+    private Vector3 _baseSpriteLocalPos; 
+
     [Header("Storage")]
     public int maxStorage = 999;
     
@@ -41,6 +44,10 @@ public class Hub : MonoBehaviour
     {
         grid = FindObjectOfType<TileGridService>();
         centerCell = grid.WorldToCell(transform.position);
+
+        // 记录初始本地位置（没有SpriteRenderer时也安全）
+        var sr = GetComponent<SpriteRenderer>();
+        _baseSpriteLocalPos = sr ? sr.transform.localPosition : Vector3.zero; // NEW
 
         RegisterInitialPorts();
         InitializeCurrentStage();
@@ -97,15 +104,11 @@ public class Hub : MonoBehaviour
             return false;
         }
 
-        // 添加到全局库存管理器
         bool success = InventoryManager.Instance.AddItem(payload.item, payload.amount);
         
         if (success)
         {
-            // 发送物品接收消息
             MsgCenter.SendMsg(MsgConst.HUB_ITEM_RECEIVED, payload);
-            
-            // 检查当前阶段任务是否完成
             CheckStageCompletion();
         }
 
@@ -119,7 +122,6 @@ public class Hub : MonoBehaviour
         var currentStage = stages[currentStageIndex];
         bool stageComplete = true;
         
-        // 检查所有需求是否满足
         foreach (var requirement in currentStage.requirements)
         {
             int currentAmount = InventoryManager.Instance.GetItemCount(requirement.item);
@@ -166,11 +168,14 @@ public class Hub : MonoBehaviour
         
         var currentStage = stages[currentStageIndex];
         
-        // 更新贴图
         var spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null && currentStage.stageSprite != null)
+        if (spriteRenderer != null)
         {
-            spriteRenderer.sprite = currentStage.stageSprite;
+            // 更新贴图
+            if (currentStage.stageSprite != null)
+            {
+                spriteRenderer.sprite = currentStage.stageSprite;
+            }
         }
         
         // 启用/禁用阶段特定的游戏对象
@@ -194,19 +199,16 @@ public class Hub : MonoBehaviour
         return InventoryManager.Instance.GetItemCount(item);
     }
 
-    // 获取所有物品总数量
     public int GetTotalItemCount()
     {
         return InventoryManager.Instance.GetTotalItemCount();
     }
 
-    // 获取当前阶段信息
     public HubStage GetCurrentStage()
     {
         return currentStageIndex < stages.Count ? stages[currentStageIndex] : null;
     }
 
-    // 获取当前阶段完成进度（0-1）
     public float GetCurrentStageProgress()
     {
         if (currentStageIndex >= stages.Count || isFinalStageComplete) return 1f;
@@ -225,7 +227,6 @@ public class Hub : MonoBehaviour
         return totalProgress / currentStage.requirements.Count;
     }
 
-    // 获取特定物品在当前阶段的完成进度
     public float GetItemProgress(ItemDef item)
     {
         if (currentStageIndex >= stages.Count || isFinalStageComplete) return 1f;

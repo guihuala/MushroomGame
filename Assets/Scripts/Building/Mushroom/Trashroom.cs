@@ -6,8 +6,7 @@ public class Trashroom : Building, IItemPort, ITickable, IProductionInfoProvider
 {
     [Header("Direction")]
     public Vector2Int outDir = Vector2Int.right; // 输出方向
-    public Vector2Int inDir  = Vector2Int.left;  // 输入方向
-
+    
     [Header("Conversion Rate")]
     public ItemDef outputItem;         // 目标产物
     public float processRate = 1f;     // 每秒处理的物品数量

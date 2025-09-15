@@ -4,7 +4,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Factory/Recipe")]
 public class RecipeDef : ScriptableObject
 {
-    public string recipeName;  // 配方名称
     public List<ItemStack> inputItems;  // 输入材料列表
     public List<ItemStack> outputItems;  // 输出产品列表
     public float productionTime;  // 生产时间（秒）

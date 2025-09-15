@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7945833522264105556}
   - component: {fileID: 1646247605376963608}
   - component: {fileID: 6232425061220626123}
+  - component: {fileID: -243974923212303148}
   m_Layer: 7
   m_Name: Agaricus
   m_TagString: Untagged
@@ -57,13 +58,14 @@ MonoBehaviour:
     side: 2
     type: 0
   - localCell: {x: 1, y: 0}
-    side: 1
+    side: 2
     type: 1
   rotationSteps: 0
-  recipe: {fileID: 11400000, guid: 71f9e342d59d94010b807f556c244095, type: 2}
+  recipe: {fileID: 11400000, guid: dccfd84e4292545a0becf1bec5b4a59a, type: 2}
   speedMultiplier: 1
   inputCap: 64
   outputCap: 64
+  sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
 --- !u!114 &7945833522264105556
@@ -138,6 +140,21 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.5670834, y: 1.2835417}
   m_EdgeRadius: 0
+--- !u!114 &-243974923212303148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5295030647110757723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5618c40b64c4186a6ffda6ac7773fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  building: {fileID: 1705590861419705153}
+  sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
+  runtimeOnly: 1
 --- !u!1 &6083413352072923831
 GameObject:
   m_ObjectHideFlags: 0

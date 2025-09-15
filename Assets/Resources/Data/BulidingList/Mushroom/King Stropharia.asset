@@ -15,6 +15,6 @@ MonoBehaviour:
   buildingName: King Stropharia
   description: 
   icon: {fileID: 1502497576, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 270376801540328484, guid: ac9d909dfa93c44bca26f53af822fd3a, type: 3}
   category: 2
   constructionCost: []

@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 287565310cc544dfbaec1175edd9884e, type: 3}
-  m_Name: Test Recipe Def
+  m_Name: Agaricus
   m_EditorClassIdentifier: 
-  recipeName: 111
   inputItems:
   - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
     amount: 1
+  - item: {fileID: 11400000, guid: 1b654b3c9413f4ce3a5d67470de5acdc, type: 2}
+    amount: 1
   outputItems:
-  - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+  - item: {fileID: 11400000, guid: be091b3bb326c492aadf708f497facca, type: 2}
     amount: 1
   productionTime: 0.5

@@ -15,6 +15,6 @@ MonoBehaviour:
   buildingName: Lantern mushroom
   description: 
   icon: {fileID: -878174064, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 3662107331524145950, guid: 7c7db2b1896d143deaf4b481272c8968, type: 3}
   category: 0
   constructionCost: []

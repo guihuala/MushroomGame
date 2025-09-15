@@ -15,6 +15,6 @@ MonoBehaviour:
   buildingName: Bamboo Fungus
   description: 
   icon: {fileID: 798255633, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 4573424344138550816, guid: 9e98b5f5743cc4114ab3b3c287d7de25, type: 3}
   category: 2
   constructionCost: []

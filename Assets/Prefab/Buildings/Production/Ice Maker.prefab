@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7063021566156355855
+--- !u!1 &3960790849308708049
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,24 +8,24 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3558734175396689791}
-  - component: {fileID: 7164011442835654480}
-  - component: {fileID: 5262894562915171561}
-  - component: {fileID: 8144987566561692502}
+  - component: {fileID: 8363311127286798330}
+  - component: {fileID: 5948999395316631210}
+  - component: {fileID: 4152940537445816867}
+  - component: {fileID: 5285331857848296197}
   m_Layer: 7
-  m_Name: Processor
+  m_Name: Ice Maker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3558734175396689791
+--- !u!4 &8363311127286798330
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7063021566156355855}
+  m_GameObject: {fileID: 3960790849308708049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -34,13 +34,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &7164011442835654480
+--- !u!212 &5948999395316631210
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7063021566156355855}
+  m_GameObject: {fileID: 3960790849308708049}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: 2014472946, guid: 10223e4b298384d478a88692d0963313, type: 3}
+  m_Sprite: {fileID: -1980006255, guid: 10223e4b298384d478a88692d0963313, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -86,13 +86,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5262894562915171561
+--- !u!114 &4152940537445816867
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7063021566156355855}
+  m_GameObject: {fileID: 3960790849308708049}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e4f6ba273c2f945d9bc733978ba199f8, type: 3}
@@ -102,20 +102,20 @@ MonoBehaviour:
   grid: {fileID: 0}
   cell: {x: 0, y: 0}
   size: {x: 1, y: 1}
-  recipe: {fileID: 11400000, guid: 71f9e342d59d94010b807f556c244095, type: 2}
+  recipe: {fileID: 11400000, guid: 7e350874d64de4e08a4e64db0dfa25fe, type: 2}
   inDir: {x: 0, y: -1}
   outDir: {x: 0, y: 1}
   productionProgress: 0
   isProducing: 0
   inputBufferSize: 10
   outputBufferSize: 10
---- !u!114 &8144987566561692502
+--- !u!114 &5285331857848296197
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7063021566156355855}
+  m_GameObject: {fileID: 3960790849308708049}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c574fa11a8a1d4a7089ec8687ba9963c, type: 3}

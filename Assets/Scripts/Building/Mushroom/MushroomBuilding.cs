@@ -11,6 +11,10 @@ public class MushroomBuilding : MultiGridBuilding, ITickable ,IProductionInfoPro
     public int inputCap  = 64;
     public int outputCap = 64;
     
+    [Header("Output Routing")]
+    [Tooltip("若为 true，则产出物直接存入全局仓库（参考 Trashroom），不进入本地输出缓冲/不经输出端口。")]
+    public bool sendOutputsToInventory = false;
+    
     private readonly Dictionary<ItemDef, int> _inputs  = new();
     private readonly Dictionary<ItemDef, int> _outputs = new();
 
@@ -207,13 +211,18 @@ public class MushroomBuilding : MultiGridBuilding, ITickable ,IProductionInfoPro
             if (GetInputCount(input.item) < input.amount) return false;
         }
 
-        // 输出是否有空间
-        int willAdd = 0;
-        foreach (var output in recipe.outputItems)
+        // 输出是否有空间（只有当不直接入仓库时才判断本地输出缓冲）
+        if (!sendOutputsToInventory)
         {
-            willAdd += Mathf.Max(0, output.amount);
+            int willAdd = 0;
+            foreach (var output in recipe.outputItems)
+            {
+                willAdd += Mathf.Max(0, output.amount);
+            }
+            if (GetTotal(_outputs) + willAdd > outputCap) return false;
         }
-        return GetTotal(_outputs) + willAdd <= outputCap;
+
+        return true;
     }
 
     private void StartProduction()
@@ -238,7 +247,17 @@ public class MushroomBuilding : MultiGridBuilding, ITickable ,IProductionInfoPro
         foreach (var outDef in recipe.outputItems)
         {
             if (outDef.item == null || outDef.amount <= 0) continue;
-            AddCount(_outputs, outDef.item, outDef.amount);
+
+            if (sendOutputsToInventory)
+            {
+                // 产出直接进全局仓库
+                InventoryManager.Instance.AddItem(outDef.item, outDef.amount); // ← 关键
+            }
+            else
+            {
+                // 进入本地输出缓冲，等待通过输出端口送出
+                AddCount(_outputs, outDef.item, outDef.amount);
+            }
         }
 
         productionProgress = 0f;
@@ -309,6 +328,33 @@ public class MushroomBuilding : MultiGridBuilding, ITickable ,IProductionInfoPro
     private bool HasSpaceInInputBuffer() => GetTotal(_inputs) < inputCap;
 
     #endregion
+    
+    public void GetPortWorldInfos(List<PortWorldInfo> buffer)
+    {
+        buffer.Clear();
+        if (grid == null) return;
+
+        // 输入口（local (0,0) 面朝 Down）
+        var inLocal  = RotateLocal(new Vector2Int(0, 0), rotationSteps);
+        var inSide   = RotateSide(CellSide.Down, rotationSteps);
+        var inCell   = cell + inLocal + SideToOffset(inSide);
+        buffer.Add(new PortWorldInfo {
+            worldPos = grid.CellToWorld(inCell),
+            type     = PortType.Input,
+            side     = inSide
+        });
+
+        // 输出口（local (1,0) 面朝 Down）
+        var outLocal = RotateLocal(new Vector2Int(1, 0), rotationSteps);
+        var outSide  = RotateSide(CellSide.Down, rotationSteps);
+        var outCell  = cell + outLocal + SideToOffset(outSide);
+        buffer.Add(new PortWorldInfo {
+            worldPos = grid.CellToWorld(outCell),
+            type     = PortType.Output,
+            side     = outSide
+        });
+    }
+
 
     #region toolkit
 
@@ -346,4 +392,11 @@ public class MushroomBuilding : MultiGridBuilding, ITickable ,IProductionInfoPro
     }
 
     #endregion
+}
+
+public struct PortWorldInfo
+{
+    public Vector3 worldPos;
+    public PortType type;
+    public CellSide side;
 }

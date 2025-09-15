@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1298631592871423976}
   - component: {fileID: 4717716350096336794}
   - component: {fileID: 7054324785493414143}
+  - component: {fileID: 9163042299363771181}
   m_Layer: 7
   m_Name: Snow Fungus
   m_TagString: Untagged
@@ -57,13 +58,14 @@ MonoBehaviour:
     side: 2
     type: 0
   - localCell: {x: 1, y: 0}
-    side: 1
+    side: 2
     type: 1
   rotationSteps: 0
-  recipe: {fileID: 11400000, guid: 71f9e342d59d94010b807f556c244095, type: 2}
+  recipe: {fileID: 11400000, guid: 69525a83ed1c44ff488b1b219654ad9d, type: 2}
   speedMultiplier: 1
   inputCap: 64
   outputCap: 64
+  sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
 --- !u!114 &1298631592871423976
@@ -138,6 +140,21 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.5670834, y: 1.2835417}
   m_EdgeRadius: 0
+--- !u!114 &9163042299363771181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 632106780838963279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5618c40b64c4186a6ffda6ac7773fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  building: {fileID: 3975165992847552786}
+  sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
+  runtimeOnly: 1
 --- !u!1 &6736805914941061835
 GameObject:
   m_ObjectHideFlags: 0

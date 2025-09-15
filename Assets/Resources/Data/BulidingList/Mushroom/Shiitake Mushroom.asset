@@ -15,6 +15,6 @@ MonoBehaviour:
   buildingName: Shiitake Mushroom
   description: 
   icon: {fileID: 1440057940, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 4292978451502142575, guid: 9b9e835b8002048c59aaa04f4132b879, type: 3}
   category: 2
   constructionCost: []

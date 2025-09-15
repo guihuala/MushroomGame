@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 287565310cc544dfbaec1175edd9884e, type: 3}
+  m_Name: Mineralizer Furnace
+  m_EditorClassIdentifier: 
+  inputItems:
+  - item: {fileID: 11400000, guid: 56179e0d855c2412da7c94818f7c6e08, type: 2}
+    amount: 2
+  outputItems:
+  - item: {fileID: 11400000, guid: bdb81a4af92314f2da1f5eff2e8475bb, type: 2}
+    amount: 1
+  productionTime: 1

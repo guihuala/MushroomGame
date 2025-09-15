@@ -15,6 +15,6 @@ MonoBehaviour:
   buildingName: Agaricus
   description: 
   icon: {fileID: -77567164, guid: 10223e4b298384d478a88692d0963313, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 1705590861419705153, guid: 163bb16236da94d68a19b9be5947b07f, type: 3}
   category: 2
   constructionCost: []

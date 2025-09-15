@@ -5,8 +5,12 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class ItemPortIconRenderer : MonoBehaviour
 {
-    public MushroomBuilding building;      // 也可做成 MultiGridBuilding
-    public PortSpriteSet sprites;          // 上一步创建的配置
+    public MushroomBuilding building;
+    public PortSpriteSet sprites;
+
+    [Tooltip("用于决定图标的排序层与序号；不指定则自动从子物体中查找一个SpriteRenderer。")]
+    public SpriteRenderer baseRendererForSorting;
+
     [Tooltip("仅在运行时显示")]
     public bool runtimeOnly = true;
 
@@ -19,10 +23,12 @@ public class ItemPortIconRenderer : MonoBehaviour
     void Reset()
     {
         if (!building) building = GetComponent<MushroomBuilding>();
+        if (!baseRendererForSorting) baseRendererForSorting = GetComponentInChildren<SpriteRenderer>();
     }
 
     void OnEnable()
     {
+        if (!baseRendererForSorting) baseRendererForSorting = GetComponentInChildren<SpriteRenderer>();
         RebuildIcons();
     }
 
@@ -37,7 +43,6 @@ public class ItemPortIconRenderer : MonoBehaviour
 
         if (!building || !sprites) { HideIcons(); return; }
 
-        // 轮询“是否需要刷新”：旋转/位置变化
         if (_lastRotationSteps != building.rotationSteps || _lastCell != building.cell)
         {
             RebuildIcons();
@@ -64,12 +69,16 @@ public class ItemPortIconRenderer : MonoBehaviour
         _lastRotationSteps = building.rotationSteps;
         _lastCell = building.cell;
 
-        UpdateIcons(); // 立即刷新一次
+        UpdateIcons();
     }
 
     void UpdateIcons()
     {
         if (!building || !sprites) return;
+
+        // 确保参考渲染器可用（避免在不同Prefab层级下找不到）
+        if (!baseRendererForSorting) baseRendererForSorting = GetComponentInChildren<SpriteRenderer>(); // NEW
+
         building.GetPortWorldInfos(_ports);
 
         for (int i = 0; i < _icons.Count && i < _ports.Count; i++)
@@ -83,7 +92,7 @@ public class ItemPortIconRenderer : MonoBehaviour
 
             // 位置
             Vector3 p = info.worldPos + (Vector3)sprites.worldOffset;
-            _icons[i].transform.position = p;
+            sr.transform.position = p;
 
             // 朝向 → 旋转
             float z = info.side switch
@@ -94,22 +103,28 @@ public class ItemPortIconRenderer : MonoBehaviour
                 CellSide.Left  => 90f,
                 _ => 0f
             };
-            _icons[i].transform.rotation = Quaternion.Euler(0, 0, z);
+            sr.transform.rotation = Quaternion.Euler(0, 0, z);
 
             // 尺寸
-            _icons[i].transform.localScale = Vector3.one * Mathf.Max(0.01f, sprites.worldScale);
+            sr.transform.localScale = Vector3.one * Mathf.Max(0.01f, sprites.worldScale);
 
-            // 排序层
-            if (building.TryGetComponent<SpriteRenderer>(out var br))
+            // —— 排序层 / 序号（修正点）——
+            // 优先使用配置里的layer名；否则复制参考渲染器的layer
+            if (!string.IsNullOrEmpty(sprites.sortingLayer))
             {
-                _icons[i].sortingLayerID = string.IsNullOrEmpty(sprites.sortingLayer)
-                    ? br.sortingLayerID
-                    : SortingLayer.NameToID(sprites.sortingLayer);
-                _icons[i].sortingOrder = br.sortingOrder + sprites.orderInLayerOffset;
+                sr.sortingLayerName = sprites.sortingLayer;  // 用名称更稳
             }
+            else if (baseRendererForSorting)
+            {
+                sr.sortingLayerID = baseRendererForSorting.sortingLayerID;
+            }
+
+            // orderInLayer：在参考渲染器基础上偏移
+            int baseOrder = baseRendererForSorting ? baseRendererForSorting.sortingOrder : 0;
+            sr.sortingOrder = baseOrder + sprites.orderInLayerOffset;
         }
 
-        // 如果端口数量变了（理论上你这类建筑是固定的2个），也能自适应
+        // 多余图标隐藏
         for (int i = _ports.Count; i < _icons.Count; i++)
         {
             if (_icons[i]) _icons[i].enabled = false;

@@ -115,17 +115,16 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         }
     }
 
-    /// <summary>
-    /// 创建建筑按钮
-    /// </summary>
     private void CreateBuildingButtons()
     {
         if (buildingButtonsContainer == null || buildingButtonPrefab == null) return;
+        
+        var containerCG = buildingButtonsContainer.GetComponent<CanvasGroup>();
+        if (containerCG == null) containerCG = buildingButtonsContainer.gameObject.AddComponent<CanvasGroup>();
+        containerCG.alpha = 0f;
 
         foreach (Transform child in buildingButtonsContainer)
-        {
             Destroy(child.gameObject);
-        }
         buildingButtons.Clear();
         originalButtonScales.Clear();
         
@@ -134,27 +133,24 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             var buttonGO = Instantiate(buildingButtonPrefab, buildingButtonsContainer);
             var button = buttonGO.GetComponent<Button>();
             var iconImage = buttonGO.transform.GetChild(0).GetComponent<Image>();
-            
+
             if (iconImage != null && buildingData.icon != null)
-            {
                 iconImage.sprite = buildingData.icon;
-            }
             
-            // 保存原始尺寸
+            var childCG = buttonGO.GetComponent<CanvasGroup>();
+            if (childCG != null) childCG.alpha = 1f;
+
             originalButtonScales[button] = button.transform.localScale;
-            
             AddClickEffect(button, buttonScaleDuration);
-            
+
             BuildingData data = buildingData;
             button.onClick.AddListener(() => OnBuildingSelected(data));
-            
             buildingButtons.Add(button);
-            
-            // 初始隐藏并添加渐显效果
-            buttonGO.GetComponent<CanvasGroup>().alpha = 0;
-            buttonGO.GetComponent<CanvasGroup>().DOFade(1f, 0.3f).SetUpdate(true);
         }
+        
+        containerCG.DOFade(1f, 0.1f).SetUpdate(true);
     }
+
     
     /// <summary>
     /// 为按钮添加点击效果

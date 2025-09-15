@@ -66,7 +66,6 @@ public class MinerTooltipPanel : MonoBehaviour
     // 显示面板在指定位置
     public void ShowAtScreenPosition(Vector2 position)
     {
-        transform.position = position;
         gameObject.SetActive(true);
     }
 

@@ -53,7 +53,7 @@ MonoBehaviour:
   buildZone: 1
   grid: {fileID: 0}
   cell: {x: 0, y: 0}
-  size: {x: 2, y: 2}
+  size: {x: 2, y: 1}
   portDefs:
   - localCell: {x: 0, y: 0}
     side: 2
@@ -230,7 +230,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 798255633, guid: 10223e4b298384d478a88692d0963313, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

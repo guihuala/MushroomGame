@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e6a0c5f23b024c32b4b68a97e78420a, type: 3}
   m_Name: Port Sprite Set
   m_EditorClassIdentifier: 
-  inputSprite: {fileID: 21300000, guid: 5698a4ddaad2d4ef78fbe97c696af0fa, type: 3}
-  outputSprite: {fileID: 21300000, guid: ea4a9418f02da4b11bdec2157205e0dd, type: 3}
+  inputSprite: {fileID: 21300000, guid: ae006a26be00e455f985db789be73d4f, type: 3}
+  outputSprite: {fileID: 21300000, guid: 06ce0990fc20044abb3208d5f3af2c0f, type: 3}
   worldScale: 1.27
   worldOffset: {x: 0, y: 0}
   sortingLayer: Building

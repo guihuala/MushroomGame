@@ -49,18 +49,7 @@ public partial class PlacementSystem
             SetPreviewIcon();
         }
     }
-
-    private BuildingData GetBuildingDataForCurrentPrefab()
-    {
-        if (buildingList == null || _currentPrefab == null) return null;
-        foreach (var bd in buildingList.allBuildings)
-        {
-            if (bd.prefab != null && bd.prefab.GetType() == _currentPrefab.GetType())
-                return bd;
-        }
-        return null;
-    }
-
+    
     private void SetPreviewIcon()
     {
         if (_currentPreview == null) return;

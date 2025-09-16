@@ -3,24 +3,44 @@ using UnityEngine;
 
 public class PowerManager : Singleton<PowerManager>
 {
+    [Header("Link Rendering")]
+    public bool drawLinks = true;                    // 是否绘制连线
+    public Material linkMaterial;                    // 可留空，默认用Sprites/Default
+    [Range(0.01f, 0.3f)] public float linkWidth = 0.06f;
+    public Color linkColor = new Color(1f, 1f, 1f, 0.7f);
+    public float linkZ = -0.05f;                     // 让线条略低于建筑
+
+    private readonly List<LineRenderer> _linkLines = new();
+    private Transform _linkRoot;
+
     private float totalPower = 0f;
 
     private readonly List<PowerPlant> powerPlants = new(); // 电源
     private readonly List<PowerRelay> powerRelays = new(); // 中继
-
-    // —— 新增：网络缓存 —— //
-    private readonly List<Node> nodes = new();             // 植入当前场景的所有“节点”（电源/中继）
-    private readonly List<int>[] graph = new List<int>[0]; // 邻接表（按 nodes 索引）
+    
+    private readonly List<Node> nodes = new();             // 植入当前场景的所有节点
+    private readonly List<int>[] graph = new List<int>[0]; // 邻接表
     private readonly HashSet<int> poweredNodeIdx = new();  // 与至少一个电源连通的节点索引
     private bool dirtyGraph = true;
 
-    // 覆盖判定时用到的格子->是否有电缓存（可选，减少开销）
+    // 覆盖判定时用到的格子->是否有电缓存
     private readonly Dictionary<Vector2Int, bool> cellPoweredCache = new();
-
-    // —— 新增：默认增产倍率（可在 Inspector 做面板，先写死也行） —— //
+    
     [Range(1f, 5f)] public float defaultPoweredMultiplier = 1.25f;
 
-    #region Power amount (原有)
+    #region 生命周期
+
+    private void LateUpdate()
+    {
+        if (dirtyGraph)
+        {
+            RebuildGraph();
+        }
+    }    
+
+    #endregion
+
+    #region Power amount
 
     public void AddPowerSource(PowerPlant powerPlant)
     {
@@ -76,9 +96,9 @@ public class PowerManager : Singleton<PowerManager>
 
     private struct Node
     {
-        public Vector3 worldPos; // 世界坐标（节点中心）
-        public float range;      // 覆盖半径（世界单位）
-        public bool isPlant;     // 是否电源（true=电源，false=中继）
+        public Vector3 worldPos; // 世界坐标
+        public float range;      // 覆盖半径
+        public bool isPlant;     // 是否电源
     }
 
     private void MarkDirty()
@@ -151,9 +171,9 @@ public class PowerManager : Singleton<PowerManager>
                 }
             }
         }
-
-        // 存一下邻接（如果你后面要做更多图运算）
-        // graph = tmpGraph; // 若需要可存，否则省内存
+        
+        if (drawLinks) RebuildLinkRenderers(tmpGraph);
+        else ClearLinkRenderers();
     }
 
     /// <summary>判断一个格子中心是否在有电网络的覆盖圈内</summary>
@@ -188,6 +208,105 @@ public class PowerManager : Singleton<PowerManager>
         bool powered = IsCellPowered(cell, grid);
         if (!powered) return 1f;
         return (overrideMultiplier > 0f) ? overrideMultiplier : defaultPoweredMultiplier;
+    }
+
+    #endregion
+
+    #region line
+
+private void RebuildLinkRenderers(List<int>[] tmpGraph)
+{
+    // 1) 初始化父物体
+    if (_linkRoot == null)
+    {
+        var go = new GameObject("PowerLinks");
+        _linkRoot = go.transform;
+        _linkRoot.SetParent(this.transform, worldPositionStays: false); // ★ 建议挂到管理器下
+    }
+
+    // 2) 先把已有 LineRenderer 标记为“未使用”
+    var used = new bool[_linkLines.Count];
+
+    // 3) 逐边绘制（只画“带电网络”里的边：两端都在 poweredNodeIdx）
+    var powered = poweredNodeIdx;
+    int n = nodes.Count;
+
+    for (int i = 0; i < n; i++)
+    {
+        foreach (var j in tmpGraph[i])
+        {
+            if (j <= i) continue; // 无向图避免重复
+            if (!powered.Contains(i) || !powered.Contains(j)) continue;
+
+            Vector3 a = nodes[i].worldPos; a.z = linkZ;
+            Vector3 b = nodes[j].worldPos; b.z = linkZ;
+
+            // 复用或新建一条线
+            int idx = System.Array.IndexOf(used, false);
+            LineRenderer lr = null;
+            if (idx >= 0 && _linkLines.Count > 0 && idx < _linkLines.Count)
+            {
+                lr = _linkLines[idx];
+                used[idx] = true;
+            }
+            else
+            {
+                var go = new GameObject("PowerLink");
+                go.transform.SetParent(_linkRoot, worldPositionStays: false);
+                lr = go.AddComponent<LineRenderer>();
+                _linkLines.Add(lr);
+
+                // 重新构建 used 标记
+                used = new bool[_linkLines.Count];
+                for (int k = 0; k < _linkLines.Count - 1; k++) used[k] = true;
+                used[_linkLines.Count - 1] = true;
+                
+                lr.useWorldSpace = true;
+                lr.textureMode   = LineTextureMode.Stretch;
+                lr.alignment     = LineAlignment.View;
+                lr.numCornerVertices = 0;
+                lr.numCapVertices    = 0;
+                
+                lr.material = linkMaterial != null ? linkMaterial : new Material(Shader.Find("Sprites/Default"));
+
+                lr.widthMultiplier = linkWidth;
+                lr.startColor = lr.endColor = linkColor;
+                lr.sortingOrder = 99;
+            }
+            
+            var lightning = lr.GetComponent<LightningLine>();
+            if (lightning == null) lightning = lr.gameObject.AddComponent<LightningLine>();
+            
+            lightning.width        = linkWidth;
+            lightning.jaggedness   = 0.30f;  // 折线幅度（相对 AB 长度）
+            lightning.segments     = 10;     // 主干段数
+            lightning.taper        = 0.5f;   // 尾部收窄
+            lightning.enableBranches = true; // 开分叉
+            lightning.branchChance   = 0.05f;
+
+            lr.enabled = true;
+            
+            lightning.SetEndpoints(a, b);
+        }
+    }
+
+    // 4) 关闭未被使用的多余线段
+    for (int i = 0; i < _linkLines.Count; i++)
+    {
+        if (i >= used.Length || !used[i])
+        {
+            if (_linkLines[i]) _linkLines[i].enabled = false;
+        }
+    }
+}
+
+    private void ClearLinkRenderers()
+    {
+        if (_linkLines.Count == 0) return;
+        for (int i = 0; i < _linkLines.Count; i++)
+        {
+            if (_linkLines[i]) _linkLines[i].enabled = false;
+        }
     }
 
     #endregion

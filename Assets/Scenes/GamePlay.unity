@@ -74261,9 +74261,7 @@ MonoBehaviour:
     stageObjectsToEnable: []
   currentStageIndex: 0
   isFinalStageComplete: 0
-  initialItems:
-  - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
-    amount: 10
+  initialItems: []
 --- !u!1001 &1198007741
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77322,12 +77320,6 @@ MonoBehaviour:
   cursorDefault: {fileID: 2800000, guid: a5b593e6421c8467cb6b6133c2b6098f, type: 3}
   cursorErase: {fileID: 2800000, guid: c0a122a4cc5894032a7b1edd191a493d, type: 3}
   cursorHotspot: {x: 8, y: 8}
-  showDirectionWhilePlacing: 1
-  directionArrowSprite: {fileID: 21300000, guid: ae006a26be00e455f985db789be73d4f, type: 3}
-  arrowLocalOffset: {x: 0, y: 0.6}
-  arrowScale: 1
-  arrowSortingLayer: Preview
-  arrowOrderInLayerOffset: 100
 --- !u!156049354 &1376572711
 Grid:
   m_ObjectHideFlags: 0

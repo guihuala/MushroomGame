@@ -86,3 +86,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b683e9c243eed48d69f48de3a783079c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  drawLinks: 1
+  linkMaterial: {fileID: -876546973899608171, guid: a6c15718ecfa24ea68a102c519cb98fc, type: 3}
+  linkWidth: 0.06
+  linkColor: {r: 1, g: 0.8834678, b: 0, a: 0.7}
+  linkZ: -0.05
+  defaultPoweredMultiplier: 1.25

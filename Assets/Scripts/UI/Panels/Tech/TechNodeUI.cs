@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class TechNodeUI : MonoBehaviour, IPointerClickHandler
+public class TechNodeUI : MonoBehaviour, IPointerClickHandler,
+    IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
 {
     [Header("UI组件")]
     [SerializeField] private Image iconImage;
@@ -11,25 +12,14 @@ public class TechNodeUI : MonoBehaviour, IPointerClickHandler
 
     public System.Action<TechNode> OnNodeClick;
     private TechNode techNode;
+    private bool _hovering;
 
     public void Initialize(TechNode node, bool isUnlocked, bool canUnlock)
     {
         techNode = node;
-        
         iconImage.sprite = node.building.icon;
         nameText.text = node.building.buildingName;
-        
         SetUnlocked(isUnlocked);
-        
-        if(node.unlockCost == null)
-            return;
-        
-        // 设置成本文本
-        string costString = "";
-        foreach (var cost in node.unlockCost)
-        {
-            costString += $"{cost.item.displayName} x{cost.amount}\n";
-        }
     }
 
     public void SetUnlocked(bool unlocked)
@@ -40,5 +30,23 @@ public class TechNodeUI : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         OnNodeClick?.Invoke(techNode);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        _hovering = true;
+        TechCostTooltip.Instance?.Show(techNode, eventData.position);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _hovering = false;
+        TechCostTooltip.Instance?.Hide();
+    }
+
+    public void OnPointerMove(PointerEventData eventData)
+    {
+        if (_hovering)
+            TechCostTooltip.Instance?.Show(techNode, eventData.position);
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ConstructionCostRow : MonoBehaviour
+public class CostRow : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private Image icon;
@@ -11,7 +11,7 @@ public class ConstructionCostRow : MonoBehaviour
     
     [Header("Colors")]
     [SerializeField] private Color enoughColor = Color.white;
-    [SerializeField] private Color lackColor   = new Color(1f, 0.35f, 0.35f, 1f); // 柔一点的红
+    [SerializeField] private Color lackColor   = new Color(1f, 0.35f, 0.35f, 1f);
 
     private ItemDef _item;
     private int _need;

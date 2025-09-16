@@ -19,7 +19,7 @@ MonoBehaviour:
       amount: 1
     prerequisites: []
     overrideLevel: 0
-    orderInLevel: 0
+    orderInLevel: 1
   - building: {fileID: 11400000, guid: 61ab971223d074d0c9fe13007ed9db64, type: 2}
     unlockCost:
     - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
@@ -27,7 +27,7 @@ MonoBehaviour:
     prerequisites:
     - {fileID: 11400000, guid: bd46aca240aac416f80242de71989fb5, type: 2}
     overrideLevel: 1
-    orderInLevel: 0
+    orderInLevel: 1
   - building: {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
     unlockCost:
     - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
@@ -35,7 +35,19 @@ MonoBehaviour:
     prerequisites:
     - {fileID: 11400000, guid: bd46aca240aac416f80242de71989fb5, type: 2}
     overrideLevel: 1
-    orderInLevel: 0
+    orderInLevel: 2
+  - building: {fileID: 11400000, guid: 59bb2427e8879424b8cb187a090220e2, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: bd46aca240aac416f80242de71989fb5, type: 2}
+    overrideLevel: 1
+    orderInLevel: 3
+  - building: {fileID: 11400000, guid: d8179d8276368407c9d15cd7c2ed5ae8, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: bd46aca240aac416f80242de71989fb5, type: 2}
+    overrideLevel: 1
+    orderInLevel: 4
   - building: {fileID: 11400000, guid: 249bd13c5db0f4170bc636fde88fc456, type: 2}
     unlockCost:
     - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
@@ -43,7 +55,19 @@ MonoBehaviour:
     prerequisites:
     - {fileID: 11400000, guid: 61ab971223d074d0c9fe13007ed9db64, type: 2}
     overrideLevel: 2
-    orderInLevel: 0
+    orderInLevel: 1
+  - building: {fileID: 11400000, guid: 16ee610d4f4c64edf8d54b7b5d8978b1, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
+    overrideLevel: 2
+    orderInLevel: 2
+  - building: {fileID: 11400000, guid: 1b3d21448f76849fdbd58aa172473974, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
+    overrideLevel: 2
+    orderInLevel: 2
   - building: {fileID: 11400000, guid: 1769c3bdf986b4979a7699b4b8197795, type: 2}
     unlockCost:
     - item: {fileID: 11400000, guid: db7237f5058b045fcb9d9a5a68fdc513, type: 2}
@@ -51,113 +75,89 @@ MonoBehaviour:
     prerequisites:
     - {fileID: 11400000, guid: 59bb2427e8879424b8cb187a090220e2, type: 2}
     overrideLevel: 2
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: 59bb2427e8879424b8cb187a090220e2, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: bd46aca240aac416f80242de71989fb5, type: 2}
-    overrideLevel: 1
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: e7b3b08b99f45465183a396dcb521140, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: 249bd13c5db0f4170bc636fde88fc456, type: 2}
-    overrideLevel: 3
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: 23ae7838d2609495c85406fe3d9dfdb4, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: 249bd13c5db0f4170bc636fde88fc456, type: 2}
-    overrideLevel: 3
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: 16ee610d4f4c64edf8d54b7b5d8978b1, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
-    overrideLevel: 2
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: 1b3d21448f76849fdbd58aa172473974, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
-    overrideLevel: 2
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: 3a4be602e1cf549209f29882e8aa263e, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: 1b3d21448f76849fdbd58aa172473974, type: 2}
-    overrideLevel: 3
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: a735736b220ff4da99974a9fb2efe406, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: 1b3d21448f76849fdbd58aa172473974, type: 2}
-    overrideLevel: 3
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: d8179d8276368407c9d15cd7c2ed5ae8, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: bd46aca240aac416f80242de71989fb5, type: 2}
-    overrideLevel: 1
-    orderInLevel: 0
-  - building: {fileID: 11400000, guid: 74290b1eef9af4c54a9e575f5ae100cc, type: 2}
-    unlockCost: []
-    prerequisites:
-    - {fileID: 11400000, guid: d8179d8276368407c9d15cd7c2ed5ae8, type: 2}
-    overrideLevel: 2
-    orderInLevel: 0
+    orderInLevel: 3
   - building: {fileID: 11400000, guid: d24eae04f866a4b0385cdc275bc9f8b4, type: 2}
     unlockCost:
-    - item: {fileID: 0}
-      amount: 0
+    - item: {fileID: 11400000, guid: f0e6a2413db7d4bafb31022cc516027c, type: 2}
+      amount: 5
     prerequisites:
     - {fileID: 11400000, guid: d8179d8276368407c9d15cd7c2ed5ae8, type: 2}
     overrideLevel: 2
-    orderInLevel: 0
+    orderInLevel: 4
   - building: {fileID: 11400000, guid: 19c41d6fee23b4f9aa7700eec6721954, type: 2}
     unlockCost: []
     prerequisites:
     - {fileID: 11400000, guid: d8179d8276368407c9d15cd7c2ed5ae8, type: 2}
     overrideLevel: 2
-    orderInLevel: 0
+    orderInLevel: 5
+  - building: {fileID: 11400000, guid: e7b3b08b99f45465183a396dcb521140, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: 249bd13c5db0f4170bc636fde88fc456, type: 2}
+    overrideLevel: 3
+    orderInLevel: 1
+  - building: {fileID: 11400000, guid: 23ae7838d2609495c85406fe3d9dfdb4, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: 249bd13c5db0f4170bc636fde88fc456, type: 2}
+    overrideLevel: 3
+    orderInLevel: 2
+  - building: {fileID: 11400000, guid: a735736b220ff4da99974a9fb2efe406, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: 1b3d21448f76849fdbd58aa172473974, type: 2}
+    overrideLevel: 3
+    orderInLevel: 5
   - building: {fileID: 11400000, guid: 4487f04e1379e4a08bd21d08aab89be4, type: 2}
     unlockCost: []
     prerequisites:
     - {fileID: 11400000, guid: d24eae04f866a4b0385cdc275bc9f8b4, type: 2}
     overrideLevel: 3
-    orderInLevel: 0
+    orderInLevel: 6
   - building: {fileID: 11400000, guid: 42d113785440c4737b1fffcb114191b7, type: 2}
     unlockCost: []
     prerequisites:
     - {fileID: 11400000, guid: 19c41d6fee23b4f9aa7700eec6721954, type: 2}
     overrideLevel: 3
-    orderInLevel: 0
+    orderInLevel: 7
   - building: {fileID: 11400000, guid: a2ecd30491c0a4d97a0dad28748f1625, type: 2}
     unlockCost: []
     prerequisites:
     - {fileID: 11400000, guid: 19c41d6fee23b4f9aa7700eec6721954, type: 2}
     overrideLevel: 3
-    orderInLevel: 0
+    orderInLevel: 8
   - building: {fileID: 11400000, guid: d56f8d2b47d0f495398f6e37d6a87202, type: 2}
     unlockCost: []
     prerequisites:
     - {fileID: 11400000, guid: 19c41d6fee23b4f9aa7700eec6721954, type: 2}
     overrideLevel: 3
-    orderInLevel: 0
+    orderInLevel: 9
   - building: {fileID: 11400000, guid: f494b76da12f9485f8ccbd56e91b7b17, type: 2}
     unlockCost: []
     prerequisites:
     - {fileID: 11400000, guid: 42d113785440c4737b1fffcb114191b7, type: 2}
     overrideLevel: 4
-    orderInLevel: 0
+    orderInLevel: 1
   - building: {fileID: 11400000, guid: 54a115888f4624c5fa1aa99ad68b8a59, type: 2}
     unlockCost: []
     prerequisites:
     - {fileID: 11400000, guid: d56f8d2b47d0f495398f6e37d6a87202, type: 2}
     overrideLevel: 4
-    orderInLevel: 0
+    orderInLevel: 2
+  - building: {fileID: 11400000, guid: 74290b1eef9af4c54a9e575f5ae100cc, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: d8179d8276368407c9d15cd7c2ed5ae8, type: 2}
+    overrideLevel: 2
+    orderInLevel: 6
+  - building: {fileID: 11400000, guid: 3a4be602e1cf549209f29882e8aa263e, type: 2}
+    unlockCost: []
+    prerequisites:
+    - {fileID: 11400000, guid: 1b3d21448f76849fdbd58aa172473974, type: 2}
+    overrideLevel: 3
+    orderInLevel: 4
   initialUnlocks:
   - {fileID: 11400000, guid: bd46aca240aac416f80242de71989fb5, type: 2}
   - {fileID: 11400000, guid: d596688fbf86e47319851ff6c7ab210d, type: 2}
   - {fileID: 11400000, guid: 61ab971223d074d0c9fe13007ed9db64, type: 2}
-  - {fileID: 11400000, guid: e7b3b08b99f45465183a396dcb521140, type: 2}
+  - {fileID: 11400000, guid: d8179d8276368407c9d15cd7c2ed5ae8, type: 2}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
   m_Name: PowerRelay
   m_EditorClassIdentifier: 
-  buildingName: Glowing Fungus
+  buildingName: Power Relay
   description: 
   icon: {fileID: -1293167690, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 5599806444419695884, guid: 3605cd789acc245149c254332e491e89, type: 3}

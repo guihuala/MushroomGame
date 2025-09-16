@@ -6,10 +6,10 @@ public class ConstructionCostPanel : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private Transform listContainer;
-    [SerializeField] private ConstructionCostRow rowPrefab;
+    [SerializeField] private CostRow rowPrefab;
 
     private BuildingData _data;
-    private readonly List<ConstructionCostRow> _rows = new();
+    private readonly List<CostRow> _rows = new();
 
     private void OnEnable()
     {

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Ice Maker
   m_EditorClassIdentifier: 
   buildingName: Ice Maker
-  description: 
+  description: A powered device that freezes Water into valuable Ice Crystals, essential
+    for cryo-related processes and recipes.
   icon: {fileID: -1980006255, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 4152940537445816867, guid: b47a7fe3f802b4a9db19bcfbd94101b6, type: 3}
   category: 0
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: 1b654b3c9413f4ce3a5d67470de5acdc, type: 2}
+    amount: 2

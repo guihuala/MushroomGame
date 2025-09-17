@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: PowerRelay
   m_EditorClassIdentifier: 
   buildingName: Power Relay
-  description: 
+  description: Extends the range of bio-electrical networks, but introduces signal
+    attenuation (weakens power strength per unit traveled).
   icon: {fileID: -1293167690, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 5599806444419695884, guid: 3605cd789acc245149c254332e491e89, type: 3}
   category: 0
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: bdb81a4af92314f2da1f5eff2e8475bb, type: 2}
+    amount: 2

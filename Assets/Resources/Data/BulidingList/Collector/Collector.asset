@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Collector
   m_EditorClassIdentifier: 
   buildingName: Collector
-  description: The Collector allows you to collect manure and wood shavings from
-    the soil.
+  description: Automatically extracts and collects basic raw materials (e.g., Wood
+    Chips, Manure) from the soil.
   icon: {fileID: -1738815070, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 4677449544429423496, guid: 6008c1be3b662426f829a1056c283fd1, type: 3}
   category: 0

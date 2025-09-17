@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Lantern mushroom
   m_EditorClassIdentifier: 
   buildingName: Lantern mushroom
-  description: 
+  description: Produces fluorescent spores. Essential for constructing various types
+    of glowing devices and light sources.
   icon: {fileID: -878174064, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 3662107331524145950, guid: 7c7db2b1896d143deaf4b481272c8968, type: 3}
   category: 0
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+    amount: 5

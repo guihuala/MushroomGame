@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Mineralizer Furnace
   m_EditorClassIdentifier: 
   buildingName: Mineralizer Furnace
-  description: 
+  description: An electrical processing unit that refines raw Mineral Powder into
+    a potent, liquid Mineral Nutrient Solution.
   icon: {fileID: 2014472946, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 5262894562915171561, guid: 56c57d6dd34b54cd3a022f26c8d151d1, type: 3}
   category: 0
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: 1b654b3c9413f4ce3a5d67470de5acdc, type: 2}
+    amount: 2

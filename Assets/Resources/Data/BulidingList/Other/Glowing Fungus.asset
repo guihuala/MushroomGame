@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Glowing Fungus
   m_EditorClassIdentifier: 
   buildingName: Glowing Fungus
-  description: 
+  description: Emits a soft, natural glow, providing sustainable illumination to
+    dark areas without requiring external power.
   icon: {fileID: -1033529171, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 3302959437552956217, guid: 61334cb3468564f11af2367782dce51b, type: 3}
   category: 0
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: 646ae81d0270941018e2d04f250ee975, type: 2}
+    amount: 2

@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: Mycelium
   m_EditorClassIdentifier: 
   buildingName: Mycelium
-  description: 
+  description: The most basic transport system, used for short-distance item transfer.
+    It is low-cost and slow, making it ideal for bulk resource transportation in
+    the early game.
   icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   prefab: {fileID: 8460108924053623367, guid: 9e3e5ed9d50084e2ea1691531522d3ca, type: 3}
   category: 1
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+    amount: 1

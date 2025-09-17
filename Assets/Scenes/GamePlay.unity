@@ -74262,7 +74262,9 @@ MonoBehaviour:
     stageObjectsToEnable: []
   currentStageIndex: 0
   isFinalStageComplete: 0
-  initialItems: []
+  initialItems:
+  - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+    amount: 20
 --- !u!1001 &1198007741
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79966,7 +79968,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -200, y: -280}
+  m_AnchoredPosition: {x: 200, y: -280}
   m_SizeDelta: {x: 400, y: 520}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5150508673310415953

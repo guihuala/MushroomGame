@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: King Stropharia
   m_EditorClassIdentifier: 
   buildingName: King Stropharia
-  description: 
+  description: Processes wood and manure into dense, nutrient-rich blocks, ideal
+    for further cultivation or as potent fertilizer.
   icon: {fileID: 1502497576, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 270376801540328484, guid: ac9d909dfa93c44bca26f53af822fd3a, type: 3}
   category: 2
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+    amount: 5

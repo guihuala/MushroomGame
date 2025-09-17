@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Mycelium Splitter
   m_EditorClassIdentifier: 
   buildingName: Mycelium Splitter
-  description: 
+  description: Splits one input conduit into two output paths. If an item is present
+    at the input, it is guaranteed to be sent to at least one of the outputs.
   icon: {fileID: -1478752767, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 7700215471067707054, guid: 0c44f174fd197410f9acb5410f8f686c, type: 3}
   category: 1
-  constructionCost: []
+  constructionCost:
+  - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+    amount: 2

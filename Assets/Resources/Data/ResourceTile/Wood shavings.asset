@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50275919957954203be63b872707d10e, type: 3}
   m_Name: Wood shavings
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 223821821, guid: 3631e40f82b0b4b8a95f64fe43fefa90, type: 3}
+  m_Sprite: {fileID: 1536810956, guid: 32b87441fd93f4ec78dec5c56a3c14f4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

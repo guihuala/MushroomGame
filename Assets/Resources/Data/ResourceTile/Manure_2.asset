@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 50275919957954203be63b872707d10e, type: 3}
-  m_Name: Manure
+  m_Name: Manure_2
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -705438236, guid: 32b87441fd93f4ec78dec5c56a3c14f4, type: 3}
+  m_Sprite: {fileID: -818133407, guid: 32b87441fd93f4ec78dec5c56a3c14f4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -34,6 +34,6 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 275657978208980531, guid: c5ae66117ae8743908a5d0a2b1bc5ea2, type: 3}
   m_Flags: 1
   m_ColliderType: 1
-  yieldItem: {fileID: 0}
+  yieldItem: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
   infinite: 1
   baseRichness: 50

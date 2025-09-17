@@ -39,7 +39,7 @@ public partial class PlacementSystem : MonoBehaviour
     // 预览与当前选择
     private GenericPreview _currentPreview;
     private Building _currentPrefab;
-    private Vector2Int _currentDir = Vector2Int.right;
+    private Vector2Int _currentDir = Vector2Int.up;
     private Color _origValid, _origInvalid;
     private Tween _currentMoveTween, _currentRotateTween;
 
@@ -155,40 +155,7 @@ public partial class PlacementSystem : MonoBehaviour
         else
             _currentPreview.SetRotationEnabled(false);
     }
-
-    // 兼容旧接口：若外部还调用此方法，则尝试通过 buildingList 找到对应 Data
-    public void SetCurrentBuilding(Building buildingPrefab)
-    {
-        _currentPrefab = buildingPrefab;
-
-        // 尝试反查 Data
-        _currentData = null;
-        if (buildingList != null && buildingList.allBuildings != null)
-        {
-            foreach (var bd in buildingList.allBuildings)
-            {
-                if (bd != null && bd.prefab != null && bd.prefab.GetType() == buildingPrefab.GetType())
-                {
-                    _currentData = bd;
-                    break;
-                }
-            }
-        }
-
-        // 与 Data 入口保持一致的后续处理
-        ClearPreview();
-        _isDragging = false;
-        _dragLastBuilding = null;
-        _mode = BrushMode.Place;
-
-        if (_currentPreview == null)
-            CreatePreview(Vector3.zero);
-
-        if (_currentPrefab is IOrientable)
-            _currentPreview.SetRotationEnabled(true);
-        else
-            _currentPreview.SetRotationEnabled(false);
-    }
+    
     public void SelectIndex(int idx) => SelectIndexInternal(idx);
 
     #endregion

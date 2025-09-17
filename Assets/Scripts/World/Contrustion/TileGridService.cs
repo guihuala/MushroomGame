@@ -135,7 +135,6 @@ public class TileGridService : MonoBehaviour
             }
         }
         
-        NotifyNeighborsOfChange(startCell);
         NotifyBuildingPlaced(startCell, building);
     }
 
@@ -151,34 +150,7 @@ public class TileGridService : MonoBehaviour
             }
         }
         
-        NotifyNeighborsOfChange(startCell);
         NotifyBuildingRemoved(startCell);
-    }
-    
-    private void NotifyNeighborsOfChange(Vector2Int changedCell)
-    {
-        // 定义4个方向的邻居
-        Vector2Int[] directions = { 
-            Vector2Int.up, 
-            Vector2Int.right, 
-            Vector2Int.down, 
-            Vector2Int.left 
-        };
-    
-        foreach (var dir in directions)
-        {
-            var neighborCell = changedCell + dir;
-        
-            // 发送邻居变化消息
-            MsgCenter.SendMsg(MsgConst.NEIGHBOR_CHANGED, neighborCell);
-        
-            // 如果有建筑，也通知具体的建筑
-            var building = GetBuildingAt(neighborCell);
-            if (building != null)
-            {
-                building.OnNeighborChanged();
-            }
-        }
     }
     
     private void NotifyBuildingPlaced(Vector2Int cell, Building building)

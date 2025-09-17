@@ -27,7 +27,6 @@ public class PowerConveyer : Conveyer
             if (movingCount == 0 || PowerManager.Instance.TryConsumePower(need))
             {
                 useSpeed = poweredSpeed;
-                MarkPathActivated(this, 1f);
             }
             else
             {

@@ -46,8 +46,7 @@ public class BeltScheduler : Singleton<BeltScheduler>
             if (path.Count > 0) _paths.Add(path);
         }
     }
-
-    // 由 TickManager 传入 dt
+    
     public void TickOnce(float dt)
     {
         foreach (var path in _paths) {

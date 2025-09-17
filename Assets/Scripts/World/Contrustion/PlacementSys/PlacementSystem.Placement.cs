@@ -3,7 +3,7 @@ using UnityEngine;
 public partial class PlacementSystem
 {
     #region 放置/擦除
-    private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis, bool adjustPrev)
+    private void PlaceOne(Vector2Int cell, Vector3 worldPos, Vector2Int dirForThis)
     {
         // 1) 必须有 Data 和 Prefab
         if (_currentData == null || _currentData.prefab == null)
@@ -36,18 +36,14 @@ public partial class PlacementSystem
 
         // 4) 实例化并朝向
         var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
-        if (building is IOrientable orientable) orientable.SetDirection(dirForThis);
+        if (building is IOrientable orientable) 
+        {
+            orientable.SetDirection(dirForThis);
+        }
 
         // 5) 占格 & 回调
         grid.OccupyCells(cell, building.size, building);
         building.OnPlaced(grid, cell);
-
-        // 6) 拖线时让上一件顺向
-        if (adjustPrev && _dragLastBuilding is IOrientable prevOrient)
-        {
-            var delta = NormalizeToCardinal(cell - _dragLastCell);
-            if (delta != Vector2Int.zero) prevOrient.SetDirection(delta);
-        }
         
         AudioManager.Instance.PlaySfx("Place");
 
@@ -55,7 +51,7 @@ public partial class PlacementSystem
         _dragLastBuilding = building;
     }
 
-    // 仅沿水平或垂直（锁定轴）步进放置
+    // 仅沿水平或垂直步进放置
     private void StepAndPlaceAlongLockedAxis(Vector2Int last, Vector2Int target)
     {
         var cur = last;
@@ -66,18 +62,9 @@ public partial class PlacementSystem
                 : new Vector2Int(0, (int)Mathf.Sign(target.y - cur.y));
 
             var next = cur + step;
-            PlaceOne(next, grid.CellToWorld(next), step, adjustPrev: true);
+            PlaceOne(next, grid.CellToWorld(next), _currentDir);
             cur = next;
         }
-    }
-    
-    private static Vector2Int NormalizeToCardinal(Vector2Int delta)
-    {
-        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
-            return new Vector2Int((int)Mathf.Sign(delta.x), 0);
-        if (Mathf.Abs(delta.y) > Mathf.Abs(delta.x))
-            return new Vector2Int(0, (int)Mathf.Sign(delta.y));
-        return Vector2Int.zero;
     }
     #endregion
 }

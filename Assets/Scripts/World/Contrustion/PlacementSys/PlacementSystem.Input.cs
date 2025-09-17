@@ -26,7 +26,7 @@ public partial class PlacementSystem
             _dragLastCell = cell;
             _lineAxis = LineAxis.Free;
 
-            PlaceOne(cell, worldPos, _currentDir, true);
+            PlaceOne(cell, worldPos, _currentDir);
             return;
         }
 
@@ -47,7 +47,7 @@ public partial class PlacementSystem
                     ? new Vector2Int(cell.x, _dragAnchorCell.y)
                     : new Vector2Int(_dragAnchorCell.x, cell.y);
 
-                // 沿着“上一格 -> 投影格”逐格放置（保证严格直线）
+                // 沿着“上一格 -> 投影格”逐格放置
                 if (projected != _dragLastCell)
                 {
                     StepAndPlaceAlongLockedAxis(_dragLastCell, projected);
@@ -87,7 +87,7 @@ public partial class PlacementSystem
             return;
         }
 
-        // 右键按住：标记待拆除建筑（会自动发送显示提示事件）
+        // 右键按住：标记待拆除建筑
         if (_isRightErasing && _input.IsRightMouseHeld() && !_input.IsPointerOverUI())
         {
             if (!_eraseAsBox && cell != _eraseAnchorCell)

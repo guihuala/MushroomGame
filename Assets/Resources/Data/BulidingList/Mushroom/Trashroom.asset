@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67541480876445878f86b5adc901944, type: 3}
   m_Name: Trashroom
   m_EditorClassIdentifier: 
-  buildingName: Trashroom
+  buildingName: Decomposition Mushroom
   description: Functions as a biological waste disposal unit. Can break down any
     unwanted material and convert it into useful humus.
   icon: {fileID: 1726949328, guid: 10223e4b298384d478a88692d0963313, type: 3}

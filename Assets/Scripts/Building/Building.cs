@@ -17,6 +17,8 @@ public abstract class Building : MonoBehaviour
     
     protected static Vector2Int RotCW(Vector2Int v)  => new Vector2Int(v.y, -v.x);
     protected static Vector2Int RotCCW(Vector2Int v) => new Vector2Int(-v.y, v.x);
+    
+    public Vector3 GetWorldPosition() => grid.CellToWorld(cell);
 
     public virtual void OnPlaced(TileGridService g, Vector2Int c)
     {

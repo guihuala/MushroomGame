@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: 21300000, guid: 5698a4ddaad2d4ef78fbe97c696af0fa, type: 3}
+  m_Sprite: {fileID: 361124735, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -102,15 +102,14 @@ MonoBehaviour:
   cell: {x: 0, y: 0}
   size: {x: 1, y: 1}
   beltSpeed: 1
-  inDir: {x: -1, y: 0}
-  outDir: {x: 1, y: 0}
+  inDir: {x: 0, y: 1}
+  outDir: {x: 0, y: -1}
   itemSpacing: 0.3
   maxItems: 3
-  pathLineEnabled: 1
-  pathLineWidth: 0.1
-  pathLineColor: {r: 0.9, g: 1, b: 0.9, a: 0.9}
-  pathLineMaterial: {fileID: 0}
-  cornerVertices: 6
-  capVertices: 2
-  highlightColor: {r: 1, g: 1, b: 1, a: 1}
-  highlightFadePerSec: 2.5
+  sprites:
+    straight: {fileID: 361124735, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+    corner: {fileID: 360694176, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+    tee: {fileID: 875459674, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+    cross: {fileID: -411923938, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+  deadEndCap: {fileID: -191762402, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+  none: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}

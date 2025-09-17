@@ -176,35 +176,27 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         // 添加页签切换动画
         UpdateCategoryTabsVisualWithAnimation();
 
-        ShowBuildingsInCategoryWithAnimation(category);
+        // 移除动画效果，直接显示建筑
+        ShowBuildingsInCategory(category);
     }
     
     /// <summary>
-    /// 显示指定分类的建筑（带动画）
+    /// 显示指定分类的建筑（无动画）
     /// </summary>
-    private void ShowBuildingsInCategoryWithAnimation(BuildingCategory category)
+    private void ShowBuildingsInCategory(BuildingCategory category)
     {
-        Sequence sequence = DOTween.Sequence();
-        
         for (int i = 0; i < buildingButtons.Count; i++)
         {
             var buildingData = buildingsByCategory.Values.SelectMany(x => x).ElementAt(i);
             var button = buildingButtons[i];
             var shouldShow = buildingData.category == category;
             
-            if (button.gameObject.activeSelf != shouldShow)
+            button.gameObject.SetActive(shouldShow);
+            
+            // 直接设置正常大小，不使用动画
+            if (shouldShow)
             {
-                if (shouldShow)
-                {
-                    button.gameObject.SetActive(true);
-                    button.transform.localScale = Vector3.zero;
-                    sequence.Insert(i * 0.05f,
-                        button.transform.DOScale(originalButtonScales[button], 0.02f).SetEase(Ease.OutBack));
-                }
-                else
-                {
-                    button.gameObject.SetActive(false);
-                }
+                button.transform.localScale = originalButtonScales[button];
             }
         }
     }

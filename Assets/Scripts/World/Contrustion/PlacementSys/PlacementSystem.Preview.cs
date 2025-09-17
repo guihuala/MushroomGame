@@ -89,7 +89,7 @@ public partial class PlacementSystem
     
     private void RotatePreview()
     {
-        Vector2Int[] rotationCycle = { Vector2Int.right, Vector2Int.down, Vector2Int.left, Vector2Int.up };
+        Vector2Int[] rotationCycle = { Vector2Int.up ,Vector2Int.right, Vector2Int.down, Vector2Int.left};
         int currentIndex = System.Array.IndexOf(rotationCycle, _currentDir);
         int nextIndex = (currentIndex + 1) % rotationCycle.Length;
         SetDirection(rotationCycle[nextIndex]);

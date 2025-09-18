@@ -49,9 +49,7 @@ public static class AutoTileSystem
         bool in_back    = CanIn(back);
         bool in_ibRight = CanIn(ibRight);
         bool in_ibLeft  = CanIn(ibLeft);
-
-
-        // 只刷新外观：贴图由 Conveyer.ComputeConnectionMask() 决定
+        
         me.UpdateVisualSprite();
     }
 }

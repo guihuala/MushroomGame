@@ -115,7 +115,9 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     {
         if (!this || !gameObject.activeInHierarchy) return;
         if (args.Length > 0 && args[0] is Vector2Int changed && (changed - cell).sqrMagnitude <= 2f)
+        {
             AutoTile(true);
+        }
     }
 
     public void SetDirection(Vector2Int dir)
@@ -128,26 +130,33 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     #endregion
 
     #region 物流推进/转移
-
     private void UpdateItemPositions(float dt)
     {
         if (_items.Count == 0) return;
 
         float move = Mathf.Max(0f, dt * beltSpeed);
-        float headLimit = 1f;
+        float headLimit;
 
-        var nextPort = grid.GetPortAt(cell + outDir);
-        if (nextPort is Conveyer nextBelt)
+        var nextPort = grid.GetPortAt(cell + outDir) as IItemPort;
+        bool hasValidDown = nextPort != null && TransportCompat.DownAccepts(outDir, nextPort);
+
+        if (!hasValidDown)
         {
-            headLimit = (nextBelt.Items.Count == 0) ? 1f : Mathf.Min(1f, nextBelt.Items[0].pos - itemSpacing);
+            // 没有下游或下游不接受 → 只能到本格中心
+            headLimit = 0.5f;
+        }
+        else if (nextPort is Conveyer nextBelt)
+        {
+            // 下游是传送带：根据它的队首预留间距
+            headLimit = (nextBelt.Items.Count == 0)
+                ? 1f
+                : Mathf.Min(1f, nextBelt.Items[0].pos - itemSpacing);
+            headLimit = Mathf.Max(0f, headLimit); // 防负值
         }
         else
         {
-            // 主动（重新）绑定正前方端口——不改方向，只刷新引用
-            FindBestOutputConnection(); 
-            
-            bool canOut = _connectedOutputPort != null && _connectedOutputPort.CanReceive;
-            headLimit = canOut ? 1f : 1f - 0.0001f;
+            // 下游是可接收的非传送带端口（机器/箱子等）：允许到 1f，交接由 TryTransferFirstItem 处理
+            headLimit = 1f;
         }
 
         Vector3 a = grid.CellToWorld(cell);
@@ -155,10 +164,17 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
 
         for (int i = _items.Count - 1; i >= 0; i--)
         {
-            float limit = (i == _items.Count - 1) ? headLimit : Mathf.Min(_items[i + 1].pos - itemSpacing, 1f);
+            float rearLimit = (i == _items.Count - 1)
+                ? headLimit
+                : Mathf.Min(_items[i + 1].pos - itemSpacing, headLimit);
+
             var it = _items[i];
-            it.pos = Mathf.Min(it.pos + move, limit);
-            it.payload.worldPos = Vector3.Lerp(a, b, Mathf.Clamp01(it.pos));
+            it.pos = Mathf.Min(it.pos + move, rearLimit);
+
+            // 写回渲染坐标：死端时最多到 0.5，其它情况按实际 pos
+            float t = hasValidDown ? it.pos : Mathf.Min(it.pos, 0.5f);
+            it.payload.worldPos = Vector3.Lerp(a, b, Mathf.Clamp01(t));
+
             _items[i] = it;
         }
     }
@@ -176,6 +192,8 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
         {
             bool space = nextBelt.Items.Count == 0 || nextBelt.Items[0].pos >= itemSpacing;
             if (!space || nextBelt.Items.Count >= nextBelt.maxItems) return;
+            
+            head.lane = LaneFromUpstream(nextBelt, this);
 
             _items.RemoveAt(headIdx);
             head.pos = 0f;
@@ -191,7 +209,23 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
                 _items.RemoveAt(headIdx);
         }
     }
+    
+    private static int LaneFromUpstream(Conveyer next, Conveyer up)
+    {
+        // 下游的“后方”格（即它的入口）在 next.cell - next.outDir
+        Vector2Int back = -next.outDir;
 
+        // 以 next 的朝向推导左右（右手坐标）：(y,-x)
+        Vector2Int right = new Vector2Int(next.outDir.y, -next.outDir.x);
+        Vector2Int left  = new Vector2Int(-next.outDir.y, next.outDir.x);
+
+        if (up.cell == next.cell + right) return +1;  // 右侧汇入
+        if (up.cell == next.cell + left)  return -1;  // 左侧汇入
+
+        // 直线/其它情况默认 0
+        return 0;
+    }
+    
     private void InternalReceive(BeltItem item)
     {
         item.pos = 0f;
@@ -366,9 +400,6 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
         if (!spriteRenderer) return;
 
         int mask = ComputeConnectionMask(); // 获取当前连接掩码
-        
-        Debug.Log($"[BELT VIS] cell={cell} out={outDir} mask={Convert.ToString(mask,2).PadLeft(4,'0')}");
-
         var (spr, rot) = ChooseSpriteAndRotation(mask);
 
         spriteRenderer.sprite = spr;

@@ -76396,8 +76396,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemVisualPrefab: {fileID: 3846650673936490404, guid: 98c08babfd5df458289da7403005ba07, type: 3}
+  itemRoot: {fileID: 0}
   smoothTime: 0.08
   maxSpeed: 100
+  snapDistance: 0.6
+  mergeLaneOffset: 0.12
 --- !u!114 &1376572714
 MonoBehaviour:
   m_ObjectHideFlags: 0

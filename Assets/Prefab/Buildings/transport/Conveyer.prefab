@@ -104,8 +104,8 @@ MonoBehaviour:
   beltSpeed: 1
   inDir: {x: 0, y: 1}
   outDir: {x: 0, y: -1}
-  itemSpacing: 0.3
-  maxItems: 3
+  itemSpacing: 0.2
+  maxItems: 5
   sprites:
     straight: {fileID: 361124735, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
     corner: {fileID: 360694176, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}

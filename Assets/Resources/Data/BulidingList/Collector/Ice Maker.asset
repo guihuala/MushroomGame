@@ -20,4 +20,4 @@ MonoBehaviour:
   category: 0
   constructionCost:
   - item: {fileID: 11400000, guid: 1b654b3c9413f4ce3a5d67470de5acdc, type: 2}
-    amount: 2
+    amount: 0

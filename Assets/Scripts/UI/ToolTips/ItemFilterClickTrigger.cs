@@ -4,10 +4,8 @@ using UnityEngine.EventSystems;
 
 public class ItemFilterClickTrigger : MonoBehaviour, IPointerClickHandler
 {
-    [Header("UI Prefab")]
-    public GameObject itemSelectionPanelPrefab; // 物品选择框的预制件
-
-    private GameObject itemSelectionPanelInstance; // 实例化后的物品选择框
+    [Header("Open Offset (Screen Pixels)")]
+    public Vector2 screenOffset = new Vector2(0, -40f);
 
     private void Awake()
     {
@@ -16,17 +14,13 @@ public class ItemFilterClickTrigger : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (ItemFilter.GetInstance() != null) return;
-        
-        itemSelectionPanelInstance = Instantiate(itemSelectionPanelPrefab);
-        itemSelectionPanelInstance.SetActive(true);
-        
-        itemSelectionPanelInstance.transform.position = transform.position + new Vector3(0, -20f, 0);
-        
-        var itemFilter = itemSelectionPanelInstance.GetComponent<ItemFilter>();
-        itemFilter.InitializeFilter();
+        var panel = ItemFilter.Instance;
+        if (panel == null) return;
+
+        // 以当前物体位置为参考点打开
+        panel.OpenAtWorld(transform.position, screenOffset);
     }
-    
+
     private void EnsureCollider()
     {
         var col = GetComponent<Collider2D>();

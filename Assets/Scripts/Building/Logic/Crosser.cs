@@ -69,7 +69,7 @@ public class Crosser : Building, IItemPort, ITickable, IOrientable
 
     private void UpdateVisual()
     {
-        transform.right = new Vector3(outDir.x, outDir.y, 0f);
+        transform.up = new Vector3(outDir.x, outDir.y, 0f);
     }
     #endregion
 

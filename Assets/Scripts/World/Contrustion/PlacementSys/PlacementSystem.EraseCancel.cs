@@ -1,4 +1,3 @@
-// PlacementSystem.EraseCancel.cs 修改为使用事件中心
 using UnityEngine;
 
 public partial class PlacementSystem

@@ -56,8 +56,7 @@ public class Distributor : Building, IItemPort, IOrientable, ITickable
 
     private void UpdateVisual()
     {
-        // 简单做法：让物体“右向”对齐 outDir
-        transform.right = new Vector3(outDir.x, outDir.y, 0f);
+        transform.up = new Vector3(outDir.x, outDir.y, 0f);
     }
     
     public bool TryReceive(in ItemPayload payloadIn)

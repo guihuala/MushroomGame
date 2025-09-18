@@ -1,14 +1,15 @@
-using UnityEngine;
-
-
 public class BeltItem
 {
     public ItemPayload payload;
-    public float pos; // 位置
+    public float pos;
+
+    public readonly long id;
+    private static long _nextId;
 
     public BeltItem(ItemPayload payload)
     {
         this.payload = payload;
-        this.pos = 0f;
+        pos = 0f;
+        id = ++_nextId;
     }
 }

@@ -37,6 +37,8 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     private Vector2Int _connectedDirection;
 
     private readonly List<IItemPort> _connectedInputPorts = new();
+    public IReadOnlyList<IItemPort> Inputs => _connectedInputPorts;
+    
     private IBeltNode _beltNodeImplementation;
 
     #endregion
@@ -193,6 +195,8 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     private void InternalReceive(BeltItem item)
     {
         item.pos = 0f;
+        item.payload.worldPos = grid.CellToWorld(cell);
+        
         _items.Insert(0, item);
     }
 
@@ -217,6 +221,7 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     {
         if (!CanReceive) return false;
         var item = new BeltItem(payloadIn) { pos = 0f };
+        item.payload.worldPos = grid.CellToWorld(cell);
         _items.Insert(0, item);
         return true;
     }

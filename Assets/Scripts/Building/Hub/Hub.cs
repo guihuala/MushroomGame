@@ -89,9 +89,6 @@ public class Hub : MonoBehaviour
         var port = new HubPort(cell, this);
         _ports.Add(port);
         grid.RegisterPort(cell, port);
-
-        // --- 调试输出 ---
-        Debug.Log($"[Hub] 注册端口: Cell={cell}, Offset={offset}, Hub={name}");
     }
 
 

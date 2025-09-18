@@ -148,12 +148,10 @@ public partial class PlacementSystem : MonoBehaviour
         {
             CreatePreview(Vector3.zero);
         }
-
-        // 根据 prefab 是否实现 IOrientable 控制预览是否可旋转
-        if (_currentPrefab is IOrientable)
-            _currentPreview.SetRotationEnabled(true);
-        else
-            _currentPreview.SetRotationEnabled(false);
+        
+        bool rotatable = _currentPrefab is IOrientable;
+        _currentPreview.SetRotationEnabled(rotatable);
+        SetDirection(_currentDir);
     }
     
     public void SelectIndex(int idx) => SelectIndexInternal(idx);

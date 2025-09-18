@@ -8,6 +8,15 @@ public class BeltRenderer : MonoBehaviour
     [Header("Smooth 动画")] public float smoothTime = 0.08f;
     public float maxSpeed = 100f;
     
+    [Header("Merge 预览")]
+    public bool debugMergeGhosts = true;     // 开关：随时可在 Inspector 勾掉
+    public float upstreamWindowStart = 0.5f; // 上游进入投影窗的阈值
+    public float ghostAlpha = 0.6f;          // 幽灵半透明
+
+    private readonly Dictionary<Conveyer, List<GameObject>> _mergeGhosts = new();
+    private readonly Queue<GameObject> _ghostPool = new();
+
+    
     private readonly HashSet<Conveyer> _activeConveyors = new();
 
     private readonly Dictionary<BeltItem, GameObject> _goByItem = new();
@@ -65,6 +74,8 @@ public class BeltRenderer : MonoBehaviour
 
                 // 正常更新
                 UpdateItemVisual(go, it);
+                
+                if (debugMergeGhosts) UpdateMergePreview(c);
             }
         }
 
@@ -116,7 +127,6 @@ public class BeltRenderer : MonoBehaviour
 
     private void UpdateItemVisual(GameObject go, BeltItem item)
     {
-        // 确保图标与 payload 对齐（避免旧图标残留）
         var sr = go.GetComponent<SpriteRenderer>();
         if (sr != null) sr.sprite = item.payload.item ? item.payload.item.icon : null;
 
@@ -126,14 +136,84 @@ public class BeltRenderer : MonoBehaviour
         if (!_velByGo.TryGetValue(go, out var v)) v = Vector3.zero;
 
         var pos = go.transform.position;
-        if ((pos - target).sqrMagnitude > 1f)
+        if ((pos - target).sqrMagnitude > 0.25f) // SNAP阈值
         {
             pos = target;
             v = Vector3.zero;
         }
 
-        var next = Vector3.SmoothDamp(pos, target, ref v, smoothTime, maxSpeed);
+        var next = Vector3.SmoothDamp(pos, target, ref v, smoothTime, Mathf.Infinity);
         go.transform.position = next;
         _velByGo[go] = v;
+    }
+
+    private void UpdateMergePreview(Conveyer c)
+    {
+        if (!_mergeGhosts.TryGetValue(c, out var ghosts))
+        {
+            ghosts = new List<GameObject>();
+            _mergeGhosts[c] = ghosts;
+        }
+        // 回收上次的幽灵
+        foreach (var g in ghosts) ReturnGhost(g);
+        ghosts.Clear();
+
+        // 统计上游传送带
+        var inputs = c.Inputs; // 需要 Conveyer 暴露 IReadOnlyList<IItemPort> Inputs
+        int upstreamBelts = 0;
+
+        // 下游带的世界端点（与逻辑层一致）
+        Vector3 a = c.grid.CellToWorld(c.cell);
+        Vector3 b = c.grid.CellToWorld(c.cell + c.outDir);
+
+        foreach (var ip in inputs)
+        {
+            if (ip is not Conveyer up) continue;
+            upstreamBelts++;
+
+            var upItems = up.Items;
+            for (int i = 0; i < upItems.Count; i++)
+            {
+                var it = upItems[i];
+                if (it.pos < upstreamWindowStart) continue;
+
+                // 把上游 [upstreamWindowStart,1] 映射到下游 [0.5,1]
+                float t = Mathf.InverseLerp(upstreamWindowStart, 1f, it.pos);
+                float downPos = Mathf.Lerp(0.5f, 1f, t);
+                Vector3 target = Vector3.Lerp(a, b, downPos);
+
+                var go = SpawnGhost(c);
+                var sr = go.GetComponent<SpriteRenderer>();
+                if (sr != null) {
+                    sr.sprite = it.payload.item ? it.payload.item.icon : null;
+                    var col = sr.color; col.a = ghostAlpha; sr.color = col;
+                }
+                go.transform.position = target;
+                go.transform.rotation = Quaternion.identity;
+                ghosts.Add(go);
+            }
+        }
+
+        // 不是合流（上游不到 2 条）就不显示幽灵
+        if (upstreamBelts < 2)
+        {
+            foreach (var g in ghosts) ReturnGhost(g);
+            ghosts.Clear();
+        }
+    }
+
+    private GameObject SpawnGhost(Conveyer c)
+    {
+        var go = _ghostPool.Count > 0 ? _ghostPool.Dequeue() : Instantiate(itemVisualPrefab);
+        go.transform.SetParent(c.transform, false);
+        go.SetActive(true);
+        return go;
+    }
+    private void ReturnGhost(GameObject go)
+    {
+        if (!go) return;
+        go.SetActive(false);
+        go.transform.SetParent(null);
+        _ghostPool.Enqueue(go);
     }
 }

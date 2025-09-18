@@ -12,13 +12,11 @@ public class ItemFilterClickTrigger : MonoBehaviour, IPointerClickHandler
         EnsureCollider();
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public void OnPointerClick(PointerEventData e)
     {
         var panel = ItemFilter.Instance;
         if (panel == null) return;
-
-        // 以当前物体位置为参考点打开
-        panel.OpenAtWorld(transform.position, screenOffset);
+        panel.OpenAtScreen(e.position, new Vector2(16,16), 8);
     }
 
     private void EnsureCollider()

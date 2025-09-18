@@ -54,102 +54,15 @@ public class TaskPanel : MonoBehaviour, IHoverPanel
         if (context is Hub hub) Initialize(hub);
     }
 
-private void Reposition(Vector2 screenPos)
-{
-    CacheRTAndCanvas();
-    if (_rt == null) return;
-
-    if (_rootCanvas != null && _rootCanvas.renderMode != RenderMode.WorldSpace)
+    private void Reposition(Vector2 screenPos)
     {
-        var canvasRT = (RectTransform)_rootCanvas.transform;
+        CacheRTAndCanvas();
+        if (_rt == null || _rootCanvas == null) return;
 
-        // 鼠标的 Canvas 局部坐标
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRT, screenPos, _rootCanvas.worldCamera, out var mouseLocal);
-
-        var size  = _rt.rect.size;   // 面板当前尺寸（受 Layout 变化）
-        var pivot = _rt.pivot;       // 面板当前 pivot
-
-        Vector2 pos; // 目标 anchoredPosition
-
-        if (!smartOffsetBySize)
-        {
-            // 兼容旧逻辑：固定偏移
-            pos = mouseLocal + hoverOffset;
-        }
-        else
-        {
-            // 默认放在鼠标的“右下角”（不遮住鼠标）
-            // 右侧：left(minX) = mouseX + paddingX
-            // 下方：top (maxY) = mouseY - paddingY
-            pos = new Vector2(
-                mouseLocal.x + cursorPadding.x + pivot.x * size.x,
-                mouseLocal.y - cursorPadding.y - (1f - pivot.y) * size.y
-            );
-
-            // 画布可见范围（留出边距）
-            Vector2 minEdge = canvasRT.rect.min + new Vector2(edgePadding, edgePadding);
-            Vector2 maxEdge = canvasRT.rect.max - new Vector2(edgePadding, edgePadding);
-
-            // 计算当前面板在画布内的包围（以 anchoredPosition + pivot 求 min/max）
-            Vector2 min = pos - pivot * size;
-            Vector2 max = pos + (Vector2.one - pivot) * size;
-
-            // 水平翻转：若右侧溢出，则放到鼠标左侧（right=maxX = mouseX - paddingX）
-            if (max.x > maxEdge.x)
-            {
-                pos.x = mouseLocal.x - cursorPadding.x - (1f - pivot.x) * size.x;
-            }
-
-            // 重新算一次左右边界并夹紧（面板比画布还大等极端情况）
-            min = pos - pivot * size;
-            max = pos + (Vector2.one - pivot) * size;
-            if (min.x < minEdge.x)
-                pos.x += (minEdge.x - min.x);
-            else if (max.x > maxEdge.x)
-                pos.x -= (max.x - maxEdge.x);
-
-            // 垂直翻转：若下方溢出，则放到鼠标上方（bottom=minY = mouseY + paddingY）
-            min = pos - pivot * size;
-            max = pos + (Vector2.one - pivot) * size;
-            if (min.y < minEdge.y)
-            {
-                pos.y = mouseLocal.y + cursorPadding.y + pivot.y * size.y;
-            }
-
-            // 再次夹紧上下边界
-            min = pos - pivot * size;
-            max = pos + (Vector2.one - pivot) * size;
-            if (min.y < minEdge.y)
-                pos.y += (minEdge.y - min.y);
-            else if (max.y > maxEdge.y)
-                pos.y -= (max.y - maxEdge.y);
-        }
-
-        _rt.anchoredPosition = pos;
-
-        // 兼容你的原有“贴边防出界”开关（智能模式已做过一次，保留这层保险）
-        if (clampToCanvas)
-        {
-            Vector2 minEdge = canvasRT.rect.min + new Vector2(edgePadding, edgePadding);
-            Vector2 maxEdge = canvasRT.rect.max - new Vector2(edgePadding, edgePadding);
-            Vector2 min = _rt.anchoredPosition - pivot * size;
-            Vector2 max = _rt.anchoredPosition + (Vector2.one - pivot) * size;
-
-            Vector2 corrected = _rt.anchoredPosition;
-            if (min.x < minEdge.x) corrected.x += (minEdge.x - min.x);
-            if (max.x > maxEdge.x) corrected.x -= (max.x - maxEdge.x);
-            if (min.y < minEdge.y) corrected.y += (minEdge.y - min.y);
-            if (max.y > maxEdge.y) corrected.y -= (max.y - maxEdge.y);
-            _rt.anchoredPosition = corrected;
-        }
+        UIPosUtil.PlacePanelAtScreenPoint(
+            _rt, _rootCanvas, screenPos,
+            cursorPadding, edgePadding, smartFlip: true);
     }
-    else
-    {
-        // World Space Canvas：简单偏移
-        _rt.position = (Vector2)_rt.position + hoverOffset;
-    }
-}
 
     private void Awake()
     {

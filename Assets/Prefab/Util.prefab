@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxStorage: 99999
+  itemDefResourcesPath: Data/Item
 --- !u!114 &8881270999556699430
 MonoBehaviour:
   m_ObjectHideFlags: 0

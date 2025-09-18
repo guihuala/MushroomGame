@@ -76961,6 +76961,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3080850820936065389, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: itemButtonPrefab
+      value: 
+      objectReference: {fileID: 3626220691869721620, guid: c82f5f1d86a4b4ee7b6886323e7c2067, type: 3}
     - target: {fileID: 6618367041641777076, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
       propertyPath: m_Name
       value: ItemSelect
@@ -76968,6 +76972,22 @@ PrefabInstance:
     - target: {fileID: 6618367041641777076, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8763420342373812113, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: m_Padding.m_Top
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8763420342373812113, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: m_Padding.m_Left
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8763420342373812113, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: m_Padding.m_Right
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8763420342373812113, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: m_Padding.m_Bottom
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 9002457716938461258, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
       propertyPath: m_Pivot.x

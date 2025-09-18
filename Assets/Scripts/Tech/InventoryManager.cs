@@ -20,23 +20,17 @@ public class InventoryManager : Singleton<InventoryManager>, IManager
 {
     [Header("Storage Settings")]
     public int maxStorage = 99999;
-
-    [Header("Catalog Settings")]
-    [Tooltip("从 Resources 下的这个相对路径读取全部 ItemDef，例如：\"Items\" 或 \"Data/Items\"")]
-    public string itemDefResourcesPath = "Items";
-
-    // 运行期“库存数量”映射
+    
+    public string itemDefResourcesPath;
+    
     private readonly Dictionary<ItemDef, int> _inventory = new Dictionary<ItemDef, int>();
-
-    // 运行期“全部物品目录”（不关心库存数量）
+    
     private readonly List<ItemDef> _catalog = new List<ItemDef>();
-    public IReadOnlyList<ItemDef> AllItemsCatalog => _catalog;
-
-    // ========== 生命周期 ==========
+    
     public void Initialize()
     {
-        BuildCatalogFromResources(itemDefResourcesPath); // 先搭好“全部物品”目录
-        ClearInventory();                                 // 清库存（按你原来的逻辑）
+        BuildCatalogFromResources(itemDefResourcesPath);
+        ClearInventory();
     }
     
     public void BuildCatalogFromResources(string resourcesPath)
@@ -55,8 +49,7 @@ public class InventoryManager : Singleton<InventoryManager>, IManager
             Debug.LogWarning($"[InventoryManager] 未在 Resources/{resourcesPath} 下找到任何 ItemDef。");
             return;
         }
-
-        // 去重 + 保持稳定顺序
+        
         var seen = new HashSet<ItemDef>();
         foreach (var def in items)
         {
@@ -64,12 +57,8 @@ public class InventoryManager : Singleton<InventoryManager>, IManager
             _catalog.Add(def);
             seen.Add(def);
         }
-
-        // （可选）按名称排序：_catalog.Sort((a,b)=>string.Compare(a.name,b.name,StringComparison.Ordinal));
-        MsgCenter.SendMsgAct(MsgConst.INVENTORY_CHANGED); // 如果你有 UI 监听这个事件，可复用
     }
-
-    // ========== 库存操作 ==========
+    
     public bool AddItem(ItemDef item, int amount)
     {
         if (item == null || amount <= 0) return false;
@@ -149,19 +138,5 @@ public class InventoryManager : Singleton<InventoryManager>, IManager
     {
         _inventory.Clear();
         MsgCenter.SendMsgAct(MsgConst.INVENTORY_CHANGED);
-    }
-
-    public bool TryTakeItems(ItemDef item, int amount, out ItemStack takenStack)
-    {
-        takenStack = new ItemStack { item = item, amount = 0 };
-
-        if (!HasEnoughItem(item, amount)) return false;
-
-        if (RemoveItem(item, amount))
-        {
-            takenStack.amount = amount;
-            return true;
-        }
-        return false;
     }
 }

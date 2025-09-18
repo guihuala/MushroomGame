@@ -372,7 +372,6 @@ GameObject:
   - component: {fileID: 4352607039088009705}
   - component: {fileID: 3805552461308331836}
   - component: {fileID: 435346386346568698}
-  - component: {fileID: 448550635368422694}
   - component: {fileID: 116496571680981153}
   m_Layer: 2
   m_Name: ProductionPanel
@@ -453,26 +452,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   title: {fileID: 2619372637736665313}
-  progressFill: {fileID: 1764655201852134928}
   inputsRoot: {fileID: 9149220255809763284}
   outputsRoot: {fileID: 3781985912540101746}
   iconEntryPrefab: {fileID: 2523862220455648038, guid: d7c724829161446638636244e9f5d1ee, type: 3}
   extraText: {fileID: 142577298675908167}
   resourceIconFolder: Icons
-  hoverOffset: {x: 300, y: -18}
   clampToCanvas: 1
---- !u!114 &448550635368422694
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6716652933444719452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f912e59120a64315963a13185a0737b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!61 &116496571680981153
 BoxCollider2D:
   m_ObjectHideFlags: 0

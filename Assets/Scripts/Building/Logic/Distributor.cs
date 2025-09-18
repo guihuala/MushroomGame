@@ -4,8 +4,8 @@ using UnityEngine;
 public class Distributor : Building, IItemPort, IOrientable, ITickable
 {
     [Header("Direction")]
-    public Vector2Int outDir = Vector2Int.right;
-    public Vector2Int inDir  = Vector2Int.left;
+    public Vector2Int outDir = Vector2Int.up;
+    public Vector2Int inDir  = Vector2Int.down;
 
     [Header("Capacity / Behavior")]
     public int bufferCap = 8;            // 内部缓存上限（件）
@@ -42,7 +42,7 @@ public class Distributor : Building, IItemPort, IOrientable, ITickable
     public void SetDirection(Vector2Int dir)
     {
         outDir = dir == Vector2Int.zero
-            ? Vector2Int.right
+            ? Vector2Int.up
             : new Vector2Int(Mathf.Clamp(dir.x, -1, 1), Mathf.Clamp(dir.y, -1, 1));
 
         inDir =

@@ -52,7 +52,7 @@ public class Crosser : Building, IItemPort, ITickable, IOrientable
     public void SetDirection(Vector2Int dir)
     {
         outDir = dir == Vector2Int.zero
-            ? Vector2Int.right
+            ? Vector2Int.up
             : new Vector2Int(Mathf.Clamp(dir.x, -1, 1), Mathf.Clamp(dir.y, -1, 1));
         inDir = -outDir;
 

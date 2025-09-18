@@ -5,8 +5,8 @@ public class Processor : Building, ITickable, IItemPort, IOrientable, IProductio
 {
     [Header("加工器设置")]
     public RecipeDef recipe;  // 生产配方
-    public Vector2Int inDir = Vector2Int.left;  // 输入方向
-    public Vector2Int outDir = Vector2Int.right;  // 输出方向
+    public Vector2Int inDir = Vector2Int.down;  // 输入方向
+    public Vector2Int outDir = Vector2Int.up;  // 输出方向
     
     [Header("生产设置")]
     public float productionProgress = 0f;  // 当前生产进度
@@ -319,7 +319,7 @@ public class Processor : Building, ITickable, IItemPort, IOrientable, IProductio
     {
         outDir = dir;
         inDir = -dir;
-        transform.right = new Vector3(dir.x, dir.y, 0f);
+        transform.up = new Vector3(dir.x, dir.y, 0f);
     }
 
     #endregion

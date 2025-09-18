@@ -5,8 +5,8 @@ using UnityEngine.Serialization;
 public class Filter : Building, IItemPort, IOrientable, ITickable
 {
     [Header("Direction")]
-    public Vector2Int outDir = Vector2Int.right;   // 输出朝向
-    public Vector2Int inDir  = Vector2Int.left;    // 输入朝向
+    public Vector2Int outDir = Vector2Int.up;   // 输出朝向
+    public Vector2Int inDir  = Vector2Int.down;    // 输入朝向
 
     [Header("Whitelist")]
     public ItemDef allowedItem;
@@ -50,7 +50,7 @@ public class Filter : Building, IItemPort, IOrientable, ITickable
     public void SetDirection(Vector2Int dir)
     {
         outDir = dir == Vector2Int.zero
-            ? Vector2Int.right
+            ? Vector2Int.up
             : new Vector2Int(Mathf.Clamp(dir.x, -1, 1), Mathf.Clamp(dir.y, -1, 1));
 
         inDir =

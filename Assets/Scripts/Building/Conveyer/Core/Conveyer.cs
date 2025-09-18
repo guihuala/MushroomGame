@@ -7,8 +7,8 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
     #region 基础参数
 
     [Header("传送带")] [Tooltip("每秒移动的格子数")] public float beltSpeed = 1.0f;
-    [Tooltip("输入方向")] public Vector2Int inDir;
-    [Tooltip("输出方向")] public Vector2Int outDir;
+    [Tooltip("输入方向")] public Vector2Int inDir = Vector2Int.down;
+    [Tooltip("输出方向")] public Vector2Int outDir = Vector2Int.up;
 
     [Header("物流")] [Tooltip("物品之间的最小间距（0~1）")]
     public float itemSpacing = 0.30f;
@@ -141,7 +141,10 @@ public partial class Conveyer : Building, IItemPort, IOrientable, IBeltNode
         }
         else
         {
-            bool canOut = IsCurrentConnectionValid() && _connectedOutputPort != null && _connectedOutputPort.CanReceive;
+            // 主动（重新）绑定正前方端口——不改方向，只刷新引用
+            FindBestOutputConnection(); 
+            
+            bool canOut = _connectedOutputPort != null && _connectedOutputPort.CanReceive;
             headLimit = canOut ? 1f : 1f - 0.0001f;
         }
 

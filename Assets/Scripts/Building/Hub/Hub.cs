@@ -26,9 +26,6 @@ public class Hub : MonoBehaviour
     private Vector2Int centerCell;
     private readonly List<HubPort> _ports = new();
 
-    // NEW: 记录SpriteRenderer的初始本地位置，避免偏移累计
-    private Vector3 _baseSpriteLocalPos; 
-
     [Header("Storage")]
     public int maxStorage = 999;
     
@@ -45,10 +42,8 @@ public class Hub : MonoBehaviour
         grid = FindObjectOfType<TileGridService>();
         centerCell = grid.WorldToCell(transform.position);
 
-        // 记录初始本地位置（没有SpriteRenderer时也安全）
         var sr = GetComponent<SpriteRenderer>();
-        _baseSpriteLocalPos = sr ? sr.transform.localPosition : Vector3.zero; // NEW
-
+        
         RegisterInitialPorts();
         InitializeCurrentStage();
         AddInitialItemsToInventory();
@@ -90,11 +85,15 @@ public class Hub : MonoBehaviour
 
     public void AddPort(Vector2Int offset)
     {
-        var cell = centerCell + offset;
+        var cell = centerCell + offset + Vector2Int.up;
         var port = new HubPort(cell, this);
         _ports.Add(port);
         grid.RegisterPort(cell, port);
+
+        // --- 调试输出 ---
+        Debug.Log($"[Hub] 注册端口: Cell={cell}, Offset={offset}, Hub={name}");
     }
+
 
     public bool ReceiveItem(in ItemPayload payload)
     {

@@ -6,7 +6,7 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     [Header("生产效率")]
     public float cycleTime = 1.0f;  // 每生产一包的时间
     public int packetAmount = 1;    // 每包数量
-    public Vector2Int outDir = Vector2Int.right;
+    public Vector2Int outDir = Vector2Int.up;
 
     [Header("资源检测")]
     public ResourceTilemapService tileService;
@@ -140,7 +140,7 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     public void SetDirection(Vector2Int dir)
     {
         outDir = dir;
-        transform.right = new Vector3(dir.x, dir.y, 0f);
+        transform.up = new Vector3(dir.x, dir.y, 0f);
     }
 
     #endregion

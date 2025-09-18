@@ -18,12 +18,7 @@ public class ItemPort : IItemPort
         _building = building;
         PortType = portType;
     }
-
-    internal void SetCell(Vector2Int newCell) // 新增：允许旋转时更新位置
-    {
-        Cell = newCell;
-    }
-
+    
     public bool CanReceive => PortType == PortType.Input;
     public bool CanProvide => PortType == PortType.Output;
 

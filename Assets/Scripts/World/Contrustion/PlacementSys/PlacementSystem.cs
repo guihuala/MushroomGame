@@ -83,8 +83,8 @@ public partial class PlacementSystem : MonoBehaviour
 
         if (IsInBuildMode)
         {
-            UpdatePreview(worldPos, cell);
             HandleBuildModeInput(cell, worldPos);
+            UpdatePreview(worldPos, cell);
         }
         else
         {

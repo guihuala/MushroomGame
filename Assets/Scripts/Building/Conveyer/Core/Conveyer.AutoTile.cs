@@ -66,11 +66,6 @@ public static class TransportCompat
             return false;
         }
 
-        if (down is Miner || down is Trashroom) 
-        {
-            return false; // 不接受物品
-        }
-
         return true; // 默认接受
     }
     

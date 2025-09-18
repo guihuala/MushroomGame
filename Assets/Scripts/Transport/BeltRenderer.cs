@@ -14,7 +14,7 @@ public class BeltRenderer : MonoBehaviour
     private readonly Dictionary<Conveyer, List<GameObject>> _itemVisuals = new();
     private readonly Queue<GameObject> _visualPool = new();
     private readonly HashSet<Conveyer> _activeConveyors = new();
-    private readonly Dictionary<GameObject, Vector3> _velocities = new(); // SmoothDamp 速度状态
+    private readonly Dictionary<GameObject, Vector3> _velocities = new();
 
     void Start()
     {

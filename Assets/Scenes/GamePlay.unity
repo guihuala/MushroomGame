@@ -531,7 +531,6 @@ MonoBehaviour:
   tabTransitionDuration: 0.3
   buttonScaleDuration: 0.2
   detailsFadeDuration: 0.3
-  buttonHoverScale: 1.1
   buttonSelectScale: 1.15
   buildingDetailsPanel: {fileID: 1774197303}
   buildingNameText: {fileID: 925859621}
@@ -76103,6 +76102,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &965159354 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6618367041641777076, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+  m_PrefabInstance: {fileID: 1598121979}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &992072736
 GameObject:
   m_ObjectHideFlags: 0
@@ -80525,6 +80529,26 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080850820936065389, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: frameColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3080850820936065389, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: frameColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3080850820936065389, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: frameColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3080850820936065389, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: frameThickness.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3080850820936065389, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      propertyPath: frameThickness.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3080850820936065389, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
       propertyPath: itemButtonPrefab
       value: 
       objectReference: {fileID: 3626220691869721620, guid: c82f5f1d86a4b4ee7b6886323e7c2067, type: 3}
@@ -80635,13 +80659,28 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6618367041641777076, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1598121984}
   m_SourcePrefab: {fileID: 100100000, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
 --- !u!224 &1598121980 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 9002457716938461258, guid: fd9fe89e73e134571b8afc8ef295a902, type: 3}
   m_PrefabInstance: {fileID: 1598121979}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &1598121984
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965159354}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1618359006
 GameObject:
   m_ObjectHideFlags: 0

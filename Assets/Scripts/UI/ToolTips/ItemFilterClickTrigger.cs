@@ -4,15 +4,17 @@ using UnityEngine.EventSystems;
 
 public class ItemFilterClickTrigger : MonoBehaviour, IPointerClickHandler
 {
-    [Header("Open Offset (Screen Pixels)")]
-    public Vector2 screenOffset = new Vector2(0, -40f);
-
     private Collider2D _col;
     private bool _blockedByErase;
+    
+    private Filter _filter;
 
     private void Awake()
     {
         _col = EnsureCollider();
+        
+        _filter = GetComponent<Filter>();
+        if (_filter == null) _filter = GetComponentInParent<Filter>();
     }
     private void OnEnable()
     {
@@ -25,14 +27,19 @@ public class ItemFilterClickTrigger : MonoBehaviour, IPointerClickHandler
         MsgCenter.UnregisterMsgAct(MsgConst.ERASE_MODE_EXIT,  OnEraseExit);
     }
     private void OnEraseEnter() { _blockedByErase = true;  if (_col) _col.enabled = false; }
-    private void OnEraseExit()  { _blockedByErase = false; if (_col) _col.enabled = true;  }
+
+    private void OnEraseExit()
+    {
+        _blockedByErase = false;
+        if (_col) _col.enabled = true;
+    }
 
     public void OnPointerClick(PointerEventData e)
     {
         if (_blockedByErase) return;
-        var panel = ItemFilter.Instance;
+        var panel = ItemFilterPanel.Instance;
         if (panel == null) return;
-        panel.OpenAtScreen(e.position, new Vector2(16,16), 8);
+        panel.OpenForFilter(_filter, e.position, new Vector2(16, 16), 8);
     }
 
     private Collider2D EnsureCollider()

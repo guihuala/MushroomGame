@@ -86,8 +86,9 @@ public partial class PlacementSystem : MonoBehaviour
         Vector2 mouse = _input.GetMousePosition();
         Vector3 mouseWorld = mainCam.ScreenToWorldPoint(mouse);
         Vector2Int cell = grid.WorldToCell(mouseWorld);
-        Vector3 worldPos = grid.CellToWorld(cell);
-
+        
+        // 叠加视觉偏移，保证预览=最终落点
+        Vector3 worldPos = grid.CellToWorld(cell) + ComputeVisualOffsetWorld(_currentPrefab, cell, _currentDir);
         if (IsInBuildMode)
         {
             HandleBuildModeInput(cell, worldPos);
@@ -95,7 +96,7 @@ public partial class PlacementSystem : MonoBehaviour
         }
         else
         {
-            HandleDefaultModeInput(cell); // 默认模式：右键清除
+            HandleDefaultModeInput(cell);
         }
     }
     

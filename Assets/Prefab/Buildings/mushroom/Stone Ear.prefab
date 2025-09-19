@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 5094737035285406848}
   - component: {fileID: 4909614366723315021}
   - component: {fileID: 9206374207280657740}
+  - component: {fileID: 7469510270612908601}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -111,7 +112,7 @@ Transform:
   m_GameObject: {fileID: 5924302167948483901}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.609, y: -0.625, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -243,6 +244,21 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &7469510270612908601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5924302167948483901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1
 --- !u!1 &6164359205705388509
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,10 +269,10 @@ GameObject:
   m_Component:
   - component: {fileID: 6881628871209113478}
   - component: {fileID: 5504956735633657044}
-  - component: {fileID: 6281719720407861833}
   - component: {fileID: 2393760998868078637}
   - component: {fileID: 2346945469112608865}
   - component: {fileID: 1431126468263108758}
+  - component: {fileID: 5629632075838181147}
   m_Layer: 7
   m_Name: Stone Ear
   m_TagString: Untagged
@@ -312,21 +328,6 @@ MonoBehaviour:
   sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
---- !u!114 &6281719720407861833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6164359205705388509}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  squashAmount: 0.8
-  squashDuration: 0.1
-  recoveryDuration: 0.1
 --- !u!114 &2393760998868078637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,7 +372,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.637969, y: 0.007088542}
+  m_Offset: {x: -0.04285264, y: 0.007088542}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -382,7 +383,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.5670834, y: 1.2835417}
+  m_Size: {x: 2.306343, y: 1.2835417}
   m_EdgeRadius: 0
 --- !u!114 &1431126468263108758
 MonoBehaviour:
@@ -400,3 +401,17 @@ MonoBehaviour:
   sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
   baseRendererForSorting: {fileID: 5569272438677920630}
   runtimeOnly: 1
+--- !u!114 &5629632075838181147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6164359205705388509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fd3cd49527041efb378dc9c0002d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor01: {x: 0, y: 0}
+  extraOffsetCells: {x: 0, y: -0.6}

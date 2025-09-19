@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4420316294542713563}
   - component: {fileID: 1705590861419705153}
-  - component: {fileID: 7945833522264105556}
   - component: {fileID: 1646247605376963608}
   - component: {fileID: 6232425061220626123}
   - component: {fileID: -243974923212303148}
+  - component: {fileID: 1070967523999980831}
   m_Layer: 7
   m_Name: Agaricus
   m_TagString: Untagged
@@ -69,21 +69,6 @@ MonoBehaviour:
   sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
---- !u!114 &7945833522264105556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5295030647110757723}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  squashAmount: 0.8
-  squashDuration: 0.1
-  recoveryDuration: 0.1
 --- !u!114 &1646247605376963608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +142,20 @@ MonoBehaviour:
   sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
   baseRendererForSorting: {fileID: 162904472710821144}
   runtimeOnly: 1
+--- !u!114 &1070967523999980831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5295030647110757723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fd3cd49527041efb378dc9c0002d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor01: {x: 0.5, y: 0}
+  extraOffsetCells: {x: 0, y: -0.5}
 --- !u!1 &6083413352072923831
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,6 +167,7 @@ GameObject:
   - component: {fileID: 5104832055062320595}
   - component: {fileID: 1249798327762363675}
   - component: {fileID: 1293760023802691267}
+  - component: {fileID: 82453853822063982}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -184,7 +184,7 @@ Transform:
   m_GameObject: {fileID: 6083413352072923831}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.609, y: -0.769, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -316,6 +316,21 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &82453853822063982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6083413352072923831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1
 --- !u!1 &8327943784062388568
 GameObject:
   m_ObjectHideFlags: 0

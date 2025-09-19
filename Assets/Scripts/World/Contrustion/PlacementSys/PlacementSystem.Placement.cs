@@ -12,7 +12,7 @@ public partial class PlacementSystem
             _dragLastCell = cell;
             return;
         }
-        _currentPrefab = _currentData.prefab; // 确保一致
+        _currentPrefab = _currentData.prefab;
 
         // 2) 建造区域可行性
         if (!grid.AreCellsFree(cell, _currentPrefab.size, _currentPrefab))
@@ -36,11 +36,12 @@ public partial class PlacementSystem
         }
 
         // 4) 实例化并朝向
-
-        var building = Instantiate(_currentData.prefab, worldPos, Quaternion.identity);
+        Vector3 basePos = grid.CellToWorld(cell);
+        Vector3 finalPos = basePos + ComputeVisualOffsetWorld(_currentPrefab, cell, _currentDir);
+        var building = Instantiate(_currentPrefab, finalPos, Quaternion.identity);
         
         var meta = building.gameObject.AddComponent<PlacedBuildingMeta>();
-        meta.sourceData = _currentData;   // _currentData 为你当前要放置的 SO
+        meta.sourceData = _currentData;
         
         var t = building.transform;
         t.localScale = Vector3.zero;

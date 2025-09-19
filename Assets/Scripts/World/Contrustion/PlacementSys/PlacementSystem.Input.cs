@@ -113,15 +113,15 @@ public partial class PlacementSystem
             
             if (_isEraseCancelled)
             {
-                ClearPendingErase(); // 这会发送隐藏提示事件
+                ClearPendingErase();
             }
             else if (_eraseAsBox)
             {
-                ConfirmErase(); // 这会发送确认事件和隐藏提示事件
+                ConfirmErase();
             }
             else
             {
-                ConfirmErase(); // 这会发送确认事件和隐藏提示事件
+                ConfirmErase();
             }
 
             _isRightErasing = false;

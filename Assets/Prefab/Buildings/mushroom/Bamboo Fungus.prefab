@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7903011984252598019}
   - component: {fileID: 4573424344138550816}
-  - component: {fileID: 4266372626159269062}
   - component: {fileID: 7107295937863113733}
   - component: {fileID: 5428450702942923983}
   - component: {fileID: 7323099126967639}
+  - component: {fileID: 3065425395746810813}
   m_Layer: 7
   m_Name: Bamboo Fungus
   m_TagString: Untagged
@@ -69,21 +69,6 @@ MonoBehaviour:
   sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
---- !u!114 &4266372626159269062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4700892327063334938}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  squashAmount: 0.8
-  squashDuration: 0.1
-  recoveryDuration: 0.1
 --- !u!114 &7107295937863113733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +142,20 @@ MonoBehaviour:
   sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
   baseRendererForSorting: {fileID: 3093635278870732122}
   runtimeOnly: 1
+--- !u!114 &3065425395746810813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4700892327063334938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fd3cd49527041efb378dc9c0002d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor01: {x: 0.5, y: 0}
+  extraOffsetCells: {x: 0, y: -0.6}
 --- !u!1 &5048500358110549219
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,6 +167,7 @@ GameObject:
   - component: {fileID: 4284753883123401921}
   - component: {fileID: 4089164950822257059}
   - component: {fileID: 1063764581982220437}
+  - component: {fileID: 3586479020423336362}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -184,7 +184,7 @@ Transform:
   m_GameObject: {fileID: 5048500358110549219}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.609, y: -0.625, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -316,6 +316,21 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &3586479020423336362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5048500358110549219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1
 --- !u!1 &8658995726288210355
 GameObject:
   m_ObjectHideFlags: 0

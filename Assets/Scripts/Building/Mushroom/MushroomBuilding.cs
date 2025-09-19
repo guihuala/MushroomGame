@@ -38,7 +38,7 @@ public class MushroomBuilding : MultiGridBuilding, ITickable ,IProductionInfoPro
 
         buildZone = BuildZone.SurfaceOnly;
         
-        _mushroomAnimator = GetComponent<MushroomAnimator>();
+        _mushroomAnimator = transform.GetChild(0).GetComponent<MushroomAnimator>();
     }
 
     public override void OnPlaced(TileGridService g, Vector2Int c)

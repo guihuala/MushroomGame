@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 800905184068334529}
   - component: {fileID: 7938829755622109214}
   - component: {fileID: 4381269982109150966}
+  - component: {fileID: 125639646129997143}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 2300847744001226922}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.82, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -159,6 +160,21 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &125639646129997143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2300847744001226922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1
 --- !u!1 &7685253601240072978
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,6 +187,7 @@ GameObject:
   - component: {fileID: 7328642733549531455}
   - component: {fileID: 4321983722051725106}
   - component: {fileID: 1019106973815920559}
+  - component: {fileID: 3518403220937332965}
   m_Layer: 7
   m_Name: PowerShroom
   m_TagString: Untagged
@@ -274,3 +291,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.14, y: 3.2562022}
   m_EdgeRadius: 0
+--- !u!114 &3518403220937332965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7685253601240072978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fd3cd49527041efb378dc9c0002d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor01: {x: 0.5, y: 0}
+  extraOffsetCells: {x: 0, y: -0.8}

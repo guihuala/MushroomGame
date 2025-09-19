@@ -94,10 +94,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2504513226533005413}
   - component: {fileID: 3975165992847552786}
-  - component: {fileID: 1298631592871423976}
   - component: {fileID: 4717716350096336794}
   - component: {fileID: 7054324785493414143}
   - component: {fileID: 9163042299363771181}
+  - component: {fileID: 4041774738842535658}
   m_Layer: 7
   m_Name: Snow Fungus
   m_TagString: Untagged
@@ -153,21 +153,6 @@ MonoBehaviour:
   sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
---- !u!114 &1298631592871423976
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632106780838963279}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  squashAmount: 0.8
-  squashDuration: 0.1
-  recoveryDuration: 0.1
 --- !u!114 &4717716350096336794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,6 +226,20 @@ MonoBehaviour:
   sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
   baseRendererForSorting: {fileID: 2973465712530588857}
   runtimeOnly: 1
+--- !u!114 &4041774738842535658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 632106780838963279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fd3cd49527041efb378dc9c0002d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor01: {x: 0.5, y: 0}
+  extraOffsetCells: {x: 0, y: -0.6}
 --- !u!1 &6736805914941061835
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,6 +251,7 @@ GameObject:
   - component: {fileID: 1629233282226802509}
   - component: {fileID: 8149854884039273628}
   - component: {fileID: 2438656500219760506}
+  - component: {fileID: 3337491939378638679}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -268,7 +268,7 @@ Transform:
   m_GameObject: {fileID: 6736805914941061835}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.609, y: -0.625, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -341,7 +341,7 @@ MonoBehaviour:
   targetRenderer: {fileID: 8149854884039273628}
   timeScale: 1
   phaseDegrees: 0
-  enableTilt: 1
+  enableTilt: 0
   tiltAmplitudeDeg: 7.5
   tiltFrequency: 1.2
   tiltCurve:
@@ -400,3 +400,18 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &3337491939378638679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6736805914941061835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1

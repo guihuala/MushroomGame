@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7983153923845757430}
   - component: {fileID: 5349984104926006743}
   - component: {fileID: 1157917317520120951}
+  - component: {fileID: 7498523544447012852}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 294565761193051981}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.98, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -159,6 +160,21 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &7498523544447012852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294565761193051981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1
 --- !u!1 &2967845243329491270
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,10 +269,10 @@ GameObject:
   m_Component:
   - component: {fileID: 6538109376908356275}
   - component: {fileID: 4292978451502142575}
-  - component: {fileID: 3785593007734473880}
   - component: {fileID: 4380863410944806293}
   - component: {fileID: 5129025372957866655}
   - component: {fileID: 344085808837703722}
+  - component: {fileID: 6526765582889920364}
   m_Layer: 7
   m_Name: Shiitake Mushroom
   m_TagString: Untagged
@@ -312,21 +328,6 @@ MonoBehaviour:
   sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
---- !u!114 &3785593007734473880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4328187514289356040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  squashAmount: 0.8
-  squashDuration: 0.1
-  recoveryDuration: 0.1
 --- !u!114 &4380863410944806293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,7 +372,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.6126277, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -382,7 +383,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.6, y: 1.37}
+  m_Size: {x: 2.4798765, y: 1.37}
   m_EdgeRadius: 0
 --- !u!114 &344085808837703722
 MonoBehaviour:
@@ -400,3 +401,17 @@ MonoBehaviour:
   sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
   baseRendererForSorting: {fileID: 1168678164199645016}
   runtimeOnly: 1
+--- !u!114 &6526765582889920364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4328187514289356040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fd3cd49527041efb378dc9c0002d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor01: {x: 0.5, y: 0}
+  extraOffsetCells: {x: 0, y: -0.8}

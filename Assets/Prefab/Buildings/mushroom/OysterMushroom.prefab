@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1943173817603735031}
   - component: {fileID: 7689886981650832357}
   - component: {fileID: 8326539643386171698}
+  - component: {fileID: 7875037477080180360}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 4926975180955946650}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.609, y: -0.625, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -159,6 +160,21 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &7875037477080180360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4926975180955946650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1
 --- !u!1 &6132037727644607957
 GameObject:
   m_ObjectHideFlags: 0
@@ -169,10 +185,10 @@ GameObject:
   m_Component:
   - component: {fileID: 676007664726732410}
   - component: {fileID: 3351338112139567625}
-  - component: {fileID: 7375012069248114572}
   - component: {fileID: 8710427952342193604}
   - component: {fileID: 1359726542470923196}
   - component: {fileID: -6688059848981173895}
+  - component: {fileID: 5840033445124220098}
   m_Layer: 7
   m_Name: OysterMushroom
   m_TagString: Untagged
@@ -228,21 +244,6 @@ MonoBehaviour:
   sendOutputsToInventory: 1
   productionProgress: 0
   isProducing: 0
---- !u!114 &7375012069248114572
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6132037727644607957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  squashAmount: 0.8
-  squashDuration: 0.1
-  recoveryDuration: 0.1
 --- !u!114 &8710427952342193604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -316,6 +317,20 @@ MonoBehaviour:
   sprites: {fileID: 11400000, guid: 3c733d10f4a8c429f8a418d639bb11ac, type: 2}
   baseRendererForSorting: {fileID: 7689886981650832357}
   runtimeOnly: 1
+--- !u!114 &5840033445124220098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6132037727644607957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fd3cd49527041efb378dc9c0002d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor01: {x: 0.5, y: 0}
+  extraOffsetCells: {x: 0, y: -0.8}
 --- !u!1 &8107558840202168870
 GameObject:
   m_ObjectHideFlags: 0

@@ -29,6 +29,9 @@ public class LightningLine : MonoBehaviour
     private float timer;
     private System.Random rng;
     private int seed;
+    public Transform ta, tb;
+    public float zPlane = 0f;
+
 
     // 用于保存生成的分叉
     private readonly List<LineRenderer> branchPool = new();
@@ -69,6 +72,10 @@ public class LightningLine : MonoBehaviour
     private void Update()
     {
         if (lr == null) return;
+        
+        if (ta) { var p = ta.position; p.z = zPlane; a = p; }
+        if (tb) { var p = tb.position; p.z = zPlane; b = p; }
+
         timer += Time.deltaTime;
         
         var cam = Camera.main;
@@ -221,4 +228,22 @@ public class LightningLine : MonoBehaviour
     }
 
     private static float Random01(System.Random r) => (float)r.NextDouble();
+    
+    public Vector3 GetStartPoint() => lr.positionCount > 0 ? lr.GetPosition(0) : Vector3.zero;
+    public Vector3 GetEndPoint() => lr.positionCount > 1 ? lr.GetPosition(1) : Vector3.zero;
+    
+    public void SetEndpoints(Transform A, Transform B, float z)
+    {
+        ta = A; tb = B;
+        zPlane = z;
+        // 初次立即同步一次世界端点，触发一次构建
+        Vector3 Aw = (ta ? ta.position : Vector3.zero); Aw.z = zPlane;
+        Vector3 Bw = (tb ? tb.position : Vector3.zero); Bw.z = zPlane;
+        SetEndpoints(Aw, Bw);
+    }
+    
+    public bool HasEndpoint(Transform t)
+    {
+        return t && (t == ta || t == tb);
+    }
 }

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public partial class PlacementSystem
@@ -35,7 +36,16 @@ public partial class PlacementSystem
         }
 
         // 4) 实例化并朝向
-        var building = Instantiate(_currentPrefab, worldPos, Quaternion.identity);
+
+        var building = Instantiate(_currentData.prefab, worldPos, Quaternion.identity);
+        
+        var meta = building.gameObject.AddComponent<PlacedBuildingMeta>();
+        meta.sourceData = _currentData;   // _currentData 为你当前要放置的 SO
+        
+        var t = building.transform;
+        t.localScale = Vector3.zero;
+        t.DOScale(1f, placeScaleDuration).SetEase(placeScaleEase);
+
         if (building is IOrientable orientable) 
         {
             orientable.SetDirection(dirForThis);

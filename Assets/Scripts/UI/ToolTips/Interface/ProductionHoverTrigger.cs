@@ -5,37 +5,53 @@ using UnityEngine.EventSystems;
 public class ProductionHoverTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private IProductionInfoProvider _provider;
-    private bool _inside;
+    private Collider2D _col;
+    private bool _blockedByErase;
 
     private void Awake()
     {
         _provider = GetComponent<IProductionInfoProvider>();
         if (_provider == null) _provider = GetComponentInParent<IProductionInfoProvider>();
-
-        EnsureCollider();
+        _col = EnsureCollider();
     }
+
+    private void OnEnable()
+    {
+        MsgCenter.RegisterMsgAct(MsgConst.ERASE_MODE_ENTER, OnEraseEnter);
+        MsgCenter.RegisterMsgAct(MsgConst.ERASE_MODE_EXIT,  OnEraseExit);
+    }
+    private void OnDisable()
+    {
+        MsgCenter.UnregisterMsgAct(MsgConst.ERASE_MODE_ENTER, OnEraseEnter);
+        MsgCenter.UnregisterMsgAct(MsgConst.ERASE_MODE_EXIT,  OnEraseExit);
+    }
+
+    private void OnEraseEnter() { _blockedByErase = true;  if (_col) _col.enabled = false; }
+    private void OnEraseExit()  { _blockedByErase = false; if (_col) _col.enabled = true;  }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        _inside = true;
+        if (_blockedByErase) return;
         BuildingSelectionUI.Instance.ShowProductionTooltip(_provider);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        _inside = false;
+        if (_blockedByErase) return;
         BuildingSelectionUI.Instance.CloseAllTooltips();
     }
 
-    private void EnsureCollider()
+    private Collider2D EnsureCollider()
     {
         var col = GetComponent<Collider2D>();
-        if (col == null)
+        if (!col)
         {
             var sr = GetComponent<SpriteRenderer>();
             var bc = gameObject.AddComponent<BoxCollider2D>();
             bc.isTrigger = true;
-            bc.size = (sr != null && sr.sprite != null) ? sr.sprite.bounds.size : new Vector2(1.2f, 1.2f);
+            bc.size = (sr && sr.sprite) ? sr.sprite.bounds.size : new Vector2(1.2f, 1.2f);
+            col = bc;
         }
+        return col;
     }
 }

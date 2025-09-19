@@ -6,7 +6,8 @@ public class MsgConst
     public const int NEIGHBOR_CHANGED = 1003; // 邻居变化事件
     public const int CONVEYOR_PLACED = 1004;
     public const int CONVEYOR_REMOVED = 1005;
-    public const int SHOW_MUSHROOM_PANEL = 1006; // 弹出蘑菇面板
+    public const int ERASE_MODE_ENTER = 1006;
+    public const int ERASE_MODE_EXIT = 1007;
     
     // ========== Hub 相关消息 (2000-2999) ==========
     public const int HUB_CLICKED = 2001;

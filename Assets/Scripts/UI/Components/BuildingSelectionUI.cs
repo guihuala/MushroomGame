@@ -317,8 +317,7 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         // 显示建筑的材料信息面板
         if (costPanel != null)
             costPanel.SetData(buildingData);
-
-        // 使用 DOTween 添加建筑详情面板的淡入效果
+        
         detailsCanvasGroup.DOFade(1f, detailsFadeDuration);
     }
     
@@ -349,42 +348,44 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     #endregion
 
     #region Tootips
-
-    public void CloseAllTooltips()
+    
+    public void CloseAllTooltips(bool immediate = false)
     {
+        if (immediate)
+        {
+            if (buildingDetailsPanel) buildingDetailsPanel.SetActive(false);
+            if (productionTooltipPanel) productionTooltipPanel.ClosePanel();
+            if (minerTooltipPanel) minerTooltipPanel.ClosePanel();
+            return;
+        }
+        
         CloseBuildingDetailsWithAnimation();
-        
-        if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
+        if (productionTooltipPanel && productionTooltipPanel.gameObject.activeSelf)
             productionTooltipPanel.ClosePanel();
-        
-        if (minerTooltipPanel != null && minerTooltipPanel.gameObject.activeSelf)
+        if (minerTooltipPanel && minerTooltipPanel.gameObject.activeSelf)
             minerTooltipPanel.ClosePanel();
     }
 
-    // 显示生产信息面板
+    
     public void ShowProductionTooltip(IProductionInfoProvider provider)
     {
-        // 关闭所有面板
-        CloseAllTooltips();
-
+        CloseAllTooltips(immediate: true);
         if (productionTooltipPanel != null)
         {
             productionTooltipPanel.SetContext(provider);
             productionTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
         }
     }
-
-    // 显示矿机信息面板
+    
     public void ShowMinerTooltip(Miner miner)
     {
-        CloseAllTooltips();
-
+        CloseAllTooltips(immediate: true);
         if (minerTooltipPanel != null)
         {
             minerTooltipPanel.SetMiner(miner);
             minerTooltipPanel.ShowAtScreenPosition(Input.mousePosition);
         }
     }
-
+    
     #endregion
 }

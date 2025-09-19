@@ -90,6 +90,8 @@ public partial class PlacementSystem
         // 右键按住：标记待拆除建筑
         if (_isRightErasing && _input.IsRightMouseHeld() && !_input.IsPointerOverUI())
         {
+            MsgCenter.SendMsgAct(MsgConst.ERASE_MODE_ENTER);
+            
             if (!_eraseAsBox && cell != _eraseAnchorCell)
                 _eraseAsBox = true;
 
@@ -107,6 +109,8 @@ public partial class PlacementSystem
         // 右键抬起：执行或取消拆除
         if (_isRightErasing && _input.IsRightMouseUp())
         {
+            MsgCenter.SendMsgAct(MsgConst.ERASE_MODE_EXIT);
+            
             if (_isEraseCancelled)
             {
                 ClearPendingErase(); // 这会发送隐藏提示事件

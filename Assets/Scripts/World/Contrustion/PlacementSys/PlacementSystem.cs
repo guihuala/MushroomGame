@@ -17,9 +17,16 @@ public partial class PlacementSystem : MonoBehaviour
     private List<Color[]> _originalBuildingColors = new List<Color[]>();
     private bool _isEraseCancelled = false;
     
-    [Header("动画设置")]
+    [Header("指针动画")]
     public float previewMoveDuration = 0.2f;
     public Ease moveEase = Ease.OutQuad;
+    
+    [Header("建造拆除动画")]
+    public float placeScaleDuration = 0.25f;
+    public Ease  placeScaleEase     = Ease.OutBack;
+    public float eraseScaleDuration = 0.22f;
+    public Ease  eraseScaleEase     = Ease.InBack;
+    [Range(0f, 1f)] public float refundRatio = 0.5f;  // 拆除返还比例，0~1，四舍五入
 
     [Header("组件")]
     public Camera mainCam;
@@ -169,4 +176,9 @@ public partial class PlacementSystem : MonoBehaviour
     }
     
     #endregion
+}
+
+public class PlacedBuildingMeta : MonoBehaviour
+{
+    public BuildingData sourceData;
 }

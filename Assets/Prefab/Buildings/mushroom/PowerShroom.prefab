@@ -304,4 +304,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anchor01: {x: 0.5, y: 0}
-  extraOffsetCells: {x: 0, y: -0.8}
+  extraOffsetCells: {x: 0, y: -0.6}

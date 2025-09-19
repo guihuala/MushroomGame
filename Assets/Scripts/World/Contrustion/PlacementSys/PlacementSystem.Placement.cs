@@ -40,6 +40,8 @@ public partial class PlacementSystem
         Vector3 finalPos = basePos + ComputeVisualOffsetWorld(_currentPrefab, cell, _currentDir);
         var building = Instantiate(_currentPrefab, finalPos, Quaternion.identity);
         
+        ParticleManager.Instance.PlayEffect("Smoke 1", finalPos);
+        
         var meta = building.gameObject.AddComponent<PlacedBuildingMeta>();
         meta.sourceData = _currentData;
         

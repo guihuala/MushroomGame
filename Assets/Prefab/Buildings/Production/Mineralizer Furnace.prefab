@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7164011442835654480}
   - component: {fileID: 5262894562915171561}
   - component: {fileID: 8144987566561692502}
+  - component: {fileID: -3458786244417502764}
   m_Layer: 7
   m_Name: Mineralizer Furnace
   m_TagString: Untagged
@@ -121,3 +122,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c574fa11a8a1d4a7089ec8687ba9963c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-3458786244417502764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7063021566156355855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717bc3b0aea0a432080fc55dffebdeb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconSprite: {fileID: 21300000, guid: d953218df4f904dbb991cc3da3bc29a6, type: 3}
+  iconColor: {r: 1, g: 1, b: 1, a: 1}
+  iconScale: 0.5
+  sortingOrder: 5000
+  yOffset: 1
+  xOffset: 0
+  zOffset: 0.02
+  useAppearAnim: 1
+  appearTime: 0.15
+  disappearTime: 0.12
+  appearOvershoot: 1.06

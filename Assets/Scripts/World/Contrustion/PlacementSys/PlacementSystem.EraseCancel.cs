@@ -85,6 +85,8 @@ public partial class PlacementSystem
 
         TryRefundFor(building);
         building.OnRemoved();
+
+        ParticleManager.Instance.PlayEffect("Smoke 2", building.transform.position);
     }
 
     private void TryRefundFor(Building building)

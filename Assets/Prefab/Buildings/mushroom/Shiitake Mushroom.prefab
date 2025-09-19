@@ -273,6 +273,7 @@ GameObject:
   - component: {fileID: 5129025372957866655}
   - component: {fileID: 344085808837703722}
   - component: {fileID: 6526765582889920364}
+  - component: {fileID: -165752382245821170}
   m_Layer: 7
   m_Name: Shiitake Mushroom
   m_TagString: Untagged
@@ -414,4 +415,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anchor01: {x: 0.5, y: 0}
-  extraOffsetCells: {x: 0, y: -0.8}
+  extraOffsetCells: {x: 0, y: -0.6}
+--- !u!114 &-165752382245821170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4328187514289356040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717bc3b0aea0a432080fc55dffebdeb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconSprite: {fileID: 21300000, guid: d953218df4f904dbb991cc3da3bc29a6, type: 3}
+  iconColor: {r: 1, g: 0.98122364, b: 0.4198113, a: 1}
+  iconScale: 0.5
+  sortingOrder: 5000
+  yOffset: 2
+  xOffset: 0
+  zOffset: 0.02
+  useAppearAnim: 1
+  appearTime: 0.15
+  disappearTime: 0.12
+  appearOvershoot: 1.06

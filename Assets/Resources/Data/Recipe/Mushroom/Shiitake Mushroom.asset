@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputItems:
   - item: {fileID: 11400000, guid: df6f9f1f6074e4af3aa7d9e371cf28bf, type: 2}
-    amount: 0
+    amount: 1
   - item: {fileID: 11400000, guid: bb02b282ac85e44d98dcce66f5ae07db, type: 2}
-    amount: 0
+    amount: 1
   outputItems:
   - item: {fileID: 11400000, guid: b18eed2247a5242718d312291f23437c, type: 2}
     amount: 1

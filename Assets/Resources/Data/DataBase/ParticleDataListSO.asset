@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 058ca58853a3a453d887ff2ad16f1b28, type: 3}
   m_Name: ParticleDataListSO
   m_EditorClassIdentifier: 
-  particleDataList: []
+  particleDataList:
+  - effectName: Smoke 1
+    effectPath: Particles/Smoke 1
+  - effectName: Smoke 2
+    effectPath: Particles/Smoke 2
+  - effectName: Smoke 3
+    effectPath: Particles/Smoke 3
+  - effectName: Smoke 4
+    effectPath: Particles/Smoke 4

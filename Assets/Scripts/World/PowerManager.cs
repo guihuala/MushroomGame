@@ -23,6 +23,9 @@ public class PowerManager : Singleton<PowerManager>
 
     // 覆盖判定时用到的格子->是否有电缓存
     private readonly Dictionary<Vector2Int, bool> cellPoweredCache = new();
+    
+    // 顶部任意位置
+    public event System.Action PowerCoverageChanged;
 
     [Range(1f, 5f)] public float defaultPoweredMultiplier = 1.25f;
 
@@ -192,9 +195,10 @@ public class PowerManager : Singleton<PowerManager>
                 }
             }
         }
-
         if (drawLinks) RebuildLinkRenderers(tmpGraph);
         else ClearLinkRenderers();
+        
+        PowerCoverageChanged?.Invoke();
     }
 
     /// <summary>判断一个格子中心是否在有电网络的覆盖圈内</summary>

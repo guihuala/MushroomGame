@@ -9,6 +9,13 @@ public class MinerTooltipPanel : MonoBehaviour
     [SerializeField] private Text miningRateText;
     [SerializeField] private Transform resourcesContainer;
     [SerializeField] private GameObject resourceRowPrefab;
+    
+    [Header("Status & Progress")]
+    [SerializeField] private Image miningDot;            // 正在采集的小圆点（绿/灰）
+    [SerializeField] private Image  progressFillImage;   // 可选：用 fillAmount 表示进度
+
+    [Header("Current Resource")]
+    [SerializeField] private Image currentResIcon;       // 当前目标资源图标
 
     private Miner _miner;
 
@@ -29,35 +36,51 @@ public class MinerTooltipPanel : MonoBehaviour
         if (_miner == null) return;
 
         if (title != null)
-        {
             title.text = _miner.name.Replace("(Clone)", "").Trim();
-        }
 
-        // 设置开采倍率
+        // 采集倍率（沿用你原有文字）
         if (miningRateText != null)
         {
             float multiplier = PowerManager.Instance.GetSpeedMultiplier(_miner.cell, _miner.grid);
             miningRateText.text = $"Mining Rate: x{multiplier:F2}";
         }
 
-        // 清空现有资源信息
-        foreach (Transform child in resourcesContainer)
+        // —— 是否正在采集 + 进度 —— 
+        bool mining = _miner.IsMining;
+        float prog = _miner.Progress01;
+        
+        if (miningDot)
+            miningDot.color = mining ? new Color(0.35f, 1f, 0.4f, 1f) : new Color(0.6f, 0.6f, 0.6f, 1f);
+        
+        if (progressFillImage) { progressFillImage.gameObject.SetActive(true); progressFillImage.fillAmount = Mathf.Clamp01(prog); }
+        
+        // —— 当前目标资源（若有绑定节点） —— 
+        var res = _miner.CurrentResource;
+        if (currentResIcon && res != null)
         {
-            Destroy(child.gameObject);
+            currentResIcon.gameObject.SetActive(true);
+            currentResIcon.sprite = res.icon;
         }
+        else currentResIcon.gameObject.SetActive(false);
 
-        // 显示可以开采的资源节点
-        if (resourcesContainer != null && _miner.allowedResourceTypes.Count > 0)
+        // —— 可采资源列表：无项时隐藏容器 —— 
+        if (resourcesContainer != null)
         {
-            foreach (var resource in _miner.allowedResourceTypes)
+            // 清空旧项
+            foreach (Transform child in resourcesContainer)
+                Destroy(child.gameObject);
+
+            bool hasList = _miner.allowedResourceTypes != null && _miner.allowedResourceTypes.Count > 0;
+            resourcesContainer.gameObject.SetActive(hasList);
+
+            if (hasList)
             {
-                if (resource != null)
+                foreach (var resource in _miner.allowedResourceTypes)
                 {
-                    // 创建新的行
-                    var resourceRow = Instantiate(resourceRowPrefab, resourcesContainer);
-                    var rowImage = resourceRow.GetComponentInChildren<Image>();
-                    
-                    if (rowImage != null && resource.icon != null) rowImage.sprite = resource.icon;
+                    if (resource == null) continue;
+                    var row = Instantiate(resourceRowPrefab, resourcesContainer);
+                    var rowImage = row.GetComponentInChildren<Image>();
+                    if (rowImage) rowImage.sprite = resource.icon;
                 }
             }
         }

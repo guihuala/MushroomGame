@@ -17,6 +17,14 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     private float _t;  // 用于计时的变量
     private readonly Queue<ItemPayload> _buffer = new(); // 简易缓冲
     private const int BUFFER_LIMIT = 3;
+    
+    public bool IsMining { get; private set; }
+    public float Progress01 => Mathf.Clamp01(_t / Mathf.Max(1e-5f, cycleTime));  // 本轮进度 0..1
+    public ItemDef CurrentResource => _source != null ? _source.YieldItem : null;// 目标资源类型（若绑定了节点）
+    public int BufferCount => _buffer.Count;
+    public int BufferLimit => BUFFER_LIMIT;
+    public event System.Action MiningStateChanged;
+
 
     // 属性
     public bool CanProvide => _buffer.Count > 0;
@@ -77,32 +85,43 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
 
     public void Tick(float dt)
     {
-        if (_source == null) return;
+        if (_source == null) { SetMining(false); return; }
 
         float mult = PowerManager.Instance.GetSpeedMultiplier(cell, grid);
         _t += dt * mult; 
         
+        SetMining(_buffer.Count < BUFFER_LIMIT && CanMineResource(_source.YieldItem));
+
         TryProduceItem();
         TryFlushBuffer();
     }
-
+    
+    private void SetMining(bool v)
+    {
+        if (IsMining == v) return;
+        IsMining = v;
+        MiningStateChanged?.Invoke();
+    }
+    
     private void TryProduceItem()
     {
         if (_buffer.Count >= BUFFER_LIMIT || _t < cycleTime) return;
 
         if (_source.TryConsumeOnce() && CanMineResource(_source.YieldItem))
         {
-            var payload = new ItemPayload
-            {
-                item = _source.YieldItem,
-                amount = packetAmount
-            };
-
+            var payload = new ItemPayload { item = _source.YieldItem, amount = packetAmount };
             _buffer.Enqueue(payload);
+            // 生产成功，若缓冲仍未满则继续视作在采集；若已满则停止计时
+            SetMining(_buffer.Count < BUFFER_LIMIT);
+        }
+        else
+        {
+            SetMining(false);
         }
 
         _t = 0f;
     }
+
 
     private void TryFlushBuffer()
     {

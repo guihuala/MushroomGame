@@ -87,8 +87,7 @@ public class LightningLine : MonoBehaviour
             lr.enabled = visible;
             if (!visible) return;
         }
-
-        // 闪烁
+        
         float flicker = Mathf.Lerp(flickerMin, flickerMax, Mathf.PerlinNoise(Time.time * jitterSpeed, seed * 0.001f));
         var c = lr.startColor;
         c.a = flicker;

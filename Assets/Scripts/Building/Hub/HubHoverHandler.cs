@@ -31,6 +31,8 @@ public class HubHoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
                 if (!taskPanel.gameObject.activeSelf)
                 {
+                    _hub?.SendMessage("ClearStageBadges", SendMessageOptions.DontRequireReceiver);
+
                     taskPanel.Initialize(_hub);
                     taskPanel.ShowAtScreenPosition(mouse);
                 }

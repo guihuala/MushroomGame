@@ -36,6 +36,16 @@ public class Hub : MonoBehaviour
     
     [Header("Initial Items")]
     public List<ItemStack> initialItems = new();
+    
+    [Header("Stage Badge")]
+    public Sprite stageBadgeSprite;               // 每个阶段完成后生成的徽章图
+    public Vector3 badgeLocalOffset = new Vector3(0f, 1.4f, 0f); // 徽章锚点：头顶
+    public float badgeSpacingX = 0.35f;           // 多个徽章横向间距
+    public float badgeScale = 1.0f;               // 徽章缩放
+    public int   badgeSortingOrder = 5000;        // 渲染层级
+    private Transform _badgeRoot;                 // 徽章根节点
+    private int _badgeCount = 0;                  // 已生成徽章数量
+
 
     void Start()
     {
@@ -47,6 +57,14 @@ public class Hub : MonoBehaviour
         RegisterInitialPorts();
         InitializeCurrentStage();
         AddInitialItemsToInventory();
+        
+        if (_badgeRoot == null)
+        {
+            var go = new GameObject("Badges");
+            _badgeRoot = go.transform;
+            _badgeRoot.SetParent(transform, worldPositionStays: false);
+            _badgeRoot.localPosition = badgeLocalOffset;
+        }
     }
     
     private void AddInitialItemsToInventory()
@@ -142,6 +160,8 @@ public class Hub : MonoBehaviour
             InventoryManager.Instance.RemoveItem(requirement.item, requirement.requiredAmount);
         }
         MsgCenter.SendMsg(MsgConst.HUB_STAGE_COMPLETED, currentStageIndex);
+        
+        TrySpawnStageBadge();
 
         if (currentStageIndex < stages.Count - 1)
         {
@@ -153,7 +173,7 @@ public class Hub : MonoBehaviour
             isFinalStageComplete = true;
             MsgCenter.SendMsgAct(MsgConst.HUB_ALL_STAGES_COMPLETE);
             DebugManager.Log("All hub stages completed!", this);
-            
+
             GameManager.Instance.SetGameState(GameManager.GameState.GameCleared);
         }
     }
@@ -238,5 +258,42 @@ public class Hub : MonoBehaviour
         }
         
         return 0f;
+    }
+    
+    private void TrySpawnStageBadge()
+    {
+        if (stageBadgeSprite == null) return;
+        if (_badgeRoot == null)
+        {
+            var go = new GameObject("Badges");
+            _badgeRoot = go.transform;
+            _badgeRoot.SetParent(transform, worldPositionStays: false);
+            _badgeRoot.localPosition = badgeLocalOffset;
+        }
+
+        // 计算该徽章的相对位置：横向排布（也可改为纵向/圆弧等）
+        var offset = new Vector3((_badgeCount) * badgeSpacingX, 0f, 0f);
+        
+        var goBadge = MushroomAnimator.CreateBadge(
+            _badgeRoot,
+            stageBadgeSprite,
+            offset,
+            badgeScale,
+            badgeSortingOrder,
+            name: $"StageBadge_{_badgeCount + 1}"
+        );
+
+        _badgeCount++;
+    }
+    
+    private void ClearStageBadges()
+    {
+        if (_badgeRoot == null) return;
+        for (int i = _badgeRoot.childCount - 1; i >= 0; i--)
+        {
+            var child = _badgeRoot.GetChild(i);
+            if (child) Destroy(child.gameObject);
+        }
+        _badgeCount = 0;
     }
 }

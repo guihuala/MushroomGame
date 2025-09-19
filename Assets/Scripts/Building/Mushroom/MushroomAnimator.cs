@@ -35,4 +35,23 @@ public class MushroomAnimator : MonoBehaviour
 
         _isAnimating = false;
     }
+    
+    public static GameObject CreateBadge(Transform parent, Sprite sprite, Vector3 localPos, float scale = 1f, int sortingOrder = 5000, string name = "StageBadge")
+    {
+        if (parent == null || sprite == null) return null;
+
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, worldPositionStays: false);
+        go.transform.localPosition = localPos;
+        go.transform.localScale = Vector3.one * scale;
+
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = sprite;
+        sr.sortingOrder = sortingOrder;
+
+        var anim = go.AddComponent<MushroomAnimator>();
+        anim.PlaySquashAndStretch(); // 生成时播放“弹一下”的动效
+
+        return go;
+    }
 }

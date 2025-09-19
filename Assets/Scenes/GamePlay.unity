@@ -73287,6 +73287,11 @@ MonoBehaviour:
   initialItems:
   - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
     amount: 40
+  stageBadgeSprite: {fileID: 21300000, guid: 213c212dbf5704f7f862dd141ce55dcd, type: 3}
+  badgeLocalOffset: {x: 2, y: 3, z: 0}
+  badgeSpacingX: 0.35
+  badgeScale: 2
+  badgeSortingOrder: 5000
 --- !u!1001 &1198007741
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -73477,6 +73482,7 @@ GameObject:
   - component: {fileID: 1179134435}
   - component: {fileID: 1216048113}
   - component: {fileID: 1216048115}
+  - component: {fileID: 1216048116}
   m_Layer: 4
   m_Name: worlshroom
   m_TagString: Untagged
@@ -73624,6 +73630,21 @@ MonoBehaviour:
   randomizePhase: 1
   randomPhaseJitterDeg: 15
   randomSeed: 0
+--- !u!114 &1216048116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1216048112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae9c71ba21a4c4c44bf58cb09ee33aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squashAmount: 0.8
+  squashDuration: 0.1
+  recoveryDuration: 0.1
 --- !u!1 &1231319708
 GameObject:
   m_ObjectHideFlags: 0

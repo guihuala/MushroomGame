@@ -29,7 +29,6 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     public float tabTransitionDuration = 0.3f;
     public float buttonScaleDuration = 0.2f;
     public float detailsFadeDuration = 0.3f;
-    public float buttonHoverScale = 1.1f;
     public float buttonSelectScale = 1.15f;
     
     [Header("建筑详情栏")]
@@ -51,36 +50,63 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     private List<Button> buildingButtons = new List<Button>();
     private Dictionary<Button, Vector3> originalButtonScales = new Dictionary<Button, Vector3>();
     
+    private MsgRecAction _onBuildingUnlocked;
+    
     void Start()
     {
         CloseBuildingDetails();
-        InitializeUI();
     }
+
+    private void OnEnable()
+    {
+        _onBuildingUnlocked = OnBuildingUnlocked;
+        MsgCenter.RegisterMsg(MsgConst.BUILDING_UNLOCKED, _onBuildingUnlocked);
+    }
+
+    private void OnDisable()
+    {
+        if (_onBuildingUnlocked != null)
+            MsgCenter.UnregisterMsg(MsgConst.BUILDING_UNLOCKED, _onBuildingUnlocked);
+    }
+
     
     void Update()
     {
         UpdateSelectionVisuals();
     }
     
-    /// <summary>
-    /// 初始化UI
-    /// </summary>
-    private void InitializeUI()
+    public void InitializeUI()
     {
-        if (buildingList == null || placementSystem == null) return;
-        
-        // 按分类组织建筑
+        if (placementSystem == null) return;
+
         buildingsByCategory = new Dictionary<BuildingCategory, List<BuildingData>>();
+
         foreach (var category in buildingList.GetAllCategories())
         {
-            buildingsByCategory[category] = buildingList.GetBuildingsByCategory(category);
+            var unlocked = TechTreeManager.Instance != null
+                ? TechTreeManager.Instance.GetUnlockedBuildingsByCategory(category)
+                : new List<BuildingData>();
+            
+            var displayable = unlocked
+                .Where(b => b != null && b.prefab != null)
+                .ToList();
+
+            buildingsByCategory[category] = displayable;
         }
-        
+
         CreateCategoryTabs();
         CreateBuildingButtons();
-        SelectCategory(BuildingCategory.Production);
+
+        var nonEmpty = buildingsByCategory
+            .Where(kv => kv.Value != null && kv.Value.Count > 0)
+            .Select(kv => kv.Key).ToList();
+
+        if (nonEmpty.Count > 0)
+            SelectCategory(nonEmpty.Contains(currentCategory) ? currentCategory : nonEmpty[0]);
+        else
+            SelectCategory(BuildingCategory.Production);
     }
-    
+
     private void CreateCategoryTabs()
     {
         if (categoryTabsContainer == null || categoryTabPrefab == null) return;
@@ -365,7 +391,6 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         if (minerTooltipPanel && minerTooltipPanel.gameObject.activeSelf)
             minerTooltipPanel.ClosePanel();
     }
-
     
     public void ShowProductionTooltip(IProductionInfoProvider provider)
     {
@@ -388,4 +413,9 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     }
     
     #endregion
+    
+    private void OnBuildingUnlocked(params object[] args)
+    {
+        InitializeUI();
+    }
 }

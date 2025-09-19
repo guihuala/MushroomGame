@@ -9,6 +9,7 @@ public class TechNode
     public List<ItemStack> unlockCost;
     public List<TechNode> prerequisites;
     public bool isUnlocked;
+    public bool isUsable;
 
     public TechNode(BuildingData building, List<ItemStack> cost, bool initialUnlock = false)
     {
@@ -22,13 +23,11 @@ public class TechNode
     {
         if (isUnlocked) return false;
         
-        // Check prerequisites
         foreach (var prereq in prerequisites)
         {
             if (!prereq.isUnlocked) return false;
         }
         
-        // Check resources
         foreach (var cost in unlockCost)
         {
             if (cost.item == null || !InventoryManager.Instance.HasEnoughItemStack(cost))
@@ -50,28 +49,6 @@ public class TechNode
         isUnlocked = true;
         return true;
     }
-
-    public string GetStatusDescription()
-    {
-        if (isUnlocked) return "已解锁";
-        if (CanUnlock()) return "可解锁";
-        
-        // Check missing prerequisites
-        foreach (var prereq in prerequisites)
-        {
-            if (!prereq.isUnlocked)
-                return $"需要 {prereq.building.buildingName}";
-        }
-        
-        // Check missing resources
-        foreach (var cost in unlockCost)
-        {
-            if (!InventoryManager.Instance.HasEnoughItemStack(cost))
-                return $"需要 {cost.item.displayName} x{cost.amount}";
-        }
-        
-        return "未知状态";
-    }
     
     public bool HasParent()
     {
@@ -84,7 +61,6 @@ public class TechNode
     }
 }
 
-
 public class TechTreeManager : Singleton<TechTreeManager>, IManager
 {
     [SerializeField] private TechTreeConfig techTreeConfig;
@@ -93,15 +69,12 @@ public class TechTreeManager : Singleton<TechTreeManager>, IManager
     private HashSet<BuildingData> unlockedBuildings = new HashSet<BuildingData>();
     
     private Dictionary<BuildingData, int> _overrideLevels = new Dictionary<BuildingData, int>();
-    private Dictionary<BuildingData, int> _depthCache = new Dictionary<BuildingData, int>();
-
-
-    public TechTreeConfig Config => techTreeConfig;
 
     public void Initialize()
     {
         InitializeTechTree();
         UnlockInitialBuildings();
+        BuildingSelectionUI.Instance.InitializeUI();
     }
 
     private void InitializeTechTree()
@@ -180,18 +153,11 @@ public class TechTreeManager : Singleton<TechTreeManager>, IManager
         if (node == null || !node.TryUnlock()) return false;
         
         unlockedBuildings.Add(building);
-        DebugManager.Log($"建筑 {building.buildingName} 已解锁!");
         
         MsgCenter.SendMsg(MsgConst.BUILDING_UNLOCKED, building);
         return true;
     }
-
-    public bool CanUnlockBuilding(BuildingData building)
-    {
-        var node = GetTechNode(building);
-        return node != null && node.CanUnlock();
-    }
-
+    
     public List<BuildingData> GetUnlockedBuildings()
     {
         return unlockedBuildings.ToList();
@@ -203,25 +169,12 @@ public class TechTreeManager : Singleton<TechTreeManager>, IManager
             .Where(b => b.category == category)
             .ToList();
     }
-
-    public List<BuildingData> GetAvailableBuildings()
-    {
-        return techTree.Values
-            .Where(node => node.CanUnlock())
-            .Select(node => node.building)
-            .ToList();
-    }
-
+    
     public Dictionary<BuildingData, TechNode> GetTechTreeStructure()
     {
         return new Dictionary<BuildingData, TechNode>(techTree);
     }
-
-    public bool IsBuildingUnlocked(BuildingData building)
-    {
-        return unlockedBuildings.Contains(building);
-    }
-
+    
     // 获取节点的层级深度（用于UI布局）
     public int GetNodeDepth(BuildingData building)
     {
@@ -234,14 +187,5 @@ public class TechTreeManager : Singleton<TechTreeManager>, IManager
             maxDepth = Mathf.Max(maxDepth, GetNodeDepth(prereq.building) + 1);
         }
         return maxDepth;
-    }
-
-    // 获取所有依赖此建筑的节点（用于UI连线）
-    public List<BuildingData> GetDependentBuildings(BuildingData building)
-    {
-        return techTree.Values
-            .Where(node => node.prerequisites.Any(p => p.building == building))
-            .Select(node => node.building)
-            .ToList();
     }
 }

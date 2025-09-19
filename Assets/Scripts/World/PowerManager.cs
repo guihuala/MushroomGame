@@ -110,6 +110,7 @@ public class PowerManager : Singleton<PowerManager>
         public Vector3 worldPos; // 世界坐标
         public float range; // 覆盖半径
         public bool isPlant; // 是否电源
+        public bool active; 
     }
 
     private void MarkDirty()
@@ -133,7 +134,8 @@ public class PowerManager : Singleton<PowerManager>
                 tr = p.transform,
                 worldPos = p.transform.position,
                 range = p.coverageRange,
-                isPlant = true
+                isPlant = true,
+                active = p.IsProducing
             });
         }
 
@@ -145,7 +147,7 @@ public class PowerManager : Singleton<PowerManager>
                 tr = r.transform,
                 worldPos = r.transform.position,
                 range = r.powerTransmissionRange,
-                isPlant = false
+                isPlant = false,
             });
         }
 
@@ -174,7 +176,7 @@ public class PowerManager : Singleton<PowerManager>
 
         for (int i = 0; i < n; i++)
         {
-            if (nodes[i].isPlant)
+            if (nodes[i].isPlant && nodes[i].active)
             {
                 q.Enqueue(i);
                 visited[i] = true;
@@ -358,6 +360,12 @@ public class PowerManager : Singleton<PowerManager>
             _linkLines.Remove(lr);
             if (lr) Destroy(lr.gameObject);
         }
+    }
+    
+    public void NotifyPlantActivityChanged(PowerPlant plant)
+    {
+        // 这里不需要知道是哪个电厂变了，整体置脏即可
+        MarkDirty();
     }
 
     #endregion

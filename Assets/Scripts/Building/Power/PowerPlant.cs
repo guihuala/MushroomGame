@@ -25,6 +25,10 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
     public Color ringColor = new Color(1f, 0.85f, 0.2f, 0.5f);
     public int ringSegments = 64;
     private LineRenderer _ring;
+    
+    public bool IsProducing => cachedResources >= resourceConsumed;
+
+    private bool _lastActive; // 记录上一次活动状态
 
     public override void OnPlaced(TileGridService g, Vector2Int c)
     {
@@ -34,6 +38,47 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
         TickManager.Instance?.Register(this);
         EnsureRing();
         SetRingVisible(false);
+
+        _lastActive = IsProducing;
+        PowerManager.Instance?.NotifyPlantActivityChanged(this); // 初次同步
+    }
+
+    private void TryGeneratePower()
+    {
+        if (cachedResources >= resourceConsumed)
+        {
+            cachedResources -= resourceConsumed;
+            PowerManager.Instance.AddPower(powerGenerated);
+            Debug.Log("PowerGenerator generated " + powerGenerated + " power.");
+
+            // 资源减少后可能从“有燃料”变为“无燃料”，需要刷新电网
+            NotifyActivityIfChanged();
+        }
+    }
+
+    public bool TryReceive(in ItemPayload payload)
+    {
+        Debug.Log(payload.item);
+        if (payload.item == resourceType)
+        {
+            cachedResources += payload.amount;
+            Debug.Log("Received " + payload.amount + " resources, current cache: " + cachedResources);
+
+            // 收到燃料后可能从“无燃料”变为“有燃料”，需要刷新电网
+            NotifyActivityIfChanged();
+            return true;
+        }
+        return false;
+    }
+
+    private void NotifyActivityIfChanged()
+    {
+        bool now = IsProducing;
+        if (now != _lastActive)
+        {
+            _lastActive = now;
+            PowerManager.Instance?.NotifyPlantActivityChanged(this);
+        }
     }
 
     public override void OnRemoved()
@@ -89,29 +134,6 @@ public class PowerPlant : Building, ITickable, IItemPort, IProductionInfoProvide
             
             TryGeneratePower();
         }
-    }
-
-    private void TryGeneratePower()
-    {
-        if (cachedResources >= resourceConsumed)
-        {
-            cachedResources -= resourceConsumed;
-            PowerManager.Instance.AddPower(powerGenerated);
-            Debug.Log("PowerGenerator generated " + powerGenerated + " power.");
-        }
-    }
-    
-    public bool TryReceive(in ItemPayload payload)
-    {
-        Debug.Log(payload.item);
-        if (payload.item == resourceType)
-        {
-            cachedResources += payload.amount;
-            Debug.Log("Received " + payload.amount + " resources, current cache: " + cachedResources);
-            return true;
-        }
-
-        return false;
     }
 
     public bool TryProvide(ref ItemPayload payload) => false;

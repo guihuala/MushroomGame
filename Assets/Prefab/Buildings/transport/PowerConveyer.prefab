@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: -1076369318, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -106,14 +106,13 @@ MonoBehaviour:
   outDir: {x: 1, y: 0}
   itemSpacing: 0.3
   maxItems: 3
-  pathLineEnabled: 1
-  pathLineWidth: 0.2
-  pathLineColor: {r: 1, g: 0.96816087, b: 0.4481132, a: 0.9}
-  pathLineMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  cornerVertices: 6
-  capVertices: 2
-  highlightColor: {r: 1, g: 0.905031, b: 0.495283, a: 1}
-  highlightFadePerSec: 2.5
+  sprites:
+    straight: {fileID: -961100069, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
+    corner: {fileID: 379873505, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
+    tee: {fileID: 400416736, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
+    cross: {fileID: 220250338, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
+  deadEndCap: {fileID: -1993385129, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
+  none: {fileID: -1076369318, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
   powerPerSecondPerItem: 0.2
   poweredSpeed: 2
   powerlessSpeed: 0

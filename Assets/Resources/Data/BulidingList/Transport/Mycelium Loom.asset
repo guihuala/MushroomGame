@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Mycelium Loom
   description: Requires power to operate. A high-efficiency transport conduit that
     can span across obstacles, enabling complex and elevated logistics routes.
-  icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  icon: {fileID: -1076369318, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
   prefab: {fileID: 1980940513668515614, guid: b01417ca57a084e46b371994ba08886c, type: 3}
   category: 1
   constructionCost:

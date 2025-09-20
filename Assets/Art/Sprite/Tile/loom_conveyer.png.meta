@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: b6deaaaf748c14e68bbc2d535e9dc764
+guid: ff17391e436eb4c988b69fd5f8e66b4a
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: base_conveyer_0
+      name: loom_conveyer_0
       rect:
         serializedVersion: 2
         x: 0
@@ -124,14 +124,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a1bedd506ff3649b2ae71ab91064dc16
-      internalID: 361124735
+      spriteID: debbe02e821674078bf868fea417b789
+      internalID: -961100069
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: base_conveyer_1
+      name: loom_conveyer_1
       rect:
         serializedVersion: 2
         x: 128
@@ -145,14 +145,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c66c6414a4f2a42cdbdcda06652c4997
-      internalID: 1628049137
+      spriteID: b772cac7c5a6b4f8bbf09e8dd63336f7
+      internalID: 379873505
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: base_conveyer_2
+      name: loom_conveyer_2
       rect:
         serializedVersion: 2
         x: 256
@@ -166,14 +166,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 79bc53007510340fa9483af2238c6d4c
-      internalID: -419692564
+      spriteID: f2cf956ac9f5d4ed28d69f2bddace977
+      internalID: 400416736
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: base_conveyer_3
+      name: loom_conveyer_3
       rect:
         serializedVersion: 2
         x: 0
@@ -187,14 +187,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 93d82617803514d76823032b31cc9032
-      internalID: 1602029264
+      spriteID: bcec4c1ce919d41b080b7542b1ebbc2a
+      internalID: 220250338
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: base_conveyer_4
+      name: loom_conveyer_4
       rect:
         serializedVersion: 2
         x: 128
@@ -208,14 +208,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dae0eda0d504549dc98c92639cb6a4ce
-      internalID: 2011251569
+      spriteID: 477379480920c45628e21805970675d5
+      internalID: -1993385129
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: base_conveyer_5
+      name: loom_conveyer_5
       rect:
         serializedVersion: 2
         x: 256
@@ -229,8 +229,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 22bd4476af9144b7fa816bd17f12f2d0
-      internalID: 489400916
+      spriteID: aa64aa11b6d6c4a8eb6d39a955e32bc9
+      internalID: -1076369318
       vertices: []
       indices: 
       edges: []
@@ -246,12 +246,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      base_conveyer_0: 361124735
-      base_conveyer_1: 1628049137
-      base_conveyer_2: -419692564
-      base_conveyer_3: 1602029264
-      base_conveyer_4: 2011251569
-      base_conveyer_5: 489400916
+      loom_conveyer_0: -961100069
+      loom_conveyer_1: 379873505
+      loom_conveyer_2: 400416736
+      loom_conveyer_3: 220250338
+      loom_conveyer_4: -1993385129
+      loom_conveyer_5: -1076369318
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

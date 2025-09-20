@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: -1703652305
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: 361124735, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+  m_Sprite: {fileID: 489400916, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -108,8 +108,8 @@ MonoBehaviour:
   maxItems: 5
   sprites:
     straight: {fileID: 361124735, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
-    corner: {fileID: 360694176, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
-    tee: {fileID: 875459674, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
-    cross: {fileID: -411923938, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
-  deadEndCap: {fileID: -191762402, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
-  none: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+    corner: {fileID: 1628049137, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+    tee: {fileID: -419692564, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+    cross: {fileID: 1602029264, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+  deadEndCap: {fileID: 2011251569, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}
+  none: {fileID: 489400916, guid: b6deaaaf748c14e68bbc2d535e9dc764, type: 3}

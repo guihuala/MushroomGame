@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Oyster mushroom
   m_EditorClassIdentifier: 
   buildingName: Oyster mushroom
-  description: A basic fungus cultivated on wood chips. Provides a small amount of
-    edible ingredients and useful humus for soil enrichment.
+  description: Nibbles on <sprite name=WoodShaving>, grows into humble <sprite name=Food>
+    and <sprite name=Humus>. Nothing fancy, but it works!
   icon: {fileID: -1474144711, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 3351338112139567625, guid: de0bf82b4d4564086abd58c9a5ad0d5f, type: 3}
   category: 2

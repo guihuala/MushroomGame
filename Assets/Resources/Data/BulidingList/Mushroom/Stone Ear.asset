@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Stone Ear
   m_EditorClassIdentifier: 
   buildingName: Stone Ear
-  description: A hardy lichen-like fungus that incorporates minerals into its structure,
-    creating a very firm and durable fungal material.
+  description: Chews <sprite name=Powder> + <sprite name=Leather>, spitting out tough
+    <sprite name=HardBlock>.
   icon: {fileID: -1812903979, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 5504956735633657044, guid: ec37bacd5c3834471b62ac372b4653f7, type: 3}
   category: 2

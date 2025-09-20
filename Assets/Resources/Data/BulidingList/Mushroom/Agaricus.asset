@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Agaricus
   m_EditorClassIdentifier: 
   buildingName: Agaricus
-  description: Grows a tough, leathery material from mycelium reinforced by nutrient
-    blocks. A useful organic crafting resource.
+  description: Devours <sprite name=WoodShaving> + <sprite name=Block>, and rewards
+    you with sturdy <sprite name=Leather>.
   icon: {fileID: -77567164, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 1705590861419705153, guid: 163bb16236da94d68a19b9be5947b07f, type: 3}
   category: 2

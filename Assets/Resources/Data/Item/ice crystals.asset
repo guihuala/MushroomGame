@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId: ice crystals
   displayName: 
-  icon: {fileID: 21300000, guid: fbfe783682bf94ae3a696b4f5a094c6d, type: 3}
+  icon: {fileID: -1292931295, guid: 54beee953cbaa49448b8792eb4d73b0e, type: 3}
   stackLimit: 100

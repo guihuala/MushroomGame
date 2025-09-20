@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Crusher
   m_EditorClassIdentifier: 
   buildingName: Crusher
-  description: Grinds and processes subterranean minerals, extracting valuable Ore
-    and Mineral Powders from the soil.
+  description: Grinds and processes subterranean minerals, extracting <sprite name=Powder>
+    from the stones.
   icon: {fileID: -2006014857, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 3649531574820566243, guid: 799a7904207154e00832ce3485e7a74a, type: 3}
   category: 0

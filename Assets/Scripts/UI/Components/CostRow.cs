@@ -41,8 +41,7 @@ public class CostRow : MonoBehaviour
             MsgCenter.UnregisterMsg(MsgConst.INVENTORY_ITEM_REMOVED, _onItemChangedMsg);
         }
     }
-
-    /// <summary>绑定本行显示的物品/需求，并立刻渲染一次。</summary>
+    
     public void Bind(ItemDef item, int need, int have)
     {
         _item = item;

@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: PowerShroom
   m_EditorClassIdentifier: 
   buildingName: PowerShroom
-  description: Generates bio-electricity through a chemical process, providing a
-    unique and organic power source.
+  description: Sips <sprite icon=Fluid>, hums with life and makes fresh electricity.
   icon: {fileID: 2000793908, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 7328642733549531455, guid: e142883f9c29d4b8982965653e11a82d, type: 3}
   category: 0

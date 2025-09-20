@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Snow Fungus
   m_EditorClassIdentifier: 
   buildingName: Snow Fungus
-  description: A delicate fungus requiring cold mineral solutions. Produces a pure,
-    versatile gel substance with likely alchemical or crafting uses.
+  description: Blends <sprite name=Fluid> + <sprite name=Crystal>, producing sticky
+    <sprite name=Glue>.
   icon: {fileID: 853253154, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 3975165992847552786, guid: 008b665bb76cf48088019a5d583e2376, type: 3}
   category: 2

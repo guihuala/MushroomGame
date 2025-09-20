@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.EventSystems;
+using TMPro;
 
 public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
 {
@@ -34,14 +34,17 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     [Header("建筑详情栏")]
     public GameObject buildingDetailsPanel;
     public Text buildingNameText;
-    public Text buildingDescriptionText;
     public Image buildingIconImage;
     public ConstructionCostPanel costPanel;
     
+    [Header("建筑描述（TMP 渲染）")]
+    [SerializeField] private TMP_Text descriptionTMP;
+    [SerializeField] private TMP_SpriteAsset iconSpriteAsset; 
+
     [Header("工具栏")]
     public ProductionTooltipPanel productionTooltipPanel; 
     public MinerTooltipPanel minerTooltipPanel;
-    
+
     private Dictionary<BuildingCategory, List<BuildingData>> buildingsByCategory;
     private BuildingCategory currentCategory = BuildingCategory.Production;
     private BuildingData currentSelectedBuilding;
@@ -69,7 +72,6 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             MsgCenter.UnregisterMsg(MsgConst.BUILDING_UNLOCKED, _onBuildingUnlocked);
     }
 
-    
     void Update()
     {
         UpdateSelectionVisuals();
@@ -111,14 +113,9 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     {
         if (categoryTabsContainer == null || categoryTabPrefab == null) return;
     
-        // 清空现有页签
-        foreach (Transform child in categoryTabsContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in categoryTabsContainer) Destroy(child.gameObject);
         categoryTabButtons.Clear();
     
-        // 创建新页签
         foreach (var category in buildingsByCategory.Keys)
         {
             if (buildingsByCategory[category].Count == 0) continue;
@@ -129,9 +126,7 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             var tabIcon = GetCategoryIcon(category);
         
             if (tabImage != null && tabIcon != null)
-            {
                 tabImage.sprite = tabIcon;
-            }
             
             BuildingCategory cat = category;
             tabButton.onClick.AddListener(() => SelectCategory(cat));
@@ -149,8 +144,7 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         if (containerCG == null) containerCG = buildingButtonsContainer.gameObject.AddComponent<CanvasGroup>();
         containerCG.alpha = 0f;
 
-        foreach (Transform child in buildingButtonsContainer)
-            Destroy(child.gameObject);
+        foreach (Transform child in buildingButtonsContainer) Destroy(child.gameObject);
         buildingButtons.Clear();
         originalButtonScales.Clear();
         
@@ -177,38 +171,22 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         containerCG.DOFade(1f, 0.1f).SetUpdate(true);
     }
 
-    
-    /// <summary>
-    /// 为按钮添加点击效果
-    /// </summary>
     private void AddClickEffect(Button button, float duration)
     {
-        button.onClick.AddListener(() => {
-            // 点击时放大效果
+        button.onClick.AddListener(() =>
+        {
             button.transform.DOScale(originalButtonScales[button] * buttonSelectScale, duration / 2)
-                .OnComplete(() => {
-                    button.transform.DOScale(originalButtonScales[button], duration / 2);
-                });
+                .OnComplete(() => { button.transform.DOScale(originalButtonScales[button], duration / 2); });
         });
     }
     
-    /// <summary>
-    /// 选择分类
-    /// </summary>
     private void SelectCategory(BuildingCategory category)
     {
         currentCategory = category;
-        
-        // 添加页签切换动画
         UpdateCategoryTabsVisualWithAnimation();
-
-        // 移除动画效果，直接显示建筑
         ShowBuildingsInCategory(category);
     }
     
-    /// <summary>
-    /// 显示指定分类的建筑（无动画）
-    /// </summary>
     private void ShowBuildingsInCategory(BuildingCategory category)
     {
         for (int i = 0; i < buildingButtons.Count; i++)
@@ -216,20 +194,11 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
             var buildingData = buildingsByCategory.Values.SelectMany(x => x).ElementAt(i);
             var button = buildingButtons[i];
             var shouldShow = buildingData.category == category;
-            
             button.gameObject.SetActive(shouldShow);
-            
-            // 直接设置正常大小，不使用动画
-            if (shouldShow)
-            {
-                button.transform.localScale = originalButtonScales[button];
-            }
+            if (shouldShow) button.transform.localScale = originalButtonScales[button];
         }
     }
     
-    /// <summary>
-    /// 建筑选择事件
-    /// </summary>
     private void OnBuildingSelected(BuildingData buildingData)
     {
         currentSelectedBuilding = buildingData;
@@ -246,20 +215,15 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         }
         
         AudioManager.Instance.PlaySfx("LightClick");
-        
         ShowBuildingDetailsWithAnimation(buildingData);
     }
     
-    /// <summary>
-    /// 更新选择视觉效果
-    /// </summary>
     private void UpdateSelectionVisuals()
     {
         for (int i = 0; i < buildingButtons.Count; i++)
         {
             var buildingData = buildingsByCategory.Values.SelectMany(x => x).ElementAt(i);
             var button = buildingButtons[i];
-            
             if (button != null)
             {
                 var colors = button.colors;
@@ -269,9 +233,6 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         }
     }
     
-    /// <summary>
-    /// 更新页签视觉效果（带动画）
-    /// </summary>
     private void UpdateCategoryTabsVisualWithAnimation()
     {
         for (int i = 0; i < categoryTabButtons.Count; i++)
@@ -282,10 +243,8 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
                 bool isSelected = i == (int)currentCategory;
                 Color targetColor = isSelected ? selectedTabColor : normalTabColor;
                 
-                // 使用动画过渡颜色
                 tabButton.GetComponent<Image>().DOColor(targetColor, tabTransitionDuration);
                 
-                // 添加缩放效果
                 if (isSelected)
                 {
                     tabButton.transform.DOScale(1.1f, tabTransitionDuration / 2)
@@ -311,53 +270,47 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
     }
 
     #region BuildingDetail
-
-    /// <summary>
-    /// 显示建筑详情（带动画）
-    /// </summary>
+    
     private void ShowBuildingDetailsWithAnimation(BuildingData buildingData)
     {
         buildingDetailsPanel.SetActive(true);
         
-        // 重置详情面板的透明度
-        CanvasGroup detailsCanvasGroup = buildingDetailsPanel.GetComponent<CanvasGroup>();
-        if (detailsCanvasGroup == null)
-            detailsCanvasGroup = buildingDetailsPanel.AddComponent<CanvasGroup>();
-            
+        var detailsCanvasGroup = buildingDetailsPanel.GetComponent<CanvasGroup>();
+        if (detailsCanvasGroup == null) detailsCanvasGroup = buildingDetailsPanel.AddComponent<CanvasGroup>();
         detailsCanvasGroup.alpha = 0;
         
         buildingNameText.text = buildingData.buildingName;
-        buildingDescriptionText.text = buildingData.description;
         buildingIconImage.sprite = buildingData.icon;
+
+        // ★ 用 TMP 渲染简介（自动换行 + 图标混排）
+        if (descriptionTMP != null)
+        {
+            descriptionTMP.spriteAsset = iconSpriteAsset;                 // 绑定图标集
+            descriptionTMP.enableWordWrapping = true;                     // 自动换行
+            descriptionTMP.overflowMode = TextOverflowModes.Overflow;     // 高度可扩展
+            descriptionTMP.alignment = TextAlignmentOptions.TopLeft;      // 左上对齐
+            descriptionTMP.text = IconMarkupTMP.ToTMP(buildingData.description);
+        }
         
         // 图标放大动画
         buildingIconImage.transform.localScale = Vector3.zero;
         buildingIconImage.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
     
-        // 显示建筑信息时关闭生产信息面板
         if (productionTooltipPanel != null && productionTooltipPanel.gameObject.activeSelf)
-        {
             productionTooltipPanel.ClosePanel();
-        }
     
-        // 显示建筑的材料信息面板
         if (costPanel != null)
             costPanel.SetData(buildingData);
         
         detailsCanvasGroup.DOFade(1f, detailsFadeDuration);
     }
     
-    /// <summary>
-    /// 关闭建筑详情（带动画）
-    /// </summary>
     private void CloseBuildingDetailsWithAnimation()
     {
         if (buildingDetailsPanel != null && buildingDetailsPanel.activeSelf)
         {
-            CanvasGroup detailsCanvasGroup = buildingDetailsPanel.GetComponent<CanvasGroup>();
-            if (detailsCanvasGroup == null)
-                detailsCanvasGroup = buildingDetailsPanel.AddComponent<CanvasGroup>();
-                
+            var detailsCanvasGroup = buildingDetailsPanel.GetComponent<CanvasGroup>();
+            if (detailsCanvasGroup == null) detailsCanvasGroup = buildingDetailsPanel.AddComponent<CanvasGroup>();
             detailsCanvasGroup.DOFade(0f, detailsFadeDuration / 2)
                 .OnComplete(() => buildingDetailsPanel.SetActive(false));
         }
@@ -365,12 +318,9 @@ public class BuildingSelectionUI : Singleton<BuildingSelectionUI>
         
     private void CloseBuildingDetails()
     {
-        if (buildingDetailsPanel != null)
-        {
-            buildingDetailsPanel.SetActive(false);
-        }
+        if (buildingDetailsPanel != null) buildingDetailsPanel.SetActive(false);
     }
-
+    
     #endregion
 
     #region Tootips

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Shiitake Mushroom
   m_EditorClassIdentifier: 
   buildingName: Shiitake Mushroom
-  description: 'Grows in nutrient-rich manure. Produces edible mushrooms and a valuable,
-    flavorful byproduct: MSG.'
+  description: "Thrives on <sprite name=Manure> + <sprite name=Water>, giving <sprite
+    name=Food> with a sprinkle of <sprite name=MSG>\u2014delicious but modest."
   icon: {fileID: 1440057940, guid: 10223e4b298384d478a88692d0963313, type: 3}
   prefab: {fileID: 4292978451502142575, guid: 9b9e835b8002048c59aaa04f4132b879, type: 3}
   category: 2

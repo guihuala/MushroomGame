@@ -905,7 +905,7 @@ MonoBehaviour:
   inertiaDamping: 10
   enableRubberBand: 1
   rubberStrength: 0.15
-  boundsPadding: 500
+  boundsPadding: 800
   closeButton: {fileID: 5170840983670113584}
   zoomControls: {fileID: 7151823618088620350}
   zoomInButton: {fileID: 4282713482266537846}

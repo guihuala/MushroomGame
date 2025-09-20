@@ -475,11 +475,17 @@ MonoBehaviour:
   prevButton: {fileID: 1828912173695709616}
   content: {fileID: 4179871995415211232}
   pageTitles:
-  - Common controls
-  - Build Mode
+  - Collect Raw Materials
+  - Plant Mushroom
+  - Manage resources and tech
+  - Explore the map
+  - tasks and final goal
   pagePrefabs:
   - {fileID: 9004541831624457106, guid: 409fad1fcf0fc4bbb91702ccc2cbbee1, type: 3}
   - {fileID: 9066097273055690578, guid: 20b6e147b4fe64e968679b67b7c94a97, type: 3}
+  - {fileID: 4383988860628251702, guid: debcbd70021d14d52a7a53d21d1ddbef, type: 3}
+  - {fileID: 2523488887673501506, guid: 899289703359442f6891adedbac36357, type: 3}
+  - {fileID: 6244226803363424575, guid: c95633f589ebb46b085ac041b326e5d3, type: 3}
 --- !u!114 &2820499648992151583
 MonoBehaviour:
   m_ObjectHideFlags: 0

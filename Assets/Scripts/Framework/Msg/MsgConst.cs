@@ -31,7 +31,11 @@ public class MsgConst
     // ========== 科技树消息 (5000-5999) ==========
     public const int BUILDING_UNLOCKED = 5001;
     
-    // ========== 游戏状态消息 (6000-6999) ==========
-    public const int GAME_PAUSED = 6001;
-    public const int GAME_RESUMED = 6002;
+    // ========== 教程 (6000-6999) ==========
+    public const int BUILD_MENU_OPENED    = 6001;     // 打开建造面板
+    public const int FIRST_LINE_BUILT     = 6002;      // 首条菌丝生产线建成
+    public const int FIRST_MUSHROOM_PLANTED = 6003;
+    public const int TECH_TREE_OPENED     = 6004;
+    public const int MAP_EDGE_TOUCHED     = 6005;      // 探索到边界/黑暗区
+    public const int STAGE_TASK_COMPLETED = 6006;  // 阶段任务完成
 }

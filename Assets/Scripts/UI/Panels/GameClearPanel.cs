@@ -37,7 +37,6 @@ public class GameClearPanel : BasePanel
 
     private string BuildDetails()
     {
-        // 展示每个阶段（名称）与该阶段的任务总览（基于库存）
         var hub = FindObjectOfType<Hub>();
         if (hub == null || hub.stages == null || hub.stages.Count == 0) return " ";
 

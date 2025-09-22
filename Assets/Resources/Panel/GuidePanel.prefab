@@ -263,7 +263,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: c386ad0a7c6294e8f92a84165a0ab10f, type: 3}
-    m_FontSize: 48
+    m_FontSize: 36
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 3
@@ -475,12 +475,14 @@ MonoBehaviour:
   prevButton: {fileID: 1828912173695709616}
   content: {fileID: 4179871995415211232}
   pageTitles:
+  - Control
   - Collect Raw Materials
   - Plant Mushroom
   - Manage resources and tech
   - Explore the map
   - tasks and final goal
   pagePrefabs:
+  - {fileID: 8942283571505675715, guid: fea76376a48984a17b65d2363afdf8fa, type: 3}
   - {fileID: 9004541831624457106, guid: 409fad1fcf0fc4bbb91702ccc2cbbee1, type: 3}
   - {fileID: 9066097273055690578, guid: 20b6e147b4fe64e968679b67b7c94a97, type: 3}
   - {fileID: 4383988860628251702, guid: debcbd70021d14d52a7a53d21d1ddbef, type: 3}

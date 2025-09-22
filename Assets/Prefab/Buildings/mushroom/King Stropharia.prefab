@@ -320,13 +320,13 @@ MonoBehaviour:
     type: 0
   - localCell: {x: 1, y: 0}
     side: 2
-    type: 0
+    type: 1
   rotationSteps: 0
   recipe: {fileID: 11400000, guid: d29a0cddfc60341b19b554953f709f25, type: 2}
   speedMultiplier: 1
   inputCap: 64
   outputCap: 64
-  sendOutputsToInventory: 1
+  sendOutputsToInventory: 0
   productionProgress: 0
   isProducing: 0
 --- !u!114 &8381781352509555577

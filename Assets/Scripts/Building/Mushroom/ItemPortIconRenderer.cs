@@ -94,32 +94,17 @@ public class ItemPortIconRenderer : MonoBehaviour
             Vector3 p = info.worldPos + (Vector3)sprites.worldOffset;
             sr.transform.position = p;
 
-            // 朝向 → 旋转
-            float z = info.side switch
-            {
-                CellSide.Up    => 0f,
-                CellSide.Right => -90f,
-                CellSide.Down  => 180f,
-                CellSide.Left  => 90f,
-                _ => 0f
-            };
-            sr.transform.rotation = Quaternion.Euler(0, 0, z);
-
-            // 尺寸
-            sr.transform.localScale = Vector3.one * Mathf.Max(0.01f, sprites.worldScale);
-
-            // —— 排序层 / 序号（修正点）——
-            // 优先使用配置里的layer名；否则复制参考渲染器的layer
+            sr.transform.rotation = Quaternion.Euler(0, 0, 0);
+            
             if (!string.IsNullOrEmpty(sprites.sortingLayer))
             {
-                sr.sortingLayerName = sprites.sortingLayer;  // 用名称更稳
+                sr.sortingLayerName = sprites.sortingLayer;
             }
             else if (baseRendererForSorting)
             {
                 sr.sortingLayerID = baseRendererForSorting.sortingLayerID;
             }
-
-            // orderInLayer：在参考渲染器基础上偏移
+            
             int baseOrder = baseRendererForSorting ? baseRendererForSorting.sortingOrder : 0;
             sr.sortingOrder = baseOrder + sprites.orderInLayerOffset;
         }

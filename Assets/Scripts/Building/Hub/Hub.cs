@@ -8,7 +8,8 @@ public class HubStage
     public string stageName;
     public Sprite stageSprite;
     public List<ItemRequirement> requirements;
-    public GameObject[] stageObjectsToEnable;
+
+    public List<Vector2Int> portOffsets = new();
 }
 
 [Serializable]
@@ -22,29 +23,25 @@ public class ItemRequirement
 public class Hub : MonoBehaviour
 {
     public TileGridService grid;
-    
+
     private Vector2Int centerCell;
     private readonly List<HubPort> _ports = new();
 
-    [Header("Storage")]
-    public int maxStorage = 999;
-    
-    [Header("Stage Settings")]
-    public List<HubStage> stages = new();
+    [Header("Storage")] public int maxStorage = 999;
+
+    [Header("Stage Settings")] public List<HubStage> stages = new();
     public int currentStageIndex = 0;
     public bool isFinalStageComplete = false;
-    
-    [Header("Initial Items")]
-    public List<ItemStack> initialItems = new();
-    
-    [Header("Stage Badge")]
-    public Sprite stageBadgeSprite;               // 每个阶段完成后生成的徽章图
+
+    [Header("Initial Items")] public List<ItemStack> initialItems = new();
+
+    [Header("Stage Badge")] public Sprite stageBadgeSprite; // 每个阶段完成后生成的徽章图
     public Vector3 badgeLocalOffset = new Vector3(0f, 1.4f, 0f); // 徽章锚点：头顶
-    public float badgeSpacingX = 0.35f;           // 多个徽章横向间距
-    public float badgeScale = 1.0f;               // 徽章缩放
-    public int   badgeSortingOrder = 5000;        // 渲染层级
-    private Transform _badgeRoot;                 // 徽章根节点
-    private int _badgeCount = 0;                  // 已生成徽章数量
+    public float badgeSpacingX = 0.35f; // 多个徽章横向间距
+    public float badgeScale = 1.0f; // 徽章缩放
+    public int badgeSortingOrder = 5000; // 渲染层级
+    private Transform _badgeRoot; // 徽章根节点
+    private int _badgeCount = 0; // 已生成徽章数量
 
 
     void Start()
@@ -53,11 +50,11 @@ public class Hub : MonoBehaviour
         centerCell = grid.WorldToCell(transform.position);
 
         var sr = GetComponent<SpriteRenderer>();
-        
+
         RegisterInitialPorts();
         InitializeCurrentStage();
         AddInitialItemsToInventory();
-        
+
         if (_badgeRoot == null)
         {
             var go = new GameObject("Badges");
@@ -66,7 +63,7 @@ public class Hub : MonoBehaviour
             _badgeRoot.localPosition = badgeLocalOffset;
         }
     }
-    
+
     private void AddInitialItemsToInventory()
     {
         foreach (var initialItem in initialItems)
@@ -77,22 +74,22 @@ public class Hub : MonoBehaviour
             }
         }
     }
-    
+
     private void InitializeCurrentStage()
     {
         if (stages.Count == 0) return;
-        
+
         currentStageIndex = Mathf.Clamp(currentStageIndex, 0, stages.Count - 1);
         UpdateStageVisuals();
     }
-    
+
     private void RegisterInitialPorts()
     {
         AddPort(Vector2Int.zero);
         AddPort(Vector2Int.left);
         AddPort(Vector2Int.right);
     }
-    
+
     private void OnDestroy()
     {
         foreach (var port in _ports)
@@ -103,12 +100,12 @@ public class Hub : MonoBehaviour
 
     public void AddPort(Vector2Int offset)
     {
+        DebugManager.Log("AddPort: " + offset.ToString());
         var cell = centerCell + offset + Vector2Int.up;
         var port = new HubPort(cell, this);
         _ports.Add(port);
         grid.RegisterPort(cell, port);
     }
-
 
     public bool ReceiveItem(in ItemPayload payload)
     {
@@ -119,7 +116,7 @@ public class Hub : MonoBehaviour
         }
 
         bool success = InventoryManager.Instance.AddItem(payload.item, payload.amount);
-        
+
         if (success)
         {
             MsgCenter.SendMsg(MsgConst.HUB_ITEM_RECEIVED, payload);
@@ -132,10 +129,10 @@ public class Hub : MonoBehaviour
     private void CheckStageCompletion()
     {
         if (isFinalStageComplete || currentStageIndex >= stages.Count) return;
-        
+
         var currentStage = stages[currentStageIndex];
         bool stageComplete = true;
-        
+
         foreach (var requirement in currentStage.requirements)
         {
             int currentAmount = InventoryManager.Instance.GetItemCount(requirement.item);
@@ -145,7 +142,7 @@ public class Hub : MonoBehaviour
                 break;
             }
         }
-        
+
         if (stageComplete)
         {
             CompleteCurrentStage();
@@ -159,8 +156,9 @@ public class Hub : MonoBehaviour
         {
             InventoryManager.Instance.RemoveItem(requirement.item, requirement.requiredAmount);
         }
+
         MsgCenter.SendMsg(MsgConst.HUB_STAGE_COMPLETED, currentStageIndex);
-        
+
         TrySpawnStageBadge();
 
         if (currentStageIndex < stages.Count - 1)
@@ -181,9 +179,9 @@ public class Hub : MonoBehaviour
     private void UpdateStageVisuals()
     {
         if (currentStageIndex >= stages.Count) return;
-        
+
         var currentStage = stages[currentStageIndex];
-        
+
         var spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
@@ -194,22 +192,9 @@ public class Hub : MonoBehaviour
             }
         }
         
-        // 启用/禁用阶段特定的游戏对象
-        for (int i = 0; i < stages.Count; i++)
-        {
-            if (stages[i].stageObjectsToEnable != null)
-            {
-                foreach (var obj in stages[i].stageObjectsToEnable)
-                {
-                    if (obj != null)
-                    {
-                        obj.SetActive(i == currentStageIndex);
-                    }
-                }
-            }
-        }
+        RefreshPortsForStage();
     }
-    
+
     public int GetItemCount(ItemDef item)
     {
         return InventoryManager.Instance.GetItemCount(item);
@@ -223,24 +208,6 @@ public class Hub : MonoBehaviour
     public HubStage GetCurrentStage()
     {
         return currentStageIndex < stages.Count ? stages[currentStageIndex] : null;
-    }
-
-    public float GetCurrentStageProgress()
-    {
-        if (currentStageIndex >= stages.Count || isFinalStageComplete) return 1f;
-        
-        var currentStage = stages[currentStageIndex];
-        if (currentStage.requirements.Count == 0) return 0f;
-        
-        float totalProgress = 0f;
-        foreach (var requirement in currentStage.requirements)
-        {
-            int currentAmount = GetItemCount(requirement.item);
-            float itemProgress = Mathf.Clamp01((float)currentAmount / requirement.requiredAmount);
-            totalProgress += itemProgress;
-        }
-        
-        return totalProgress / currentStage.requirements.Count;
     }
 
     public float GetItemProgress(ItemDef item)
@@ -286,14 +253,22 @@ public class Hub : MonoBehaviour
         _badgeCount++;
     }
     
-    private void ClearStageBadges()
+    private void RefreshPortsForStage()
     {
-        if (_badgeRoot == null) return;
-        for (int i = _badgeRoot.childCount - 1; i >= 0; i--)
+        // 先清理旧端口
+        foreach (var port in _ports)
         {
-            var child = _badgeRoot.GetChild(i);
-            if (child) Destroy(child.gameObject);
+            grid.UnregisterPort(port.Cell, port);
         }
-        _badgeCount = 0;
+        _ports.Clear();
+
+        // 按当前阶段配置新端口
+        var currentStage = GetCurrentStage();
+        if (currentStage == null) return;
+
+        foreach (var offset in currentStage.portOffsets)
+        {
+            AddPort(offset);
+        }
     }
 }

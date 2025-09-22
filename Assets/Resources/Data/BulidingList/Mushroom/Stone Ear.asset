@@ -19,5 +19,5 @@ MonoBehaviour:
   prefab: {fileID: 5504956735633657044, guid: ec37bacd5c3834471b62ac372b4653f7, type: 3}
   category: 2
   constructionCost:
-  - item: {fileID: 11400000, guid: 57fbde240ee2e444da91b59106d8e1f7, type: 2}
+  - item: {fileID: 11400000, guid: df6f9f1f6074e4af3aa7d9e371cf28bf, type: 2}
     amount: 5

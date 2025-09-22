@@ -84892,7 +84892,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcda2c75d5ff640b9b79fd94f4bb0c06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  title: {fileID: 0}
+  title: {fileID: 1459311957}
   miningRateText: {fileID: 1713527593}
   resourcesContainer: {fileID: 458071338}
   resourceRowPrefab: {fileID: 404237909400056890, guid: f51fa10c3ea8e42159c95feaec9a7710, type: 3}

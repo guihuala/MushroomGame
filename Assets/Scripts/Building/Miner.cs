@@ -21,9 +21,6 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     public bool IsMining { get; private set; }
     public float Progress01 => Mathf.Clamp01(_t / Mathf.Max(1e-5f, cycleTime));  // 本轮进度 0..1
     public ItemDef CurrentResource => _source != null ? _source.YieldItem : null;// 目标资源类型（若绑定了节点）
-    public int BufferCount => _buffer.Count;
-    public int BufferLimit => BUFFER_LIMIT;
-    public event System.Action MiningStateChanged;
 
 
     // 属性
@@ -100,7 +97,6 @@ public class Miner : Building, ITickable, IOrientable, IItemPort
     {
         if (IsMining == v) return;
         IsMining = v;
-        MiningStateChanged?.Invoke();
     }
     
     private void TryProduceItem()

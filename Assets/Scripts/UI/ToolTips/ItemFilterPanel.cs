@@ -79,8 +79,6 @@ public class ItemFilterPanel : MonoBehaviour
 
     private void SetVisible(bool show)  
     {
-        FindAllItems();
-        
         if (!cg) cg = GetComponent<CanvasGroup>();
         cg.alpha = show ? 1f : 0f;
         cg.interactable = show;
@@ -136,6 +134,8 @@ public class ItemFilterPanel : MonoBehaviour
         var canvas = GetComponentInParent<Canvas>();
         var rt = (RectTransform)transform;
 
+        FindAllItems();
+        
         SetVisible(true);
         BuildListUIIfNeeded();
 

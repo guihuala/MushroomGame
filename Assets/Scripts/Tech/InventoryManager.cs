@@ -127,7 +127,6 @@ public class InventoryManager : Singleton<InventoryManager>, IManager
         var list = new List<ItemStack>(_catalog.Count);
         foreach (var def in _catalog)
         {
-            DebugManager.Log($"[InventoryManager] {def}");
             int amt = GetItemCount(def);
             if (!includeZeroAmount && amt <= 0) continue;
             list.Add(new ItemStack { item = def, amount = amt });

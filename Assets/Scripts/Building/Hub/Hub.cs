@@ -100,7 +100,6 @@ public class Hub : MonoBehaviour
 
     public void AddPort(Vector2Int offset)
     {
-        DebugManager.Log("AddPort: " + offset.ToString());
         var cell = centerCell + offset + Vector2Int.up;
         var port = new HubPort(cell, this);
         _ports.Add(port);

@@ -101,7 +101,7 @@ MonoBehaviour:
   grid: {fileID: 0}
   cell: {x: 0, y: 0}
   size: {x: 1, y: 1}
-  beltSpeed: 1
+  beltSpeed: 2
   inDir: {x: -1, y: 0}
   outDir: {x: 1, y: 0}
   itemSpacing: 0.3
@@ -114,5 +114,5 @@ MonoBehaviour:
   deadEndCap: {fileID: -1993385129, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
   none: {fileID: -1076369318, guid: ff17391e436eb4c988b69fd5f8e66b4a, type: 3}
   powerPerSecondPerItem: 0.2
-  poweredSpeed: 2
-  powerlessSpeed: 0
+  poweredSpeed: 5
+  powerlessSpeed: 2

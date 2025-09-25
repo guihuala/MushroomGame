@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Time to grow some mushrooms!!!
+  m_text: They can illuminate dark areas!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 65ec2b954c3b2496dbbd7ddd03619fba, type: 2}
   m_sharedMaterial: {fileID: 8020782279796645952, guid: 65ec2b954c3b2496dbbd7ddd03619fba, type: 2}
@@ -229,8 +229,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
